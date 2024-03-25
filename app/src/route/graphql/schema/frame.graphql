@@ -1,0 +1,7 @@
+type Query {
+    frameForm(id: String!): [TaskArtefact]
+}
+
+type Mutation {
+    addFrame(artefacts: [InputArtefact]): [String]
+}

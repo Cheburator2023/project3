@@ -1,0 +1,16 @@
+const sql = `
+INSERT INTO RISK_SCALES
+(ROOT_RISK_SCALE_ID,
+ RISK_SCALE_NAME,
+ RISK_SCALE_DESC,
+ VERSION,
+ PARENT_SCALE_ID)
+VALUES (nextval('RISK_SCALES_SEQ'),
+        :RISK_SCALE_NAME,
+        :RISK_SCALE_DESC,
+        :VERSION,
+        :PARENT_SCALE_ID)
+returning ROOT_RISK_SCALE_ID 
+    `
+
+module.exports = sql

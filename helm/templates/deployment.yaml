@@ -1,0 +1,176 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "backend.fullname" . }}
+  labels: {{- include "backend.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ include "backend.fullname" . }}
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "backend.fullname" . }}
+    spec:
+      imagePullSecrets:
+        - name: {{ .Values.pullSecret }}
+      {{- if .Values.affinity.enabled }}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: nvidia.com/gpu.product
+                    operator: DoesNotExist
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          {{- if .Values.image.digest }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}@{{ .Values.image.digest }}"
+          {{- else }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          {{- end }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "backend.fullname" . }}-secret
+                  key: "PGUSER"
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "backend.fullname" . }}-secret
+                  key: "PGPASSWORD"
+            - name: PGHOST
+              value: "{{ .Values.db.PGHOST }}"
+            - name: PGDATABASE
+              value: "{{ .Values.db.PGDATABASE }}"
+            - name: PGPORT
+              value: "{{ .Values.db.PGPORT }}"
+            - name: KEYCLOAK_URL
+              value: "{{ .Values.keycloak.KEYCLOAK_URL }}"
+            - name: KEYCLOAK_REALMS
+              value: "{{ .Values.keycloak.KEYCLOAK_REALMS }}"
+            - name: KEYCLOAK_CLIENT
+              value: "{{ .Values.keycloak.KEYCLOAK_CLIENT }}"
+            - name: KEYCLOAK_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "backend.fullname" . }}-secret
+                  key: "KEYCLOAK_USER"
+            - name: KEYCLOAK_PWD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "backend.fullname" . }}-secret
+                  key: "KEYCLOAK_PWD"
+            - name: BPMN_API
+              value: "{{ .Values.bpmn.BPMN_API }}"
+            - name: BPMN_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "backend.fullname" . }}-secret
+                  key: "BPMN_USER"
+            - name: BPMN_PWD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "backend.fullname" . }}-secret
+                  key: "BPMN_PWD"
+            - name: BPMN_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "backend.fullname" . }}-secret
+                  key: "BPMN_KEY"
+            - name: NODE_ENV
+              value: "{{ .Values.bpmn.NODE_ENV }}"
+            - name: DS_DEPARTMENT_ARTEFACT_ID
+              value: "{{ .Values.DS_DEPARTMENT_ARTEFACT_ID }}"
+            - name: IMAGE_LOGICAL_NAME
+              value: "{{ .Values.IMAGE_LOGICAL_NAME}}"
+            - name: HOST
+              value: "{{ .Values.HOST }}"
+            - name: PORT
+              value: "{{ .Values.PORT }}"
+            - name: NODE_TLS_REJECT_UNAUTHORIZED
+              value: "{{ .Values.NODE_TLS_REJECT_UNAUTHORIZED }}"
+            - name: GIT_API
+              value: "{{ .Values.GIT_API }}"
+            - name: GIT_STORAGE
+              value: "{{ .Values.GIT_STORAGE }}"
+            - name: SMTP_HOST
+              value: "{{ .Values.SMTP_HOST }}"
+            - name: SMTP_USER
+              value: "{{ .Values.SMTP_USER }}"
+            - name: JIRA_API
+              value: "{{ .Values.JIRA_API }}"
+            - name: TEAMCITY_API
+              value: "{{ .Values.TEAMCITY_API }}"
+            - name: INTERFACE_URL
+              value: "{{ .Values.INTERFACE_URL}}"
+            - name: KAFKA_API
+              value: "{{ .Values.KAFKA_API }}"
+            - name: TZ
+              value: "{{ .Values.TZ }}"
+          ports:
+            - containerPort: 4000
+              protocol: TCP
+            - containerPort: 4443
+              protocol: TCP
+          # TODO: add healthchecks to the service if need.
+          # livenessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http
+          readinessProbe:
+            tcpSocket:
+              port: 4000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+        {{- if .Values.tracing.enabled }}
+        - name: {{ .Values.tracing.name }}
+          image: "{{ .Values.tracing.image.repository }}@{{ .Values.tracing.image.digest }}"
+          imagePullPolicy: {{ .Values.tracing.image.pullPolicy }}
+          resources:
+          {{- toYaml .Values.tracing.resources | nindent 12 }}
+          args:
+            {{- range $key, $value := .Values.tracing.args }}
+            {{- if $value }}
+            - --{{ $key }}={{ $value }}
+            {{- else }}
+            - --{{ $key }}
+            {{- end }}
+            {{- end }}
+          env:
+            - name: REPORTER_GRPC_TLS_ENABLED
+              value: {{ .Values.tracing.enabled | quote }}
+            - name: REPORTER_GRPC_TLS_CA
+              value: /opt/jaeger/cert/ca-cert.pem
+            - name: REPORTER_GRPC_TLS_CERT
+              value: /opt/jaeger/cert/client-cert.pem
+            - name: REPORTER_GRPC_TLS_KEY
+              value: /opt/jaeger/cert/client-cert-key.pem
+          volumeMounts:
+            - name: jaeger-agent-tls-secret
+              readOnly: true
+              mountPath: /opt/jaeger/cert/ca-cert.pem
+              subPath: "ca-cert.pem"
+            - name: jaeger-agent-tls-secret
+              readOnly: true
+              mountPath: /opt/jaeger/cert/client-cert.pem
+              subPath: "client-cert.pem"
+            - name: jaeger-agent-tls-secret
+              readOnly: true
+              mountPath: /opt/jaeger/cert/client-cert-key.pem
+              subPath: "client-cert-key.pem"
+        {{- end }}
+      {{- if .Values.tracing.enabled }}
+      volumes:
+        - name: jaeger-agent-tls-secret
+          secret:
+            secretName: jaeger-agent-tls-secret
+            defaultMode: 420
+      {{- end }}

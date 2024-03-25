@@ -1,0 +1,23 @@
+module.exports = {
+  all: require('./all'),
+  one: require('./one'),
+  assignments: require('./assignments'),
+  assignmentsBatch: require('./assignmentsBatch'),
+  new: require('./new'),
+  newRoot: require('./newRoot'),
+  edit: require('./edit'),
+  addArtefacts: require('./addArtefacts'),
+  inputArtefacts: require('./inputArtefacts'),
+  artefacts: require('./artefacts'),
+  artefactsBatch: require('./artefactsBatch'),
+  root: require('./root'),
+  updateStatus: require('./updateStatus'),
+  updateArtefacts: require('./updateArtefacts'),
+  updateAssignment: require('./updateAssignment'),
+  editArtefact: require('./editArtefact'),
+  link: require('./link'),
+  models: require('./models'),
+  modelsBatch: require('./modelsBatch'),
+  updateModels: require('./updateModels'),
+  filledArtefact: require('./filledArtefact')
+}

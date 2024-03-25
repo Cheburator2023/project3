@@ -1,0 +1,32 @@
+const sql = `
+    SELECT DISTINCT
+        t1.*,
+        t2.ARTEFACT_TYPE_DESC,
+        t3.ARTEFACT_VALUE_ID,
+        t3.ARTEFACT_VALUE,
+        t3.ARTEFACT_PARENT_VALUE_ID,
+        t3.IS_ACTIVE_FLG,
+        AXB.BPMN_NAME,
+        TM.TASK_NAME
+    FROM 
+        ARTEFACTS t1
+    INNER JOIN
+        ARTEFACT_X_TYPE t2
+    ON
+        t1.ARTEFACT_TYPE_ID = t2.ARTEFACT_TYPE_ID
+    LEFT JOIN TASKS_ARTEFACTS TA
+        ON TA.ARTEFACT_ID = t1.ARTEFACT_ID
+    LEFT JOIN TASKS TM
+        ON TM.TASK_ID = TA.TASK_ID
+    LEFT JOIN ARTEFACT_X_BPMN AXB
+        ON AXB.ARTEFACT_ID = t1.ARTEFACT_ID
+    LEFT JOIN
+        ARTEFACT_VALUES t3
+    ON
+        t1.ARTEFACT_ID = t3.ARTEFACT_ID
+    ORDER BY
+        t1.ARTEFACT_ID,
+        t3.ARTEFACT_VALUE_ID  
+`
+
+module.exports = sql

@@ -1,0 +1,4105 @@
+{
+  "ARTEFACTS": [
+    {
+      "ARTEFACT_ID": 9,
+      "ARTEFACT_LABEL": "Код модели",
+      "ARTEFACT_DESC": "Указать код модели",
+      "ARTEFACT_TECH_LABEL": "model_lang",
+      "ARTEFACT_TYPE_DESC": "dropdown",
+      "ARTEFACT_TYPE_ID": 3,
+      "TASK_NAME": "Разработка модели",
+      "IS_MAIN_INFO_FLG": "1",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": [
+        {
+          "ARTEFACT_VALUE_ID": 5,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 9,
+          "ARTEFACT_VALUE": "Python",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 6,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 9,
+          "ARTEFACT_VALUE": "SAS",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 7,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 9,
+          "ARTEFACT_VALUE": "R",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 174,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 9,
+          "ARTEFACT_VALUE": "Иное",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 200,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 9,
+          "ARTEFACT_VALUE": "test-test",
+          "IS_ACTIVE_FLG": "1"
+        }
+      ]
+    },
+    {
+      "ARTEFACT_ID": 11,
+      "ARTEFACT_LABEL": "Скрипты тестов/Сценарии валидации",
+      "ARTEFACT_DESC": "Выберите тесты валидации для модели",
+      "ARTEFACT_TECH_LABEL": "list_of_validation_tests",
+      "ARTEFACT_TYPE_DESC": "multi-dropdown",
+      "ARTEFACT_TYPE_ID": 5,
+      "TASK_NAME": "Выбор сценариев и тестов валидации из библиотеки тестов",
+      "IS_MAIN_INFO_FLG": "1",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": [
+        {
+          "ARTEFACT_VALUE_ID": 8,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 11,
+          "ARTEFACT_VALUE": "Gini Index",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 9,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 11,
+          "ARTEFACT_VALUE": "PSI",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 10,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 11,
+          "ARTEFACT_VALUE": "Data Quality",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 11,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 11,
+          "ARTEFACT_VALUE": "Kolmogorov-Smirnov Test",
+          "IS_ACTIVE_FLG": "1"
+        }
+      ]
+    },
+    {
+      "ARTEFACT_ID": 13,
+      "ARTEFACT_LABEL": "Ссылка MLFlow",
+      "ARTEFACT_DESC": "Добавить ссылку",
+      "ARTEFACT_TECH_LABEL": "mlflow_link",
+      "ARTEFACT_TYPE_DESC": "link",
+      "ARTEFACT_TYPE_ID": 7,
+      "TASK_NAME": "Разработка модели",
+      "IS_MAIN_INFO_FLG": "1",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 16,
+      "ARTEFACT_LABEL": "Отчет об анализе сущностей",
+      "ARTEFACT_DESC": "Прикрепите отчет об анализе сущностей",
+      "ARTEFACT_TECH_LABEL": "entity_analysis_report",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Анализ сущностей и атрибутов",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "data",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 17,
+      "ARTEFACT_LABEL": "Алгоритм расчета агрегатов",
+      "ARTEFACT_DESC": "Шаблон документа <a href=\"/template/Шаблон_Алгоритмы расчета агрегатов.docx\" target=\"_blank\">Шаблон_Алгоритмы расчета агрегатов.docx</a>",
+      "ARTEFACT_TECH_LABEL": "aggregate_calculation_algorithm",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Прикрепите скрипт формирования витрины",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "data",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 18,
+      "ARTEFACT_LABEL": "Решение по результатам анализа сущностей и атрибутов",
+      "ARTEFACT_DESC": "Примите решение о возможности реализации витрины для разработки",
+      "ARTEFACT_TECH_LABEL": "data_development_availability",
+      "ARTEFACT_TYPE_DESC": "dropdown",
+      "ARTEFACT_TYPE_ID": 3,
+      "TASK_NAME": "Возможна реализация витрины для разработки?",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "data",
+      "VALUES": [
+        {
+          "ARTEFACT_VALUE_ID": 12,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 18,
+          "ARTEFACT_VALUE": "Источник внешний",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 13,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 18,
+          "ARTEFACT_VALUE": "Источник внутренний и не загружен в DRP",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 14,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 18,
+          "ARTEFACT_VALUE": "Источник доступен в DRP",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 15,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 18,
+          "ARTEFACT_VALUE": "Нет",
+          "IS_ACTIVE_FLG": "1"
+        }
+      ]
+    },
+    {
+      "ARTEFACT_ID": 19,
+      "ARTEFACT_LABEL": "Решение об успешности загрузки выборки в DRP",
+      "ARTEFACT_DESC": "Выгрузка загружена в DRP?",
+      "ARTEFACT_TECH_LABEL": "drp_load_successful_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Успешность загрузки в DRP",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "data",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 20,
+      "ARTEFACT_LABEL": "Решение о создании скрипта формирования витрины силами DS",
+      "ARTEFACT_DESC": "Возможна разработка скрипта формирования витрины силами DS?",
+      "ARTEFACT_TECH_LABEL": "data_build_script_availible_ds_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Возможна разработка скрипта формирования витрины силами DS?",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "data",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 22,
+      "ARTEFACT_LABEL": "Решение об успешности тестирования скрипта формирования витрины",
+      "ARTEFACT_DESC": "Скрипт выполнен успешно?",
+      "ARTEFACT_TECH_LABEL": "data_build_test_success",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Тестирование витрины прошло успешно?",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "data",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 24,
+      "ARTEFACT_LABEL": "Результат тестирования скрипта формирования витрины",
+      "ARTEFACT_DESC": "Прикрепите файл с результатом тестирования скрипта формирования витрины",
+      "ARTEFACT_TECH_LABEL": "data_build_script_test_result",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Тестирование витрины прошло успешно?",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "data",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 26,
+      "ARTEFACT_LABEL": "Скорректированная постановка задачи",
+      "ARTEFACT_DESC": "Прикрепите файл со скорректированной постановкой задачи",
+      "ARTEFACT_TECH_LABEL": "corrected_problem_formulation",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Прикрепите скорректированную постановку задачи",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "initialization",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 27,
+      "ARTEFACT_LABEL": "Необходимо привлечение DE",
+      "ARTEFACT_DESC": "Принять решение о необходимости привлечения DE",
+      "ARTEFACT_TECH_LABEL": "need_involve_de_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Необходимо привлечь DE",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "initialization",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 28,
+      "ARTEFACT_LABEL": "Скрипт формирования long-list витрины",
+      "ARTEFACT_DESC": "Прикрепите файл",
+      "ARTEFACT_TECH_LABEL": "long_datamart_build_script",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Разработка модели",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 29,
+      "ARTEFACT_LABEL": "Скрипт формирования short-list витрины",
+      "ARTEFACT_DESC": "Прикрепите файл",
+      "ARTEFACT_TECH_LABEL": "short_datamart_build_script",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Разработка модели",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 30,
+      "ARTEFACT_LABEL": "ПиМИ для ПСИ",
+      "ARTEFACT_DESC": "Шаблон документа <a href=\"/template/Шаблон_ПиМИ для ПСИ.docx\" target=\"_blank\">Шаблон_ПиМИ для ПСИ.docx</a>",
+      "ARTEFACT_TECH_LABEL": "pimi_psi",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Разработка модели",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 31,
+      "ARTEFACT_LABEL": "Код прототипа сбора целевой переменной",
+      "ARTEFACT_DESC": "Прикрепить ссылку на код прототипа сбора целевой переменной",
+      "ARTEFACT_TECH_LABEL": "target_variable_collecting_prototype_code",
+      "ARTEFACT_TYPE_DESC": "link",
+      "ARTEFACT_TYPE_ID": 7,
+      "TASK_NAME": "Прикрепите скрипт формирования витрины",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "data",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 33,
+      "ARTEFACT_LABEL": "Дата начала разработки",
+      "ARTEFACT_DESC": "Укажите дату начала разработки",
+      "ARTEFACT_TECH_LABEL": "developing_start_date",
+      "ARTEFACT_TYPE_DESC": "date",
+      "ARTEFACT_TYPE_ID": 4,
+      "TASK_NAME": "Разработка модели",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 34,
+      "ARTEFACT_LABEL": "Дата окончания разработки",
+      "ARTEFACT_DESC": "Укажите дату окончания разработки",
+      "ARTEFACT_TECH_LABEL": "developing_end_date",
+      "ARTEFACT_TYPE_DESC": "date",
+      "ARTEFACT_TYPE_ID": 4,
+      "TASK_NAME": "Разработка модели",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": null,
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 35,
+      "ARTEFACT_LABEL": "Ссылка на Jupyter notebook",
+      "ARTEFACT_DESC": "Прикрепите ссылку",
+      "ARTEFACT_TECH_LABEL": "jupyter_notebook_link",
+      "ARTEFACT_TYPE_DESC": "link",
+      "ARTEFACT_TYPE_ID": 7,
+      "TASK_NAME": "Разработка модели",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 36,
+      "ARTEFACT_LABEL": "Ссылка на проект Rstudio",
+      "ARTEFACT_DESC": "Прикрепите ссылку",
+      "ARTEFACT_TECH_LABEL": "rstudio_link",
+      "ARTEFACT_TYPE_DESC": "link",
+      "ARTEFACT_TYPE_ID": 7,
+      "TASK_NAME": "Разработка модели",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 37,
+      "ARTEFACT_LABEL": "Ссылка на проект SAS",
+      "ARTEFACT_DESC": "Прикрепите ссылку",
+      "ARTEFACT_TECH_LABEL": "sas_link",
+      "ARTEFACT_TYPE_DESC": "link",
+      "ARTEFACT_TYPE_ID": 7,
+      "TASK_NAME": "Разработка модели",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 38,
+      "ARTEFACT_LABEL": "Ссылка на репозиторий разработки модели",
+      "ARTEFACT_DESC": "Прикрепите ссылку с репозиторием разработки модели",
+      "ARTEFACT_TECH_LABEL": "model_repository_link",
+      "ARTEFACT_TYPE_DESC": "link",
+      "ARTEFACT_TYPE_ID": 7,
+      "TASK_NAME": "Разработка модели",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 39,
+      "ARTEFACT_LABEL": "Визуализация данных",
+      "ARTEFACT_DESC": "Прикрепите файл",
+      "ARTEFACT_TECH_LABEL": "visualization",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Разработка модели",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 40,
+      "ARTEFACT_LABEL": "Требования к мониторингу модели",
+      "ARTEFACT_DESC": "Шаблон документа <a href=\"/template/Шаблон_Требования к мониторингу.docx\" target=\"_blank\">Шаблон_Требования к мониторингу.docx</a>",
+      "ARTEFACT_TECH_LABEL": "requirements_for_model_monitoring",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Формирование требований для автомониторинга",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 41,
+      "ARTEFACT_LABEL": "Бинарный файл модели",
+      "ARTEFACT_DESC": "Прикрепите ссылку с репозиторием разработки модели",
+      "ARTEFACT_TECH_LABEL": "model_binary_file",
+      "ARTEFACT_TYPE_DESC": "link",
+      "ARTEFACT_TYPE_ID": 7,
+      "TASK_NAME": "Разработка модели",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 43,
+      "ARTEFACT_LABEL": "Атрибуты входного и выходного вектора",
+      "ARTEFACT_DESC": "Шаблон документа <a href=\"/template/Шаблон_Атрибуты входного и выходного вектора.docx\" target=\"_blank\">Шаблон_Атрибуты входного и выходного вектора.docx</a>",
+      "ARTEFACT_TECH_LABEL": "vector_attributes",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Разработка модели",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 44,
+      "ARTEFACT_LABEL": "Аналитическая записка о разработке модели",
+      "ARTEFACT_DESC": "Шаблон документа <a href=\"/template/Шаблон_Аналитическая записка о разработке модели.docx\" target=\"_blank\">Шаблон_Аналитическая записка о разработке модели.docx</a>",
+      "ARTEFACT_TECH_LABEL": "analize_text_about_developing",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Разработка модели",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 45,
+      "ARTEFACT_LABEL": "Скрипт по расчету скор. баллов по факторам модели",
+      "ARTEFACT_DESC": "Прикрепите файл",
+      "ARTEFACT_TECH_LABEL": "scoring_calculation_scripts",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Разработка модели",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 46,
+      "ARTEFACT_LABEL": "Ссылка на прошлую версию модели",
+      "ARTEFACT_DESC": "Прикрепите ссылку на прошлую версию модели",
+      "ARTEFACT_TECH_LABEL": "previous_model_link",
+      "ARTEFACT_TYPE_DESC": "link",
+      "ARTEFACT_TYPE_ID": 7,
+      "TASK_NAME": "Разработка модели",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 47,
+      "ARTEFACT_LABEL": "Скрипт по расчету итогового скор. балла по модели",
+      "ARTEFACT_DESC": "Прикрепите файл",
+      "ARTEFACT_TECH_LABEL": "total_scoring_calculation_scripts",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Разработка модели",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 48,
+      "ARTEFACT_LABEL": "Скрипт формирования выборки для обучения",
+      "ARTEFACT_DESC": "Прикрепите файл",
+      "ARTEFACT_TECH_LABEL": "train_data_build_script",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Разработка модели",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 49,
+      "ARTEFACT_LABEL": "Snapshot широкой витрины, используемой в процессе разработки модели",
+      "ARTEFACT_DESC": "Прикрепите файл",
+      "ARTEFACT_TECH_LABEL": "snapshot_long_datamart",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Разработка модели",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 50,
+      "ARTEFACT_LABEL": "Калибровка/тип калибровки",
+      "ARTEFACT_DESC": "Укажите тип калибровки",
+      "ARTEFACT_TECH_LABEL": "callibration_type",
+      "ARTEFACT_TYPE_DESC": "text",
+      "ARTEFACT_TYPE_ID": 1,
+      "TASK_NAME": "Разработка модели",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 51,
+      "ARTEFACT_LABEL": "Требуется доработка витрины",
+      "ARTEFACT_DESC": "Примите решение о доработке витрины",
+      "ARTEFACT_TECH_LABEL": "need_recreate_data_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Требуется доработка витрины?",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 52,
+      "ARTEFACT_LABEL": "Модель эффективна в бизнес процессе?",
+      "ARTEFACT_DESC": "Примите решение об эффективности модели в бизнес процессе",
+      "ARTEFACT_TECH_LABEL": "decision_of_model_efficiency_flg",
+      "ARTEFACT_TYPE_DESC": "dropdown",
+      "ARTEFACT_TYPE_ID": 3,
+      "TASK_NAME": "Модель эффективна в бизнес процессе?",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": [
+        {
+          "ARTEFACT_VALUE_ID": 16,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 52,
+          "ARTEFACT_VALUE": "Нет, доработки не актуальны",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 17,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 52,
+          "ARTEFACT_VALUE": "Да",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 18,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 52,
+          "ARTEFACT_VALUE": "Необходимы доработки",
+          "IS_ACTIVE_FLG": "1"
+        }
+      ]
+    },
+    {
+      "ARTEFACT_ID": 53,
+      "ARTEFACT_LABEL": "Наименование модели",
+      "ARTEFACT_DESC": "Имя модели в системе",
+      "ARTEFACT_TECH_LABEL": "model_name",
+      "ARTEFACT_TYPE_DESC": "text",
+      "ARTEFACT_TYPE_ID": 1,
+      "TASK_NAME": "Заполнение информации",
+      "IS_MAIN_INFO_FLG": "1",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "initialization",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 54,
+      "ARTEFACT_LABEL": "Идентификатор модели",
+      "ARTEFACT_DESC": "Идентификатор модели в системе",
+      "ARTEFACT_TECH_LABEL": "model_id",
+      "ARTEFACT_TYPE_DESC": "text",
+      "ARTEFACT_TYPE_ID": 1,
+      "TASK_NAME": "Заполнение информации",
+      "IS_MAIN_INFO_FLG": "1",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "initialization",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 55,
+      "ARTEFACT_LABEL": "Версия модели",
+      "ARTEFACT_DESC": "Версия модели",
+      "ARTEFACT_TECH_LABEL": "model_version",
+      "ARTEFACT_TYPE_DESC": "text",
+      "ARTEFACT_TYPE_ID": 1,
+      "TASK_NAME": "Заполнение информации",
+      "IS_MAIN_INFO_FLG": "1",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "initialization",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 56,
+      "ARTEFACT_LABEL": "Заказчик модели",
+      "ARTEFACT_DESC": "Имя пользователя заказчика модели",
+      "ARTEFACT_TECH_LABEL": "model_customer_name",
+      "ARTEFACT_TYPE_DESC": "user",
+      "ARTEFACT_TYPE_ID": 8,
+      "TASK_NAME": "Заполнение информации",
+      "IS_MAIN_INFO_FLG": "1",
+      "IS_CLASS_FLG": 1,
+      "BPMN_NAME": "initialization",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 57,
+      "ARTEFACT_LABEL": "Продукт и область применения модели",
+      "ARTEFACT_DESC": "Выберите продукт и область применения модели",
+      "ARTEFACT_TECH_LABEL": "product_name",
+      "ARTEFACT_TYPE_DESC": "multi-dropdown",
+      "ARTEFACT_TYPE_ID": 5,
+      "TASK_NAME": "Заполнение информации",
+      "IS_MAIN_INFO_FLG": "1",
+      "IS_CLASS_FLG": 1,
+      "BPMN_NAME": "initialization",
+      "VALUES": [
+        {
+          "ARTEFACT_VALUE_ID": 144,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 57,
+          "ARTEFACT_VALUE": "Розница",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 145,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 57,
+          "ARTEFACT_VALUE": "СМБ",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 146,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 57,
+          "ARTEFACT_VALUE": "КИБ",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 147,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 57,
+          "ARTEFACT_VALUE": "Иное",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 148,
+          "ARTEFACT_PARENT_VALUE_ID": 144,
+          "ARTEFACT_ID": 57,
+          "ARTEFACT_VALUE": "Кредиты наличными",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 149,
+          "ARTEFACT_PARENT_VALUE_ID": 144,
+          "ARTEFACT_ID": 57,
+          "ARTEFACT_VALUE": "Кредитные карты",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 150,
+          "ARTEFACT_PARENT_VALUE_ID": 144,
+          "ARTEFACT_ID": 57,
+          "ARTEFACT_VALUE": "Ипотека",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 151,
+          "ARTEFACT_PARENT_VALUE_ID": 144,
+          "ARTEFACT_ID": 57,
+          "ARTEFACT_VALUE": "Авто",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 152,
+          "ARTEFACT_PARENT_VALUE_ID": 144,
+          "ARTEFACT_ID": 57,
+          "ARTEFACT_VALUE": "Иное",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 153,
+          "ARTEFACT_PARENT_VALUE_ID": 148,
+          "ARTEFACT_ID": 57,
+          "ARTEFACT_VALUE": "Корпоративный канал",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 154,
+          "ARTEFACT_PARENT_VALUE_ID": 148,
+          "ARTEFACT_ID": 57,
+          "ARTEFACT_VALUE": "Открытый канал",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 155,
+          "ARTEFACT_PARENT_VALUE_ID": 148,
+          "ARTEFACT_ID": 57,
+          "ARTEFACT_VALUE": "Предодобренные",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 156,
+          "ARTEFACT_PARENT_VALUE_ID": 148,
+          "ARTEFACT_ID": 57,
+          "ARTEFACT_VALUE": "Рефинансирование",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 157,
+          "ARTEFACT_PARENT_VALUE_ID": 148,
+          "ARTEFACT_ID": 57,
+          "ARTEFACT_VALUE": "Реструктуризация",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 158,
+          "ARTEFACT_PARENT_VALUE_ID": 148,
+          "ARTEFACT_ID": 57,
+          "ARTEFACT_VALUE": "Зарплатный проект",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 159,
+          "ARTEFACT_PARENT_VALUE_ID": 148,
+          "ARTEFACT_ID": 57,
+          "ARTEFACT_VALUE": "Иное",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 160,
+          "ARTEFACT_PARENT_VALUE_ID": 151,
+          "ARTEFACT_ID": 57,
+          "ARTEFACT_VALUE": "Стандарт",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 161,
+          "ARTEFACT_PARENT_VALUE_ID": 151,
+          "ARTEFACT_ID": 57,
+          "ARTEFACT_VALUE": "Лайт",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 162,
+          "ARTEFACT_PARENT_VALUE_ID": 151,
+          "ARTEFACT_ID": 57,
+          "ARTEFACT_VALUE": "Экспресс",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 163,
+          "ARTEFACT_PARENT_VALUE_ID": 151,
+          "ARTEFACT_ID": 57,
+          "ARTEFACT_VALUE": "Предодобренные",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 164,
+          "ARTEFACT_PARENT_VALUE_ID": 151,
+          "ARTEFACT_ID": 57,
+          "ARTEFACT_VALUE": "Цессия",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 165,
+          "ARTEFACT_PARENT_VALUE_ID": 151,
+          "ARTEFACT_ID": 57,
+          "ARTEFACT_VALUE": "Реструктуризация",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 167,
+          "ARTEFACT_PARENT_VALUE_ID": 151,
+          "ARTEFACT_ID": 57,
+          "ARTEFACT_VALUE": "Иное",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 168,
+          "ARTEFACT_PARENT_VALUE_ID": 150,
+          "ARTEFACT_ID": 57,
+          "ARTEFACT_VALUE": "Стандарт",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 169,
+          "ARTEFACT_PARENT_VALUE_ID": 150,
+          "ARTEFACT_ID": 57,
+          "ARTEFACT_VALUE": "Победа над формальностями",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 170,
+          "ARTEFACT_PARENT_VALUE_ID": 150,
+          "ARTEFACT_ID": 57,
+          "ARTEFACT_VALUE": "Цессия",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 171,
+          "ARTEFACT_PARENT_VALUE_ID": 150,
+          "ARTEFACT_ID": 57,
+          "ARTEFACT_VALUE": "Ипотека для военных",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 172,
+          "ARTEFACT_PARENT_VALUE_ID": 150,
+          "ARTEFACT_ID": 57,
+          "ARTEFACT_VALUE": "Реструктуризация",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 173,
+          "ARTEFACT_PARENT_VALUE_ID": 150,
+          "ARTEFACT_ID": 57,
+          "ARTEFACT_VALUE": "Иное",
+          "IS_ACTIVE_FLG": "1"
+        }
+      ]
+    },
+    {
+      "ARTEFACT_ID": 58,
+      "ARTEFACT_LABEL": "Сегмент",
+      "ARTEFACT_DESC": "Название сегмента",
+      "ARTEFACT_TECH_LABEL": "segment_name",
+      "ARTEFACT_TYPE_DESC": "text",
+      "ARTEFACT_TYPE_ID": 1,
+      "TASK_NAME": "Заполнение информации",
+      "IS_MAIN_INFO_FLG": "1",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "initialization",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 59,
+      "ARTEFACT_LABEL": "Бизнес-процесс",
+      "ARTEFACT_DESC": "Название бизнес-процесса",
+      "ARTEFACT_TECH_LABEL": "buiseness_process_name",
+      "ARTEFACT_TYPE_DESC": "text",
+      "ARTEFACT_TYPE_ID": 1,
+      "TASK_NAME": "Заполнение информации",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "initialization",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 60,
+      "ARTEFACT_LABEL": "Целевая переменная",
+      "ARTEFACT_DESC": "Описание целевой переменной",
+      "ARTEFACT_TECH_LABEL": "target_variable",
+      "ARTEFACT_TYPE_DESC": "text",
+      "ARTEFACT_TYPE_ID": 1,
+      "TASK_NAME": "Заполнение информации",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "initialization",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 61,
+      "ARTEFACT_LABEL": "Режим применения",
+      "ARTEFACT_DESC": "Выберите режим применения",
+      "ARTEFACT_TECH_LABEL": "using_mode",
+      "ARTEFACT_TYPE_DESC": "dropdown",
+      "ARTEFACT_TYPE_ID": 3,
+      "TASK_NAME": "Заполнение информации",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "initialization",
+      "VALUES": [
+        {
+          "ARTEFACT_VALUE_ID": 177,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 61,
+          "ARTEFACT_VALUE": "Пакет",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 178,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 61,
+          "ARTEFACT_VALUE": "Онлайн",
+          "IS_ACTIVE_FLG": "1"
+        }
+      ]
+    },
+    {
+      "ARTEFACT_ID": 62,
+      "ARTEFACT_LABEL": "Автоматическая корректировка модели",
+      "ARTEFACT_DESC": "Признак автоматической корректировки модели",
+      "ARTEFACT_TECH_LABEL": "auto_correct_model",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Заполнение информации",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "initialization",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 63,
+      "ARTEFACT_LABEL": "Плановая дата внедрении",
+      "ARTEFACT_DESC": "Укажите плановую дату внедрения",
+      "ARTEFACT_TECH_LABEL": "plan_date_integration",
+      "ARTEFACT_TYPE_DESC": "date",
+      "ARTEFACT_TYPE_ID": 4,
+      "TASK_NAME": "Заполнение информации",
+      "IS_MAIN_INFO_FLG": "1",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "initialization",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 65,
+      "ARTEFACT_LABEL": "Цель использования результатов модели",
+      "ARTEFACT_DESC": "Укажите цель использования результатов модели",
+      "ARTEFACT_TECH_LABEL": "model_result_purpose",
+      "ARTEFACT_TYPE_DESC": "text",
+      "ARTEFACT_TYPE_ID": 1,
+      "TASK_NAME": "Заполнение информации",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "initialization",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 66,
+      "ARTEFACT_LABEL": "Комментарий к цели использования результатов модели",
+      "ARTEFACT_DESC": "Прокомментируйте, если требуется, цель использования результатов модели",
+      "ARTEFACT_TECH_LABEL": "model_result_purpose_comment",
+      "ARTEFACT_TYPE_DESC": "text",
+      "ARTEFACT_TYPE_ID": 1,
+      "TASK_NAME": "Заполнение информации",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "initialization",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 67,
+      "ARTEFACT_LABEL": "Обоснование значимости",
+      "ARTEFACT_DESC": "Обоснование значимость модели",
+      "ARTEFACT_TECH_LABEL": "significance_validity",
+      "ARTEFACT_TYPE_DESC": "text",
+      "ARTEFACT_TYPE_ID": 1,
+      "TASK_NAME": "Заполнение информации",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "initialization",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 68,
+      "ARTEFACT_LABEL": "Основание для переработки модели",
+      "ARTEFACT_DESC": "Причина переработки модели",
+      "ARTEFACT_TECH_LABEL": "recreating_model_reason",
+      "ARTEFACT_TYPE_DESC": "text",
+      "ARTEFACT_TYPE_ID": 1,
+      "TASK_NAME": "Заполнение информации",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "initialization",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 69,
+      "ARTEFACT_LABEL": "Основание для разработки модели",
+      "ARTEFACT_DESC": "Причина разработки модели",
+      "ARTEFACT_TECH_LABEL": "developing_model_reason",
+      "ARTEFACT_TYPE_DESC": "dropdown",
+      "ARTEFACT_TYPE_ID": 3,
+      "TASK_NAME": "Заполнение информации",
+      "IS_MAIN_INFO_FLG": "1",
+      "IS_CLASS_FLG": 1,
+      "BPMN_NAME": "initialization",
+      "VALUES": [
+        {
+          "ARTEFACT_VALUE_ID": 139,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 69,
+          "ARTEFACT_VALUE": "Новая модель",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 140,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 69,
+          "ARTEFACT_VALUE": "Переработка по инициативе заказчика/DS",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 141,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 69,
+          "ARTEFACT_VALUE": "Переработка для устранения замечаний валидации/ДВА",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 142,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 69,
+          "ARTEFACT_VALUE": "Переработка для устранения замечаний регулятора",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 143,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 69,
+          "ARTEFACT_VALUE": "Рекалибровка",
+          "IS_ACTIVE_FLG": "1"
+        }
+      ]
+    },
+    {
+      "ARTEFACT_ID": 70,
+      "ARTEFACT_LABEL": "Заявка на разработку модели или описание гипотезы бизнес-кейса",
+      "ARTEFACT_DESC": "Шаблон документа <a href=\"/template/Шаблон_Заявка на разработку модели.xlsx\" target=\"_blank\">Шаблон_Заявка на разработку модели.xlsx</a>",
+      "ARTEFACT_TECH_LABEL": "order_for_developing_or_buiseness_case",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Заполнение информации",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "initialization",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 71,
+      "ARTEFACT_LABEL": "Необходимость пилота",
+      "ARTEFACT_DESC": "Необходим пилот?",
+      "ARTEFACT_TECH_LABEL": "pilot_necessery",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Заполнение информации",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "initialization",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 72,
+      "ARTEFACT_LABEL": "Тип модели",
+      "ARTEFACT_DESC": "Введите тип модели",
+      "ARTEFACT_TECH_LABEL": "model_type",
+      "ARTEFACT_TYPE_DESC": "text",
+      "ARTEFACT_TYPE_ID": 1,
+      "TASK_NAME": "Заполнение информации",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "initialization",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 73,
+      "ARTEFACT_LABEL": "Компания группы",
+      "ARTEFACT_DESC": "Укажите компанию группы",
+      "ARTEFACT_TECH_LABEL": "group_company",
+      "ARTEFACT_TYPE_DESC": "text",
+      "ARTEFACT_TYPE_ID": 1,
+      "TASK_NAME": "Заполнение информации",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "initialization",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 74,
+      "ARTEFACT_LABEL": "Категория моделей",
+      "ARTEFACT_DESC": "Выберите категорию моделей",
+      "ARTEFACT_TECH_LABEL": "model_category",
+      "ARTEFACT_TYPE_DESC": "text",
+      "ARTEFACT_TYPE_ID": 1,
+      "TASK_NAME": "Заполнение информации",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "initialization",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 75,
+      "ARTEFACT_LABEL": "Комментарий к продукту и области применения",
+      "ARTEFACT_DESC": "Если требуется, добавьте комментарий к выбору продукта и области применения",
+      "ARTEFACT_TECH_LABEL": "domain_knowledge",
+      "ARTEFACT_TYPE_DESC": "text",
+      "ARTEFACT_TYPE_ID": 1,
+      "TASK_NAME": "Заполнение информации",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "initialization",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 76,
+      "ARTEFACT_LABEL": "Задача",
+      "ARTEFACT_DESC": "Описание задачи",
+      "ARTEFACT_TECH_LABEL": "task",
+      "ARTEFACT_TYPE_DESC": "text",
+      "ARTEFACT_TYPE_ID": 1,
+      "TASK_NAME": "Заполнение информации",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "initialization",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 77,
+      "ARTEFACT_LABEL": "Название рейтинговой системы",
+      "ARTEFACT_DESC": "Название рейтинговой системы",
+      "ARTEFACT_TECH_LABEL": "rating_system_name",
+      "ARTEFACT_TYPE_DESC": "text",
+      "ARTEFACT_TYPE_ID": 1,
+      "TASK_NAME": "Заполнение информации",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "initialization",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 78,
+      "ARTEFACT_LABEL": "Описание рейтинговой системы",
+      "ARTEFACT_DESC": "Описание рейтинговой системы",
+      "ARTEFACT_TECH_LABEL": "rating_system_description",
+      "ARTEFACT_TYPE_DESC": "text",
+      "ARTEFACT_TYPE_ID": 1,
+      "TASK_NAME": "Заполнение информации",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "initialization",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 79,
+      "ARTEFACT_LABEL": "Вид модели для розничных рейтинговых систем",
+      "ARTEFACT_DESC": "Выбрать вид модели для розничных рейтинговых систем",
+      "ARTEFACT_TECH_LABEL": "model_type_for_rating_system",
+      "ARTEFACT_TYPE_DESC": "text",
+      "ARTEFACT_TYPE_ID": 1,
+      "TASK_NAME": "Заполнение информации",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "initialization",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 80,
+      "ARTEFACT_LABEL": "Необходимость внедрения",
+      "ARTEFACT_DESC": "Необходимо ли внедрение?",
+      "ARTEFACT_TECH_LABEL": "integration_necessery",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Заполнение информации",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "initialization",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 81,
+      "ARTEFACT_LABEL": "Глава группы DS",
+      "ARTEFACT_DESC": "Назначьте ответственного группы DS",
+      "ARTEFACT_TECH_LABEL": "ds_lead",
+      "ARTEFACT_TYPE_DESC": "user",
+      "ARTEFACT_TYPE_ID": 8,
+      "TASK_NAME": "Назначение группы, ответственной за модель",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "initialization",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 82,
+      "ARTEFACT_LABEL": "Глава группы DE",
+      "ARTEFACT_DESC": "Назначьте ответственного группы DE",
+      "ARTEFACT_TECH_LABEL": "de_lead",
+      "ARTEFACT_TYPE_DESC": "user",
+      "ARTEFACT_TYPE_ID": 8,
+      "TASK_NAME": "Назначение группы, ответственной за модель",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "initialization",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 83,
+      "ARTEFACT_LABEL": "Глава группы MIPM",
+      "ARTEFACT_DESC": "Назначьте ответственного группы MIMP",
+      "ARTEFACT_TECH_LABEL": "mimp_lead",
+      "ARTEFACT_TYPE_DESC": "user",
+      "ARTEFACT_TYPE_ID": 8,
+      "TASK_NAME": "Назначение группы, ответственной за модель",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "initialization",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 84,
+      "ARTEFACT_LABEL": "Глава группы Model Ops",
+      "ARTEFACT_DESC": "Назначьте ответственного группы Model Ops",
+      "ARTEFACT_TECH_LABEL": "modelops_lead",
+      "ARTEFACT_TYPE_DESC": "user",
+      "ARTEFACT_TYPE_ID": 8,
+      "TASK_NAME": "Назначение группы, ответственной за модель",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "initialization",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 85,
+      "ARTEFACT_LABEL": "Глава группы ДИТ",
+      "ARTEFACT_DESC": "Назначьте ответственного группы ДИТ",
+      "ARTEFACT_TECH_LABEL": "dit_lead",
+      "ARTEFACT_TYPE_DESC": "user",
+      "ARTEFACT_TYPE_ID": 8,
+      "TASK_NAME": "Назначение группы, ответственной за модель",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "initialization",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 86,
+      "ARTEFACT_LABEL": "Список сущностей и атрибутов",
+      "ARTEFACT_DESC": "Шаблон документа <a href=\"/template/Шаблон_Список сущностей и атрибутов.docx\" target=\"_blank\">Шаблон_Список сущностей и атрибутов.docx</a>",
+      "ARTEFACT_TECH_LABEL": "entity_attributes_list",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Анализ источников данных",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "initialization",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 87,
+      "ARTEFACT_LABEL": "Необходимо проведение первичной валидации",
+      "ARTEFACT_DESC": "Примите решения о необходимости проведения первичной валидации",
+      "ARTEFACT_TECH_LABEL": "need_first_validation_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Необходимо проведение первичной валидации?",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 88,
+      "ARTEFACT_LABEL": "Требуется актуализация архитектурного стека",
+      "ARTEFACT_DESC": "Примите решение о необходимости актуализации архитектурного стека",
+      "ARTEFACT_TECH_LABEL": "need_actualize_arch_requirements_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Требуется актуализация архитектурного стека",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 89,
+      "ARTEFACT_LABEL": "Требования к архитектурному стеку",
+      "ARTEFACT_DESC": "Прикрепите требования к архитектурному стеку",
+      "ARTEFACT_TECH_LABEL": "arch_requirements_file",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Требования к архитектурному стеку",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 92,
+      "ARTEFACT_LABEL": "Необходимо добавить тесты или сценарии в библиотеку тестов",
+      "ARTEFACT_DESC": "Примите решение о необходимости добавления тестов или сценариев в библиотеку тестов",
+      "ARTEFACT_TECH_LABEL": "need_add_test_or_scenaries_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Необходимо добавить тесты или сценарии в библиотеку тестов?",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 93,
+      "ARTEFACT_LABEL": "Выявлены отклонения",
+      "ARTEFACT_DESC": "Укажите, были ли выявлены отклонения",
+      "ARTEFACT_TECH_LABEL": "problems_reveal_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Выявлены отклонения?",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 95,
+      "ARTEFACT_LABEL": "Дополнительный количественный анализ и рекомендации группы валидации",
+      "ARTEFACT_DESC": "Шаблон документа <a href=\"/template/Шаблон_Дополнительный количественный анализ и рекомендации группы валидации.docx\" target=\"_blank\">Шаблон_Дополнительный количественный анализ и рекомендации группы валидации.docx</a>",
+      "ARTEFACT_TECH_LABEL": "additional_analysis_and_recommendation",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Проведение количественного анализа и формирование рекомендаций",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 96,
+      "ARTEFACT_LABEL": "Тип валидации",
+      "ARTEFACT_DESC": "Выберите тип валидации",
+      "ARTEFACT_TECH_LABEL": "validation_type",
+      "ARTEFACT_TYPE_DESC": "dropdown",
+      "ARTEFACT_TYPE_ID": 3,
+      "TASK_NAME": "Выбор сценариев и тестов валидации из библиотеки тестов",
+      "IS_MAIN_INFO_FLG": "1",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": [
+        {
+          "ARTEFACT_VALUE_ID": 175,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 96,
+          "ARTEFACT_VALUE": "Первичная валидация",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 176,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 96,
+          "ARTEFACT_VALUE": "Плановая валидация",
+          "IS_ACTIVE_FLG": "1"
+        }
+      ]
+    },
+    {
+      "ARTEFACT_ID": 97,
+      "ARTEFACT_LABEL": "Необходимость привлечения IT",
+      "ARTEFACT_DESC": "Примите решение о необходимости привлечения IT",
+      "ARTEFACT_TECH_LABEL": "need_involve_it_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Необходимость привлечения IT",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "data",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 100,
+      "ARTEFACT_LABEL": "Согласование результатов пилота",
+      "ARTEFACT_DESC": "Согласование результатов пилота с участниками пилота",
+      "ARTEFACT_TECH_LABEL": "pilot_results_approving_flg",
+      "ARTEFACT_TYPE_DESC": "dropdown",
+      "ARTEFACT_TYPE_ID": 3,
+      "TASK_NAME": "Согласование результатов пилота",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "data",
+      "VALUES": [
+        {
+          "ARTEFACT_VALUE_ID": 19,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 100,
+          "ARTEFACT_VALUE": "Пилот не успешен, необходимо проведение повторного пилота",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 20,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 100,
+          "ARTEFACT_VALUE": "Пилот успешен",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 21,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 100,
+          "ARTEFACT_VALUE": "Пилот не успешен, повторное проведение не целесообразно",
+          "IS_ACTIVE_FLG": "1"
+        }
+      ]
+    },
+    {
+      "ARTEFACT_ID": 101,
+      "ARTEFACT_LABEL": "Требуется обновление архитектуры?",
+      "ARTEFACT_DESC": "Примите решение о необходимости обновлении архитектуры",
+      "ARTEFACT_TECH_LABEL": "need_update_arch_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Требуется обновление архитектуры?",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "data",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 102,
+      "ARTEFACT_LABEL": "Требования к архтитектурному стеку DPR",
+      "ARTEFACT_DESC": "Прикрепите файл с требованиями к архтитектурному стеку DPR",
+      "ARTEFACT_TECH_LABEL": "data_pilot_arch_requirements",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Требования к архтитектурному стеку DPR",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "data",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 104,
+      "ARTEFACT_LABEL": "Подготовка требований к архитектуре",
+      "ARTEFACT_DESC": "Шаблон документа <a href=\"/template/Шаблон_Требования к архитектурному стеку DRP.docx\" target=\"_blank\">Шаблон_Требования к архитектурному стеку DRP.docx</a>",
+      "ARTEFACT_TECH_LABEL": "update_arch_drp",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Требования к архтитектурному стеку DPR",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "data",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 105,
+      "ARTEFACT_LABEL": "Бизнес-описание алгоритма сбора целевой переменной",
+      "ARTEFACT_DESC": "Прикрепите бизнес-описание алгоритма сбора целевой переменной",
+      "ARTEFACT_TECH_LABEL": "target_variable_collecting_description",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Прикрепите скрипт формирования витрины",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "data",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 106,
+      "ARTEFACT_LABEL": "Нужна интерпретация?",
+      "ARTEFACT_DESC": "Примите решение о необходимости интерпретации",
+      "ARTEFACT_TECH_LABEL": "need_interpretation_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Нужна интерпретация?",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "initialization",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 107,
+      "ARTEFACT_LABEL": "Анализ входного/выходного вектора",
+      "ARTEFACT_DESC": "Требуется ли доработка/разработка входного вектора?",
+      "ARTEFACT_TECH_LABEL": "need_input_vector_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Требуется доработка/разработка входного вектора?",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 108,
+      "ARTEFACT_LABEL": "Схема для валидации атрибутов входного/выходного вектора",
+      "ARTEFACT_DESC": "Прикрепите файл со схемой входного/выходного вектора",
+      "ARTEFACT_TECH_LABEL": "input_output_vector_validation_scheme",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Разработка модели",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 109,
+      "ARTEFACT_LABEL": "Конфигурационный файл контейнера",
+      "ARTEFACT_DESC": "Прикрепите конфигурационный файл контейнера",
+      "ARTEFACT_TECH_LABEL": "container_cfg_file",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Формирование обвязки модели",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 110,
+      "ARTEFACT_LABEL": "Образ контейнера с моделью",
+      "ARTEFACT_DESC": "Прикрепите ссылку на образ контейнера с моделью",
+      "ARTEFACT_TECH_LABEL": "model_image",
+      "ARTEFACT_TYPE_DESC": "link",
+      "ARTEFACT_TYPE_ID": 7,
+      "TASK_NAME": "Автоматическое создание REST сервиса",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 111,
+      "ARTEFACT_LABEL": "Ссылка на репозиторий в Nexus",
+      "ARTEFACT_DESC": "Добавьте ссылку на репозиторий в Nexus",
+      "ARTEFACT_TECH_LABEL": "nexus_repository_link",
+      "ARTEFACT_TYPE_DESC": "link",
+      "ARTEFACT_TYPE_ID": 7,
+      "TASK_NAME": "Автоматическое создание REST сервиса",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 112,
+      "ARTEFACT_LABEL": "Ссылка на REST-сервис модели на контуре TEST",
+      "ARTEFACT_DESC": "Добавьте ссылку на REST-сервис модели на контуре TEST",
+      "ARTEFACT_TECH_LABEL": "model_rest_service_test",
+      "ARTEFACT_TYPE_DESC": "link",
+      "ARTEFACT_TYPE_ID": 7,
+      "TASK_NAME": "Автоматическое создание REST сервиса",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 113,
+      "ARTEFACT_LABEL": "Ссылка на REST-сервис модели на контуре PROD",
+      "ARTEFACT_DESC": "Добавьте ссылку на REST-сервис модели на контуре PROD",
+      "ARTEFACT_TECH_LABEL": "model_rest_service_prod",
+      "ARTEFACT_TYPE_DESC": "link",
+      "ARTEFACT_TYPE_ID": 7,
+      "TASK_NAME": "Автоматическое создание REST сервиса",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 114,
+      "ARTEFACT_LABEL": "Код ETL-процесса для промышленной витрины",
+      "ARTEFACT_DESC": "Прикрепите файл с кодом ETL-процесса для промышленной витрины",
+      "ARTEFACT_TECH_LABEL": "etl_code_prom_datamart",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Разработка витрины",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 115,
+      "ARTEFACT_LABEL": "Код ETL-процесса для витрины мониторинга",
+      "ARTEFACT_DESC": "Прикрепите файл с кодом ETL-процесса для витрины мониторинга",
+      "ARTEFACT_TECH_LABEL": "etl_code_monitoring_datamart",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Разработка витрины",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 116,
+      "ARTEFACT_LABEL": "Список атрибутов промышленной витрины",
+      "ARTEFACT_DESC": "Шаблон документа <a href=\"/template/Шаблон_Список атрибутов для промышленной витрины.docx\" target=\"_blank\">Шаблон_Список атрибутов для промышленной витрины.docx</a>",
+      "ARTEFACT_TECH_LABEL": "prom_datamart_attributes",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Разработка БТ на промышленную витрину и витрину автомониторинга",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 117,
+      "ARTEFACT_LABEL": "БТ на витрину мониторинга",
+      "ARTEFACT_DESC": "Шаблон документа <a href=\"/template/Шаблон_БТ на витрину мониторинга.docx\" target=\"_blank\">Шаблон_БТ на витрину мониторинга.docx</a>",
+      "ARTEFACT_TECH_LABEL": "br_monitoring_datamart",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Разработка БТ на промышленную витрину и витрину автомониторинга",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 118,
+      "ARTEFACT_LABEL": "Список атрибутов для витрины мониторинга",
+      "ARTEFACT_DESC": "Шаблон документа <a href=\"/template/Шаблон_Список атрибутов для витрины мониторинга.docx\" target=\"_blank\">Шаблон_Список атрибутов для витрины мониторинга.docx</a>",
+      "ARTEFACT_TECH_LABEL": "monitoring_datamart_attributes",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Разработка БТ на промышленную витрину и витрину автомониторинга",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 120,
+      "ARTEFACT_LABEL": "Требуется привлечение ДИТ",
+      "ARTEFACT_DESC": "Примите решение о необходимости привлечении ДИТ",
+      "ARTEFACT_TECH_LABEL": "datamart_need_involve_dit_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Требуется привлечение ДИТ?",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 121,
+      "ARTEFACT_LABEL": "Тестирование успешно?",
+      "ARTEFACT_DESC": "Примите решение об успешности тестирования ДИТ",
+      "ARTEFACT_TECH_LABEL": "integration_test_success_flg",
+      "ARTEFACT_TYPE_DESC": "dropdown",
+      "ARTEFACT_TYPE_ID": 3,
+      "TASK_NAME": "Тестирование успешно?",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": [
+        {
+          "ARTEFACT_VALUE_ID": 22,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 121,
+          "ARTEFACT_VALUE": "Да",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 23,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 121,
+          "ARTEFACT_VALUE": "Нет, проблемы с производительностью модели",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 24,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 121,
+          "ARTEFACT_VALUE": "Нет, проблемы с витриной",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 25,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 121,
+          "ARTEFACT_VALUE": "Нет, проблемы с моделью",
+          "IS_ACTIVE_FLG": "1"
+        }
+      ]
+    },
+    {
+      "ARTEFACT_ID": 122,
+      "ARTEFACT_LABEL": "Тестирование успешно?",
+      "ARTEFACT_DESC": "Примите решение об успешности пользовательского тестирования",
+      "ARTEFACT_TECH_LABEL": "user_test_success_flg",
+      "ARTEFACT_TYPE_DESC": "dropdown",
+      "ARTEFACT_TYPE_ID": 3,
+      "TASK_NAME": "Тестирование успешно?",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": [
+        {
+          "ARTEFACT_VALUE_ID": 26,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 122,
+          "ARTEFACT_VALUE": "Да",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 27,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 122,
+          "ARTEFACT_VALUE": "Нет проблемы с моделью",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 28,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 122,
+          "ARTEFACT_VALUE": "Нет проблемы с витриной",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 29,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 122,
+          "ARTEFACT_VALUE": "Нет, проблемы с контейнером",
+          "IS_ACTIVE_FLG": "1"
+        }
+      ]
+    },
+    {
+      "ARTEFACT_ID": 123,
+      "ARTEFACT_LABEL": "Распоряжение о внедрении",
+      "ARTEFACT_DESC": "Шаблон документа <a href=\"/template/Шаблон_Распоряжение о внедрении модели.docx\" target=\"_blank\">Шаблон_Распоряжение о внедрении модели.docx</a>",
+      "ARTEFACT_TECH_LABEL": "integration_decree_file",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Формирование распоряжения внедрении модели на пром. стенд",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 124,
+      "ARTEFACT_LABEL": "Дата распоряжения о внедрении",
+      "ARTEFACT_DESC": "Укажите дату распоряжения о внедрении",
+      "ARTEFACT_TECH_LABEL": "integration_decree_date",
+      "ARTEFACT_TYPE_DESC": "date",
+      "ARTEFACT_TYPE_ID": 4,
+      "TASK_NAME": "Формирование распоряжения внедрении модели на пром. стенд",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 125,
+      "ARTEFACT_LABEL": "Требование к проведению мониторинга",
+      "ARTEFACT_DESC": "Прикрепите файл с требованиями к проведению мониторинга",
+      "ARTEFACT_TECH_LABEL": "monitoring_requirements",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Корректировка списков тестов или параметров мониторинга",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "monitoring",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 126,
+      "ARTEFACT_LABEL": "Описание",
+      "ARTEFACT_DESC": "Описание к проведению мониторинга",
+      "ARTEFACT_TECH_LABEL": "monitoring_description",
+      "ARTEFACT_TYPE_DESC": "text",
+      "ARTEFACT_TYPE_ID": 1,
+      "TASK_NAME": "Корректировка списка тестов, мониторинга, заполнение параметров",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "monitoring",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 127,
+      "ARTEFACT_LABEL": "Плановая дата проведения мониторинга",
+      "ARTEFACT_DESC": "Укажите плановую дату проведения мониторинга",
+      "ARTEFACT_TECH_LABEL": "monitoring_plan_date",
+      "ARTEFACT_TYPE_DESC": "date",
+      "ARTEFACT_TYPE_ID": 4,
+      "TASK_NAME": "Корректировка списка тестов, мониторинга, заполнение параметров",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "monitoring",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 128,
+      "ARTEFACT_LABEL": "Цель мониторинга",
+      "ARTEFACT_DESC": "Укажите цель мониторинга",
+      "ARTEFACT_TECH_LABEL": "monitoring_purpose",
+      "ARTEFACT_TYPE_DESC": "text",
+      "ARTEFACT_TYPE_ID": 1,
+      "TASK_NAME": "Корректировка списка тестов, мониторинга, заполнение параметров",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "monitoring",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 129,
+      "ARTEFACT_LABEL": "Расписание мониторинга",
+      "ARTEFACT_DESC": "Укажите расписание мониторинга",
+      "ARTEFACT_TECH_LABEL": "monitoring_schedule",
+      "ARTEFACT_TYPE_DESC": "text",
+      "ARTEFACT_TYPE_ID": 1,
+      "TASK_NAME": "Корректировка списка тестов, мониторинга, заполнение параметров",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "monitoring",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 130,
+      "ARTEFACT_LABEL": "Типология мониторинга",
+      "ARTEFACT_DESC": "Выберите типологию мониторинга",
+      "ARTEFACT_TECH_LABEL": "monitoring_type",
+      "ARTEFACT_TYPE_DESC": "text",
+      "ARTEFACT_TYPE_ID": 1,
+      "TASK_NAME": "Корректировка списков тестов или параметров мониторинга",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "monitoring",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 131,
+      "ARTEFACT_LABEL": "Отклонения значимые?",
+      "ARTEFACT_DESC": "Примите решение о значимости отклонений",
+      "ARTEFACT_TECH_LABEL": "deviation_significance_flg",
+      "ARTEFACT_TYPE_DESC": "dropdown",
+      "ARTEFACT_TYPE_ID": 3,
+      "TASK_NAME": "Отклонение значимое?",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "monitoring",
+      "VALUES": [
+        {
+          "ARTEFACT_VALUE_ID": 189,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 131,
+          "ARTEFACT_VALUE": "Отклонение значимое, модель допускает автокоррекировку",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 190,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 131,
+          "ARTEFACT_VALUE": "Отклонение значимое, модель не допускает автокоррекировку",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 191,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 131,
+          "ARTEFACT_VALUE": "Отклонение значимое, требуется доработка обвязки модели",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 192,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 131,
+          "ARTEFACT_VALUE": "Нет",
+          "IS_ACTIVE_FLG": "1"
+        }
+      ]
+    },
+    {
+      "ARTEFACT_ID": 132,
+      "ARTEFACT_LABEL": "Выявлены отклонения",
+      "ARTEFACT_DESC": "Выявлены ли отклонения при мониторинге?",
+      "ARTEFACT_TECH_LABEL": "deviations_reveal_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Выявлены отклонения?",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "monitoring",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 133,
+      "ARTEFACT_LABEL": "Отчет мониторинга",
+      "ARTEFACT_DESC": "Шаблон документа <a href=\"/template/Шаблон_Результаты мониторинга модели.docx\" target=\"_blank\">Шаблон_Результаты мониторинга модели.docx</a>",
+      "ARTEFACT_TECH_LABEL": "monitoring_report",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Монитор качества модели",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "monitoring",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 134,
+      "ARTEFACT_LABEL": "Сравнение результатов аналитического расчета мониторинга модели с текущим",
+      "ARTEFACT_DESC": "Прикрепите файл со сравнением результатов аналитического расчета мониторинга модели с текущим",
+      "ARTEFACT_TECH_LABEL": "monitoring_results_comparasing",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Создание отчета об отклонении",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "monitoring",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 135,
+      "ARTEFACT_LABEL": "Мастер-шкала уровня значимости отклонения показателей модели",
+      "ARTEFACT_DESC": "Прикрепите файл с мастер-шкалой уровня значимости отклонения показателей модели",
+      "ARTEFACT_TECH_LABEL": "master_scale",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Создание отчета об отклонении",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "monitoring",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 136,
+      "ARTEFACT_LABEL": "Отображение типового/текущего/типового и текущего графиков мониторинга",
+      "ARTEFACT_DESC": "Укажите отображение типового/текущего/типового и текущего графиков мониторинга",
+      "ARTEFACT_TECH_LABEL": "monitoring_graphs",
+      "ARTEFACT_TYPE_DESC": "text",
+      "ARTEFACT_TYPE_ID": 1,
+      "TASK_NAME": "Создание отчета об отклонении",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "monitoring",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 137,
+      "ARTEFACT_LABEL": "Вид отображения графиков для наиболее удобного анализа/сравнения",
+      "ARTEFACT_DESC": "Укажите вид отображения графиков для наиболее удобного анализа/сравнения",
+      "ARTEFACT_TECH_LABEL": "monitoring_graphs_type",
+      "ARTEFACT_TYPE_DESC": "text",
+      "ARTEFACT_TYPE_ID": 1,
+      "TASK_NAME": "Создание отчета об отклонении",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "monitoring",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 138,
+      "ARTEFACT_LABEL": "Отчет показателей/результатов",
+      "ARTEFACT_DESC": "Прикрепите файл с отчетом показателей/результатов",
+      "ARTEFACT_TECH_LABEL": "results_report",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Создание отчета об отклонении",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "monitoring",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 139,
+      "ARTEFACT_LABEL": "Разовая выгрузка данных",
+      "ARTEFACT_DESC": "Прикрепите ссылку на выгруженные данные",
+      "ARTEFACT_TECH_LABEL": "uploading_data_link",
+      "ARTEFACT_TYPE_DESC": "link",
+      "ARTEFACT_TYPE_ID": 7,
+      "TASK_NAME": "Проведение пилота с привлечением необходимых участников процесса",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "data",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 140,
+      "ARTEFACT_LABEL": "Глава группы валидации",
+      "ARTEFACT_DESC": "Назначьте ответственного группы валидации",
+      "ARTEFACT_TECH_LABEL": "validator_lead",
+      "ARTEFACT_TYPE_DESC": "user",
+      "ARTEFACT_TYPE_ID": 8,
+      "TASK_NAME": "Назначение группы, ответственной за модель",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "initialization",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 141,
+      "ARTEFACT_LABEL": "Установка успешна?",
+      "ARTEFACT_DESC": "Примите решение об успешности установки контейнера на контур TEST",
+      "ARTEFACT_TECH_LABEL": "conteiner_installing_test_flg",
+      "ARTEFACT_TYPE_DESC": "dropdown",
+      "ARTEFACT_TYPE_ID": 3,
+      "TASK_NAME": "Установка успешна?",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": [
+        {
+          "ARTEFACT_VALUE_ID": 30,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 141,
+          "ARTEFACT_VALUE": "Нет, проблема в контейнере",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 31,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 141,
+          "ARTEFACT_VALUE": "Да",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 32,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 141,
+          "ARTEFACT_VALUE": "Нет, проблема с кластером",
+          "IS_ACTIVE_FLG": "1"
+        }
+      ]
+    },
+    {
+      "ARTEFACT_ID": 142,
+      "ARTEFACT_LABEL": "Модель интерпретируема?",
+      "ARTEFACT_DESC": "Примите решения об интерпретируемости модели",
+      "ARTEFACT_TECH_LABEL": "is_model_interpreted_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Модель интерпретируемая?",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 143,
+      "ARTEFACT_LABEL": "Согласование протокола тестирования",
+      "ARTEFACT_DESC": "Прикрепите файл с согласованием протокола тестирования",
+      "ARTEFACT_TECH_LABEL": "test_protocol_approving",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Тестирование успешно?",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 144,
+      "ARTEFACT_LABEL": "ПСИ в части ФТ",
+      "ARTEFACT_DESC": "Шаблон документа <a href=\"/template/Шаблон_Протокол ПСИ в части ИФТ.docx\" target=\"_blank\">Шаблон_Протокол ПСИ в части ИФТ.docx</a>",
+      "ARTEFACT_TECH_LABEL": "acceptance_tests_of_functional_testing",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Проведение нагрузочного и функционального тестирования на контуре PREPROD",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 145,
+      "ARTEFACT_LABEL": "ПМИ в части ФТ",
+      "ARTEFACT_DESC": "Прикрепите файл ПМИ в части ФТ",
+      "ARTEFACT_TECH_LABEL": "methodological_tests_of_functional_testing",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Выполнение автоматизированных тестов тестирования ДИТ",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 146,
+      "ARTEFACT_LABEL": "Анализ результатов ФТ",
+      "ARTEFACT_DESC": "Прикрепите файл анализа результатов ФТ",
+      "ARTEFACT_TECH_LABEL": "functional_test_resuslt_analysis",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Проведение нагрузочного, функционального, интеграционного, регрессионнного тестирования",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 147,
+      "ARTEFACT_LABEL": "Анализ результатов НТ",
+      "ARTEFACT_DESC": "Прикрепите файл анализа результатов НТ",
+      "ARTEFACT_TECH_LABEL": "load_test_resuslt_analysis",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Проведение нагрузочного, функционального, интеграционного, регрессионнного тестирования",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 148,
+      "ARTEFACT_LABEL": "Анализ результатов РТ",
+      "ARTEFACT_DESC": "Прикрепите файл анализа результатов РТ",
+      "ARTEFACT_TECH_LABEL": "manual_test_resuslt_analysis",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Проведение нагрузочного, функционального, интеграционного, регрессионнного тестирования",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 149,
+      "ARTEFACT_LABEL": "Протокол ПСИ",
+      "ARTEFACT_DESC": "Прикрепите файл протокола ПСИ",
+      "ARTEFACT_TECH_LABEL": "acceptance_tests_protocol",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Проведение интеграционного и регресионного тестирования на контуре PREPROD",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 150,
+      "ARTEFACT_LABEL": "Проведение количественного анализа и формирование рекомендаций",
+      "ARTEFACT_DESC": "Прикрепите файл анализа валидации",
+      "ARTEFACT_TECH_LABEL": "validator_additional_analysis",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Проведение количественного анализа и формирование рекомендаций",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "validation",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 151,
+      "ARTEFACT_LABEL": "Выявлены отклонения при валидации?",
+      "ARTEFACT_DESC": "Выявлены отклонения при валидации?",
+      "ARTEFACT_TECH_LABEL": "deviations_during_validation_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Выявлены отклонения при валидации?",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "validation",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 152,
+      "ARTEFACT_LABEL": "Принятие Бизнес-партнером, бизнес-заказчиком и DS решения о необходимости доработки модели и выводе модели из эксплуатации",
+      "ARTEFACT_DESC": "Примите решение о необходимости доработки модели и выводе из эксплуатации",
+      "ARTEFACT_TECH_LABEL": "decision_of_model_completion_flg",
+      "ARTEFACT_TYPE_DESC": "dropdown",
+      "ARTEFACT_TYPE_ID": 3,
+      "TASK_NAME": "Принятие Бизнес-партнером, бизнес-заказчиком и DS решения о необходимости доработки модели и выводе модели из эксплуатации",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "validation",
+      "VALUES": [
+        {
+          "ARTEFACT_VALUE_ID": 33,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 152,
+          "ARTEFACT_VALUE": "Доработка не требуется",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 34,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 152,
+          "ARTEFACT_VALUE": "Необходима доработка модели",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 35,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 152,
+          "ARTEFACT_VALUE": "Вывод модели из эксплуатации",
+          "IS_ACTIVE_FLG": "1"
+        }
+      ]
+    },
+    {
+      "ARTEFACT_ID": 153,
+      "ARTEFACT_LABEL": "Скрипты тестов/сценарии валидации",
+      "ARTEFACT_DESC": "Выберите тесты валидации",
+      "ARTEFACT_TECH_LABEL": "validation_tests",
+      "ARTEFACT_TYPE_DESC": "text",
+      "ARTEFACT_TYPE_ID": 1,
+      "TASK_NAME": "Выбор сценариев и тестов валидации для модели из библиотеки тестов",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "validation",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 154,
+      "ARTEFACT_LABEL": "ТЗ на компоновку сценариев валидации",
+      "ARTEFACT_DESC": "Шаблон документа <a href=\"/template/Шаблон_Т3 на компоновку сценария валидации.docx\" target=\"_blank\">Шаблон_Т3 на компоновку сценария валидации.docx</a>",
+      "ARTEFACT_TECH_LABEL": "ts_validation_tests_scenary",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Выбор сценариев и тестов валидации для модели из библиотеки тестов",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "validation",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 155,
+      "ARTEFACT_LABEL": "Тип валидации",
+      "ARTEFACT_DESC": "Выберите тип валидации",
+      "ARTEFACT_TECH_LABEL": "plan_validation_type",
+      "ARTEFACT_TYPE_DESC": "text",
+      "ARTEFACT_TYPE_ID": 1,
+      "TASK_NAME": "Выбор сценариев и тестов валидации для модели из библиотеки тестов",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "validation",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 156,
+      "ARTEFACT_LABEL": "Необходимо добавить тесты или сценарии в библиотеку тестов?",
+      "ARTEFACT_DESC": "Примите решение о необходимости добавления тестов или сценариев в библиотеку тестов?",
+      "ARTEFACT_TECH_LABEL": "need_adding_validation_tests_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Необходимо добавить тесты или сценарии в библиотеку тестов?",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "validation",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 157,
+      "ARTEFACT_LABEL": "Отчет о валидации",
+      "ARTEFACT_DESC": "Шаблон документа <a href=\"/template/Шаблон_Отчет о результатах валидации.xlsx\" target=\"_blank\">Шаблон_Отчет о результатах валидации.xlsx</a>",
+      "ARTEFACT_TECH_LABEL": "validation_report",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Выявлены отклонения при валидации?",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "validation",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 158,
+      "ARTEFACT_LABEL": "Согласование изменения после автокоррекировки",
+      "ARTEFACT_DESC": "Примите решение о согласовании изменений после автокоррекировки",
+      "ARTEFACT_TECH_LABEL": "approving_autocorrect_changes_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Новые изменения согласованы?",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "monitoring",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 159,
+      "ARTEFACT_LABEL": "Тестирование после автокорректировки успешно?",
+      "ARTEFACT_DESC": "Примите решение об успешности тестирования после автокорректировки",
+      "ARTEFACT_TECH_LABEL": "auto_monitoring_testing_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Тестирование после автокорректировки успешно?",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "monitoring",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 160,
+      "ARTEFACT_LABEL": "Отчет о выгрузке внутреннего источника в DRP",
+      "ARTEFACT_DESC": "Шаблон документа <a href=\"/template/Шаблон_Результаты согласования пилотной выгрузки.docx\" target=\"_blank\">Шаблон_Результаты согласования пилотной выгрузки.docx</a>",
+      "ARTEFACT_TECH_LABEL": "drp_load_report",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Успешность загрузки в DRP",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "data",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 161,
+      "ARTEFACT_LABEL": "Отчет о загрузке списка сущностей и атрибутов для проведения пилота",
+      "ARTEFACT_DESC": "Прикрепите отчет о загрузке списка сущностей и атрибутов для проведения пилота",
+      "ARTEFACT_TECH_LABEL": "entity_attributes_load_report",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Согласование результатов пилота",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "data",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 165,
+      "ARTEFACT_LABEL": "Модель переведена на этап \"Вывод модели из промышленной эксплуатации\"?",
+      "ARTEFACT_DESC": "Примите решение о выводе модели из эксплуатации",
+      "ARTEFACT_TECH_LABEL": "removal_model_after_monitoring_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Модель переведена на этап \"Вывод модели из промышленной эксплуатации\"?",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "monitoring",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 167,
+      "ARTEFACT_LABEL": "Скрипт расчета агрегатов",
+      "ARTEFACT_DESC": "Прикрепите файл",
+      "ARTEFACT_TECH_LABEL": "script_calculation_algorithm",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Проведение пилота с привлечением необходимых участников процесса",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "data",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 168,
+      "ARTEFACT_LABEL": "Название карточки внедрения",
+      "ARTEFACT_DESC": "Введите название",
+      "ARTEFACT_TECH_LABEL": "integration_name",
+      "ARTEFACT_TYPE_DESC": "text",
+      "ARTEFACT_TYPE_ID": 1,
+      "TASK_NAME": "Название карточки внедрения",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 169,
+      "ARTEFACT_LABEL": "Название карточки разработки данных",
+      "ARTEFACT_DESC": "Введите название",
+      "ARTEFACT_TECH_LABEL": "data_name",
+      "ARTEFACT_TYPE_DESC": "text",
+      "ARTEFACT_TYPE_ID": 1,
+      "TASK_NAME": "Название карточки разработки данных",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "data",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 170,
+      "ARTEFACT_LABEL": "Название карточки мониторинга",
+      "ARTEFACT_DESC": "Введите название",
+      "ARTEFACT_TECH_LABEL": "monitoring_name",
+      "ARTEFACT_TYPE_DESC": "text",
+      "ARTEFACT_TYPE_ID": 1,
+      "TASK_NAME": "Название карточки мониторинга",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "monitoring",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 171,
+      "ARTEFACT_LABEL": "Название карточки валидации",
+      "ARTEFACT_DESC": "Введите название",
+      "ARTEFACT_TECH_LABEL": "validation_name",
+      "ARTEFACT_TYPE_DESC": "text",
+      "ARTEFACT_TYPE_ID": 1,
+      "TASK_NAME": "Название карточки валидации",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "validation",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 172,
+      "ARTEFACT_LABEL": "Название карточки разработки модели",
+      "ARTEFACT_DESC": "Введите название",
+      "ARTEFACT_TECH_LABEL": "modeldev_name",
+      "ARTEFACT_TYPE_DESC": "text",
+      "ARTEFACT_TYPE_ID": 1,
+      "TASK_NAME": "Название карточки разработки модели",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 173,
+      "ARTEFACT_LABEL": "Тип модели",
+      "ARTEFACT_DESC": "Выберите тип модели",
+      "ARTEFACT_TECH_LABEL": "model_type_lev1",
+      "ARTEFACT_TYPE_DESC": "multi-dropdown",
+      "ARTEFACT_TYPE_ID": 5,
+      "TASK_NAME": "Заполнение информации",
+      "IS_MAIN_INFO_FLG": "1",
+      "IS_CLASS_FLG": 1,
+      "BPMN_NAME": "initialization",
+      "VALUES": [
+        {
+          "ARTEFACT_VALUE_ID": 36,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Бизнес-модели",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 37,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "ВПОДК - не ПВР",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 38,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "ПВР",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 39,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Риск-модели (не ПВР - не ВПОДК)",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 40,
+          "ARTEFACT_PARENT_VALUE_ID": 38,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Не розничные",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 41,
+          "ARTEFACT_PARENT_VALUE_ID": 38,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Розничные",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 42,
+          "ARTEFACT_PARENT_VALUE_ID": 39,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Не розничные",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 43,
+          "ARTEFACT_PARENT_VALUE_ID": 39,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Розничные",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 44,
+          "ARTEFACT_PARENT_VALUE_ID": 36,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "CRM",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 45,
+          "ARTEFACT_PARENT_VALUE_ID": 36,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "HR-модели",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 46,
+          "ARTEFACT_PARENT_VALUE_ID": 36,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Бухучет",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 47,
+          "ARTEFACT_PARENT_VALUE_ID": 36,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Оптимизация",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 48,
+          "ARTEFACT_PARENT_VALUE_ID": 36,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Прочие модели",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 49,
+          "ARTEFACT_PARENT_VALUE_ID": 36,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Распознавание",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 50,
+          "ARTEFACT_PARENT_VALUE_ID": 37,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Контрагентский риск",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 51,
+          "ARTEFACT_PARENT_VALUE_ID": 37,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Ликвидность",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 52,
+          "ARTEFACT_PARENT_VALUE_ID": 37,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Недвижимость",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 53,
+          "ARTEFACT_PARENT_VALUE_ID": 37,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Операционный риск",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 54,
+          "ARTEFACT_PARENT_VALUE_ID": 37,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Оценка TTC",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 55,
+          "ARTEFACT_PARENT_VALUE_ID": 37,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Процентный риск",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 56,
+          "ARTEFACT_PARENT_VALUE_ID": 37,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Рыночные риски",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 57,
+          "ARTEFACT_PARENT_VALUE_ID": 44,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "CRM-отток",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 58,
+          "ARTEFACT_PARENT_VALUE_ID": 44,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Cross-Sell",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 59,
+          "ARTEFACT_PARENT_VALUE_ID": 44,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Sell-Up",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 60,
+          "ARTEFACT_PARENT_VALUE_ID": 45,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Задачи управления персоналом",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 61,
+          "ARTEFACT_PARENT_VALUE_ID": 46,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Выявление аномалий в бухгалтерском учете",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 62,
+          "ARTEFACT_PARENT_VALUE_ID": 46,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Улучшение бухгалтерского учета",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 63,
+          "ARTEFACT_PARENT_VALUE_ID": 47,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Прогнозирование загрузки банкоматов",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 64,
+          "ARTEFACT_PARENT_VALUE_ID": 48,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Анализ Геолокации",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 65,
+          "ARTEFACT_PARENT_VALUE_ID": 48,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Выявление аномального поведения участников торгов",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 66,
+          "ARTEFACT_PARENT_VALUE_ID": 48,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Голосовая биометрия в банке",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 67,
+          "ARTEFACT_PARENT_VALUE_ID": 48,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Прогноз цен на подержанный автомобиль - как параметр LGD модели",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 68,
+          "ARTEFACT_PARENT_VALUE_ID": 48,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Проект кластеризации отраслей по финансовым признакам",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 69,
+          "ARTEFACT_PARENT_VALUE_ID": 49,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Распознавание документации",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 70,
+          "ARTEFACT_PARENT_VALUE_ID": 50,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Сравнение EEPE и рассчитанного на основе MtM (фактический EAD)",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 71,
+          "ARTEFACT_PARENT_VALUE_ID": 51,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Модели гэпа ликвидности на все временные интервалы",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 72,
+          "ARTEFACT_PARENT_VALUE_ID": 51,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Модели досрочного возврата срочных депозитов ФЛ и ЮЛ во временных бакетах свыше 3 месяцев от портфеля",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 73,
+          "ARTEFACT_PARENT_VALUE_ID": 51,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Модели досрочного погашения кредитов ЮЛ",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 74,
+          "ARTEFACT_PARENT_VALUE_ID": 51,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Модели непогашений в контрактный срок кредитов ФЛ и ЮЛ в бакете до 3 месяцев",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 75,
+          "ARTEFACT_PARENT_VALUE_ID": 51,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Модели пролонгаций депозитных портфелей ФЛ и ЮЛ (за исключением досрочно востребованных) с учетом стрессовых корректировок",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 76,
+          "ARTEFACT_PARENT_VALUE_ID": 51,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Модель досрочных погашений кредитов ФЛ (препеймент)",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 77,
+          "ARTEFACT_PARENT_VALUE_ID": 51,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Модель расчета нестабильных долей и коэффициентов пролонгации для срочных клиентских ресурсов и денежных средств 'до востребования' для целей расчета краткосрочной ликвидности",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 78,
+          "ARTEFACT_PARENT_VALUE_ID": 51,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Модель расчета нестабильных долей пассивов 'до востребования'",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 79,
+          "ARTEFACT_PARENT_VALUE_ID": 51,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Модель учета встроенной опциональности в будущих потоках платежей для депозитов ЮЛ с возможностью досрочного погашения",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 80,
+          "ARTEFACT_PARENT_VALUE_ID": 52,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Дисконтирующие коэффициенты под риск недвижимости",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 81,
+          "ARTEFACT_PARENT_VALUE_ID": 54,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Approximate Markov Functional",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 82,
+          "ARTEFACT_PARENT_VALUE_ID": 54,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Attenuated Futures Correlation",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 83,
+          "ARTEFACT_PARENT_VALUE_ID": 54,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Black Scholes Merton",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 84,
+          "ARTEFACT_PARENT_VALUE_ID": 54,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "CapFloor",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 85,
+          "ARTEFACT_PARENT_VALUE_ID": 54,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "CapFloorBpVol",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 86,
+          "ARTEFACT_PARENT_VALUE_ID": 54,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Credit Piece-wise Constant Hazard Rate",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 87,
+          "ARTEFACT_PARENT_VALUE_ID": 54,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Credit Valuation Adjustment",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 88,
+          "ARTEFACT_PARENT_VALUE_ID": 54,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Defaultl Table Asset with Stated Dependent Hazard",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 89,
+          "ARTEFACT_PARENT_VALUE_ID": 54,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Discounted cash flows",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 90,
+          "ARTEFACT_PARENT_VALUE_ID": 54,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "FXForward",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 91,
+          "ARTEFACT_PARENT_VALUE_ID": 54,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "FXSwap",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 92,
+          "ARTEFACT_PARENT_VALUE_ID": 54,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Gamma Hazard Model",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 93,
+          "ARTEFACT_PARENT_VALUE_ID": 54,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Linear Gauss Markov",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 94,
+          "ARTEFACT_PARENT_VALUE_ID": 54,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Local Volatility Model",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 95,
+          "ARTEFACT_PARENT_VALUE_ID": 54,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Model Credit Default Times Copula",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 96,
+          "ARTEFACT_PARENT_VALUE_ID": 54,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Static Inflation",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 97,
+          "ARTEFACT_PARENT_VALUE_ID": 54,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Swap",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 98,
+          "ARTEFACT_PARENT_VALUE_ID": 54,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "VTBCommoditySwap2_GD",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 99,
+          "ARTEFACT_PARENT_VALUE_ID": 54,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "VTBFXNDF",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 100,
+          "ARTEFACT_PARENT_VALUE_ID": 54,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "VTBSwaptionSABR",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 101,
+          "ARTEFACT_PARENT_VALUE_ID": 54,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "VTBXXCCySwap",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 102,
+          "ARTEFACT_PARENT_VALUE_ID": 55,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Параметры стресс-тестирования (moderate stress)",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 103,
+          "ARTEFACT_PARENT_VALUE_ID": 55,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Параметры стресс-тестирования (severe stress)",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 104,
+          "ARTEFACT_PARENT_VALUE_ID": 56,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "VAR методика оценки рыночного риска торговой книги",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 105,
+          "ARTEFACT_PARENT_VALUE_ID": 56,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Параметры стресс-тестирования (moderate stress)",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 106,
+          "ARTEFACT_PARENT_VALUE_ID": 56,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Параметры стресс-тестирования (severe stress)",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 107,
+          "ARTEFACT_PARENT_VALUE_ID": 40,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "CCF",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 108,
+          "ARTEFACT_PARENT_VALUE_ID": 40,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "EAD",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 109,
+          "ARTEFACT_PARENT_VALUE_ID": 40,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "LGD",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 110,
+          "ARTEFACT_PARENT_VALUE_ID": 40,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "PD",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 111,
+          "ARTEFACT_PARENT_VALUE_ID": 41,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "CCF",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 112,
+          "ARTEFACT_PARENT_VALUE_ID": 41,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "EAD",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 113,
+          "ARTEFACT_PARENT_VALUE_ID": 41,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "LGD",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 114,
+          "ARTEFACT_PARENT_VALUE_ID": 41,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "PD app",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 115,
+          "ARTEFACT_PARENT_VALUE_ID": 41,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "PD beh",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 116,
+          "ARTEFACT_PARENT_VALUE_ID": 42,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Collection",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 117,
+          "ARTEFACT_PARENT_VALUE_ID": 42,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Анти-фрод",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 118,
+          "ARTEFACT_PARENT_VALUE_ID": 42,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Бизнес LGD",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 119,
+          "ARTEFACT_PARENT_VALUE_ID": 42,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Бизнес PD",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 120,
+          "ARTEFACT_PARENT_VALUE_ID": 42,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Бизнес-планирование резервов МСФО",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 121,
+          "ARTEFACT_PARENT_VALUE_ID": 42,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Делегирование полномочий ",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 122,
+          "ARTEFACT_PARENT_VALUE_ID": 42,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Идентификация клиентов ЮЛ",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 123,
+          "ARTEFACT_PARENT_VALUE_ID": 42,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Казначейство",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 124,
+          "ARTEFACT_PARENT_VALUE_ID": 42,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Моделий выявления ФКР",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 125,
+          "ARTEFACT_PARENT_VALUE_ID": 42,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Резервы МСФО",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 126,
+          "ARTEFACT_PARENT_VALUE_ID": 42,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Ценообразование корпоративных продуктов",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 127,
+          "ARTEFACT_PARENT_VALUE_ID": 43,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Collection (hard)",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 128,
+          "ARTEFACT_PARENT_VALUE_ID": 43,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Collection (soft)",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 129,
+          "ARTEFACT_PARENT_VALUE_ID": 43,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Анти-фрод",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 130,
+          "ARTEFACT_PARENT_VALUE_ID": 43,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Бизнес LGD",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 131,
+          "ARTEFACT_PARENT_VALUE_ID": 43,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Бизнес PD",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 132,
+          "ARTEFACT_PARENT_VALUE_ID": 43,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Бизнес-планирование резервов МСФО",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 133,
+          "ARTEFACT_PARENT_VALUE_ID": 43,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Делегирование полномочий",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 134,
+          "ARTEFACT_PARENT_VALUE_ID": 43,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Идентификация клиентов ФЛ",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 135,
+          "ARTEFACT_PARENT_VALUE_ID": 43,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Казначейство",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 136,
+          "ARTEFACT_PARENT_VALUE_ID": 43,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Модели выявления ФКР",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 137,
+          "ARTEFACT_PARENT_VALUE_ID": 43,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Резервы МСФО",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 138,
+          "ARTEFACT_PARENT_VALUE_ID": 43,
+          "ARTEFACT_ID": 173,
+          "ARTEFACT_VALUE": "Ценообразование розничных продуктов",
+          "IS_ACTIVE_FLG": "1"
+        }
+      ]
+    },
+    {
+      "ARTEFACT_ID": 174,
+      "ARTEFACT_LABEL": "Согласовано успешно?",
+      "ARTEFACT_DESC": "Примите решение об успешности согласования перевода модели в пром. эксплуатацию",
+      "ARTEFACT_TECH_LABEL": "model_deployment_approving_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Согласование с бизнес-заказчиком перевода модели в промышленную эксплуатацию",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 175,
+      "ARTEFACT_LABEL": "Скрипт формирования витрины",
+      "ARTEFACT_DESC": "Прикрепите скрипт формирования витрины",
+      "ARTEFACT_TECH_LABEL": "datamart_build_script",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Прикрепите скрипт формирования витрины",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "data",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 177,
+      "ARTEFACT_LABEL": "Ссылка на витрину данных",
+      "ARTEFACT_DESC": "Прикрепите ссылку на витрину данных",
+      "ARTEFACT_TECH_LABEL": "datamart_link",
+      "ARTEFACT_TYPE_DESC": "link",
+      "ARTEFACT_TYPE_ID": 7,
+      "TASK_NAME": "Прикрепите скрипт формирования витрины",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "data",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 178,
+      "ARTEFACT_LABEL": "Описание витрины",
+      "ARTEFACT_DESC": "Шаблон документа <a href=\"/template/Шаблон_Описание модели данных витрины для разработки модели.docx\" target=\"_blank\">Шаблон_Описание модели данных витрины для разработки модели.docx</a>",
+      "ARTEFACT_TECH_LABEL": "datamart_description",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Прикрепите скрипт формирования витрины",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "data",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 179,
+      "ARTEFACT_LABEL": "Добавление скрипта автообновления",
+      "ARTEFACT_DESC": "Прикрепите скрипт автообновления",
+      "ARTEFACT_TECH_LABEL": "autoupdating_datamart_script",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Добавление скрипта автообновления",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "data",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 180,
+      "ARTEFACT_LABEL": "Витрина автообновляема",
+      "ARTEFACT_DESC": "Витрина автообновляема?",
+      "ARTEFACT_TECH_LABEL": "autoupdate_datamart_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Витрина автообновляема?",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "data",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 181,
+      "ARTEFACT_LABEL": "Витрина для разработки модели",
+      "ARTEFACT_DESC": "Прикрепите ссылку",
+      "ARTEFACT_TECH_LABEL": "developing_model_datamart",
+      "ARTEFACT_TYPE_DESC": "link",
+      "ARTEFACT_TYPE_ID": 7,
+      "TASK_NAME": "Разделение витрины на части для разработки и для первичной валидации",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "data",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 182,
+      "ARTEFACT_LABEL": "Витрина для первичной валидации",
+      "ARTEFACT_DESC": "Прикрепите ссылку",
+      "ARTEFACT_TECH_LABEL": "validation_model_datamart",
+      "ARTEFACT_TYPE_DESC": "link",
+      "ARTEFACT_TYPE_ID": 7,
+      "TASK_NAME": "Разделение витрины на части для разработки и для первичной валидации",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "data",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 183,
+      "ARTEFACT_LABEL": "Добавление требований на доработку",
+      "ARTEFACT_DESC": "Шаблон документа <a href=\"/template/Шаблон_Требования на доработку витрины.docx\" target=\"_blank\">Шаблон_Требования на доработку витрины.docx</a>",
+      "ARTEFACT_TECH_LABEL": "data_recreate_req",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Добавление требований на доработку",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 184,
+      "ARTEFACT_LABEL": "Алгоритмы полей для внесения во входной и выходной вектор",
+      "ARTEFACT_DESC": "Шаблон документа <a href=\"/template/Шаблон_Алгоритмы полей для внесения во входной и выходной вектор.docx\" target=\"_blank\">Шаблон_Алгоритмы полей для внесения во входной и выходной вектор.docx</a>",
+      "ARTEFACT_TECH_LABEL": "features_algorithm_vector",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Формирование требований для автомониторинга",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 185,
+      "ARTEFACT_LABEL": "ТЗ на компановку сценариев валидации",
+      "ARTEFACT_DESC": "Прикрепите файл",
+      "ARTEFACT_TECH_LABEL": "scenary_tech_specifiaction",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Выбор сценариев и тестов валидации из библиотеки тестов",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 186,
+      "ARTEFACT_LABEL": "Конфигурационный файл первичной валидации",
+      "ARTEFACT_DESC": "Прикрепите файл",
+      "ARTEFACT_TECH_LABEL": "fisrt_validation_cfg",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Проведение количественного анализа и формирование рекомендаций",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 187,
+      "ARTEFACT_LABEL": "Шаблон отчета",
+      "ARTEFACT_DESC": "Прикрепите файл",
+      "ARTEFACT_TECH_LABEL": "fisrt_validation_template_report",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Проведение количественного анализа и формирование рекомендаций",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 188,
+      "ARTEFACT_LABEL": "БТ на витрину для валидации",
+      "ARTEFACT_DESC": "Шаблон документа <a href=\"/template/Шаблон_БТ на витрину для плановой валидации.docx\" target=\"_blank\">Шаблон_БТ на витрину для плановой валидации.docx</a>",
+      "ARTEFACT_TECH_LABEL": "br_validation_datamart",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Разработка БТ на витрину плановой валидации",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 189,
+      "ARTEFACT_LABEL": "БТ на пром. витрину",
+      "ARTEFACT_DESC": "Шаблон документа <a href=\"/template/Шаблон_БТ на промышленную витрину.docx\" target=\"_blank\">Шаблон_БТ на промышленную витрину.docx</a>",
+      "ARTEFACT_TECH_LABEL": "br_prom_datamart",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Разработка БТ на промышленную витрину и витрину автомониторинга",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 190,
+      "ARTEFACT_LABEL": "Список атрибутов для витрины плановой валидации",
+      "ARTEFACT_DESC": "Шаблон документа <a href=\"/template/Шаблон_Список атрибутов для витрины плановой валидации.docx\" target=\"_blank\">Шаблон_Список атрибутов для витрины плановой валидации.docx</a>",
+      "ARTEFACT_TECH_LABEL": "validation_datamart_attributes",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Разработка БТ на витрину плановой валидации",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 191,
+      "ARTEFACT_LABEL": "Требуется интерпретация модели",
+      "ARTEFACT_DESC": "Примите решение об интерпретации",
+      "ARTEFACT_TECH_LABEL": "need_model_interpretation_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Требуется интерпретация модели?",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 192,
+      "ARTEFACT_LABEL": "Модель после интерпретации",
+      "ARTEFACT_DESC": "Прикрепите файл с моделью после интерпретации",
+      "ARTEFACT_TECH_LABEL": "model_after_interpretation",
+      "ARTEFACT_TYPE_DESC": "file_git",
+      "ARTEFACT_TYPE_ID": 9,
+      "TASK_NAME": "Модель после интерпретации",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 193,
+      "ARTEFACT_LABEL": "Распоряжение о выводе модели из эксплуатации",
+      "ARTEFACT_DESC": "Шаблон документа <a href=\"/template/Шаблон_Распоряжение о выводе модели из пром. эксплуатации.docx\" target=\"_blank\">Шаблон_Распоряжение о выводе модели из пром. эксплуатации.docx</a>",
+      "ARTEFACT_TECH_LABEL": "decommission_order",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Формирование и согласование с Бизнес-заказчиком Распоряжения о выводе модели из эксплуатации",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "extend",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 194,
+      "ARTEFACT_LABEL": "Код ETL процесса для витрины валидации",
+      "ARTEFACT_DESC": "Прикрепите файл",
+      "ARTEFACT_TECH_LABEL": "etl_code_validation_datamart",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Создание заявки в Jira на ДИТ",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 195,
+      "ARTEFACT_LABEL": "SPK ETL процесса для промышленной витрины",
+      "ARTEFACT_DESC": "Прикрепите SPK ETL процесса для промышленной витрины",
+      "ARTEFACT_TECH_LABEL": "spk_etl_prom",
+      "ARTEFACT_TYPE_DESC": "file_git",
+      "ARTEFACT_TYPE_ID": 9,
+      "TASK_NAME": "Сборка ETL процессов",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 196,
+      "ARTEFACT_LABEL": "SPK ETL процесса для витрины мониторинга",
+      "ARTEFACT_DESC": "Прикрепите SPK ETL процесса для витрины мониторинга",
+      "ARTEFACT_TECH_LABEL": "spk_etl_monitoring",
+      "ARTEFACT_TYPE_DESC": "file_git",
+      "ARTEFACT_TYPE_ID": 9,
+      "TASK_NAME": "Сборка ETL процессов",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 197,
+      "ARTEFACT_LABEL": "SPK ETL процесса для витрины валидации",
+      "ARTEFACT_DESC": "Прикрепите SPK ETL процесса для витрины валидации",
+      "ARTEFACT_TECH_LABEL": "spk_etl_validation",
+      "ARTEFACT_TYPE_DESC": "file_git",
+      "ARTEFACT_TYPE_ID": 9,
+      "TASK_NAME": "Сборка ETL процессов",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 198,
+      "ARTEFACT_LABEL": "Чек-листы для внедрения модели",
+      "ARTEFACT_DESC": "Шаблон документа <a href=\"/template/Шаблон_Чек-лист для внедрения модели.docx\" target=\"_blank\">Шаблон_Чек-лист для внедрения модели.docx</a>",
+      "ARTEFACT_TECH_LABEL": "check_list",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Согласование с бизнес-заказчиком перевода модели в промышленную эксплуатацию",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 199,
+      "ARTEFACT_LABEL": "Скрипты мониторинга",
+      "ARTEFACT_DESC": "Прикрепите ссылку",
+      "ARTEFACT_TECH_LABEL": "monitoring_scripts",
+      "ARTEFACT_TYPE_DESC": "link",
+      "ARTEFACT_TYPE_ID": 7,
+      "TASK_NAME": "Корректировка списков тестов или параметров мониторинга",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "monitoring",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 200,
+      "ARTEFACT_LABEL": "Требуется привлечение ДИТ?",
+      "ARTEFACT_DESC": "Примите решение о необходимости привлечения ДИТ",
+      "ARTEFACT_TECH_LABEL": "need_involve_dit_monitoring_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Требуется привлечение ДИТ?",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "monitoring",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 201,
+      "ARTEFACT_LABEL": "Модель внедряется в ПИМ?",
+      "ARTEFACT_DESC": "Принять решение о внедрении в ПИМ",
+      "ARTEFACT_TECH_LABEL": "pim_integration_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Примите решение о внедрении модели в ПИМ",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 202,
+      "ARTEFACT_LABEL": "Согласование требований к архитектуре",
+      "ARTEFACT_DESC": "Согласуйте требования к архитектуре",
+      "ARTEFACT_TECH_LABEL": "requirements_approving_mipm_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Согласование требований к архитектуре",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "data",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 203,
+      "ARTEFACT_LABEL": "Согласование требований к архитектуре",
+      "ARTEFACT_DESC": "Согласуйте требования к архитектуре",
+      "ARTEFACT_TECH_LABEL": "requirements_approving_de_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Согласование требований к архитектуре",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "data",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 204,
+      "ARTEFACT_LABEL": "Необходимость корректировки постановки задачи",
+      "ARTEFACT_DESC": "Принять решение",
+      "ARTEFACT_TECH_LABEL": "need_correct_task_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Необходимость корректировки постановки задачи",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "initialization",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 205,
+      "ARTEFACT_LABEL": "Успешность разработки скрипта формирования витрины",
+      "ARTEFACT_DESC": "Принять решение",
+      "ARTEFACT_TECH_LABEL": "datamart_script_success_flg",
+      "ARTEFACT_TYPE_DESC": "dropdown",
+      "ARTEFACT_TYPE_ID": 3,
+      "TASK_NAME": "Успешность разработки скрипта формирования витрины",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "data",
+      "VALUES": [
+        {
+          "ARTEFACT_VALUE_ID": 179,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 205,
+          "ARTEFACT_VALUE": "Да",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 179,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 205,
+          "ARTEFACT_VALUE": "Да",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 180,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 205,
+          "ARTEFACT_VALUE": "Нет, требуется корректировка постановки задачи",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 180,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 205,
+          "ARTEFACT_VALUE": "Нет, требуется корректировка постановки задачи",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 181,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 205,
+          "ARTEFACT_VALUE": "Нет, требуется другой источник данных",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 181,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 205,
+          "ARTEFACT_VALUE": "Нет, требуется другой источник данных",
+          "IS_ACTIVE_FLG": "1"
+        }
+      ]
+    },
+    {
+      "ARTEFACT_ID": 206,
+      "ARTEFACT_LABEL": "Согласование параметров валидации",
+      "ARTEFACT_DESC": "Параметры валидации согласованы?",
+      "ARTEFACT_TECH_LABEL": "validation_parameters_approving_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Согласование параметров валидации",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 207,
+      "ARTEFACT_LABEL": "Согласование требований к архетектурному стеку",
+      "ARTEFACT_DESC": "Требования согласованы?",
+      "ARTEFACT_TECH_LABEL": "arch_requirements_agreement_mipm_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Согласование требований к архетектурному стеку",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 208,
+      "ARTEFACT_LABEL": "Согласование требований к архетектурному стеку",
+      "ARTEFACT_DESC": "Требования согласованы?",
+      "ARTEFACT_TECH_LABEL": "arch_requirements_agreement_de_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Согласование требований к архетектурному стеку",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 209,
+      "ARTEFACT_LABEL": "Согласование требований на витрину",
+      "ARTEFACT_DESC": "Требования согласованы?",
+      "ARTEFACT_TECH_LABEL": "datamart_requirements_approving_mlops_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Согласование требований на витрину",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 210,
+      "ARTEFACT_LABEL": "Согласование требований на витрину",
+      "ARTEFACT_DESC": "Требования согласованы?",
+      "ARTEFACT_TECH_LABEL": "datamart_requirements_approving_ds_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Согласование требований на витрину",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 211,
+      "ARTEFACT_LABEL": "Режим валидации",
+      "ARTEFACT_DESC": "Выбор режима валидации",
+      "ARTEFACT_TECH_LABEL": "validation_class_flg",
+      "ARTEFACT_TYPE_DESC": "dropdown",
+      "ARTEFACT_TYPE_ID": 3,
+      "TASK_NAME": "Режим валидации",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": [
+        {
+          "ARTEFACT_VALUE_ID": 182,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 211,
+          "ARTEFACT_VALUE": "Ручная валидация",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 183,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 211,
+          "ARTEFACT_VALUE": "Автоматическая валидация",
+          "IS_ACTIVE_FLG": "1"
+        }
+      ]
+    },
+    {
+      "ARTEFACT_ID": 212,
+      "ARTEFACT_LABEL": "Результаты проведения тестов валидации",
+      "ARTEFACT_DESC": "Прикрепить файл",
+      "ARTEFACT_TECH_LABEL": "manual_first_validation_result",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Проведение ручной первичной валидации вне СУМ",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 213,
+      "ARTEFACT_LABEL": "Отчет о результатах тестирования",
+      "ARTEFACT_DESC": "Прикрепить файл",
+      "ARTEFACT_TECH_LABEL": "manual_first_validation_report",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Проведение ручной первичной валидации вне СУМ",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 214,
+      "ARTEFACT_LABEL": "Результаты тестирования",
+      "ARTEFACT_DESC": "Принять решение",
+      "ARTEFACT_TECH_LABEL": "first_test_preprod_flg",
+      "ARTEFACT_TYPE_DESC": "dropdown",
+      "ARTEFACT_TYPE_ID": 3,
+      "TASK_NAME": "Проведение нагрузочного и функционального тестирования на контуре PREPROD",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": [
+        {
+          "ARTEFACT_VALUE_ID": 184,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 214,
+          "ARTEFACT_VALUE": "Тестирование неуспешно, ошибка в коде модели",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 185,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 214,
+          "ARTEFACT_VALUE": "Тестирование неуспешно, проблема в обвязке модели",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 186,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 214,
+          "ARTEFACT_VALUE": "Тестирование успешно",
+          "IS_ACTIVE_FLG": "1"
+        }
+      ]
+    },
+    {
+      "ARTEFACT_ID": 215,
+      "ARTEFACT_LABEL": "Результаты тестирования",
+      "ARTEFACT_DESC": "Тестирование успешно?",
+      "ARTEFACT_TECH_LABEL": "test_preprod_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Проведение интеграционного и регресионного тестирования на контуре PREPROD",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 216,
+      "ARTEFACT_LABEL": "Отчет о результатах тестирования",
+      "ARTEFACT_DESC": "Прикрепить файл",
+      "ARTEFACT_TECH_LABEL": "manual_validation_report",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Проведение ручной плановой валидации вне СУМ",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "validation",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 217,
+      "ARTEFACT_LABEL": "Результаты тестирования",
+      "ARTEFACT_DESC": "Выявлены отклонения?",
+      "ARTEFACT_TECH_LABEL": "manual_validation_decision_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Результаты тестирования",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "validation",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 218,
+      "ARTEFACT_LABEL": "Режим валидации",
+      "ARTEFACT_DESC": "Выбор режима валидации",
+      "ARTEFACT_TECH_LABEL": "plan_validation_class_flg",
+      "ARTEFACT_TYPE_DESC": "dropdown",
+      "ARTEFACT_TYPE_ID": 3,
+      "TASK_NAME": "Режим валидации",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "validation",
+      "VALUES": [
+        {
+          "ARTEFACT_VALUE_ID": 187,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 218,
+          "ARTEFACT_VALUE": "Ручная валидация",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 188,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 218,
+          "ARTEFACT_VALUE": "Автоматическая валидация",
+          "IS_ACTIVE_FLG": "1"
+        }
+      ]
+    },
+    {
+      "ARTEFACT_ID": 219,
+      "ARTEFACT_LABEL": "Согласование об откате к предыдущей версии модели",
+      "ARTEFACT_DESC": "Откат согласован?",
+      "ARTEFACT_TECH_LABEL": "rollback_approve_ds_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Согласование об откате к предыдущей версии модели",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "main",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 220,
+      "ARTEFACT_LABEL": "Согласование об откате к предыдущей версии модели",
+      "ARTEFACT_DESC": "Откат согласован?",
+      "ARTEFACT_TECH_LABEL": "rollback_approve_mipm_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Согласование об откате к предыдущей версии модели",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "main",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 221,
+      "ARTEFACT_LABEL": "Согласование об откате к предыдущей версии модели",
+      "ARTEFACT_DESC": "Откат согласован?",
+      "ARTEFACT_TECH_LABEL": "rollback_approve_modelops_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Согласование об откате к предыдущей версии модели",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "main",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 222,
+      "ARTEFACT_LABEL": "Согласование об откате по ЖЦ",
+      "ARTEFACT_DESC": "Откат согласован?",
+      "ARTEFACT_TECH_LABEL": "instance_rollback_approve_ds_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Согласование об откате по ЖЦ",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "main",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 223,
+      "ARTEFACT_LABEL": "Согласование об откате по ЖЦ",
+      "ARTEFACT_DESC": "Откат согласован?",
+      "ARTEFACT_TECH_LABEL": "instance_rollback_approve_mipm_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Согласование об откате по ЖЦ",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "main",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 224,
+      "ARTEFACT_LABEL": "ТЗ на первоначальную выгрузку",
+      "ARTEFACT_DESC": "Прикрепить файл",
+      "ARTEFACT_TECH_LABEL": "ts_first_upload_file",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "ТЗ на первоначальную выгрузку",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "data",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 225,
+      "ARTEFACT_LABEL": "Конфигурационный файл контейнера",
+      "ARTEFACT_DESC": "Прикрепить файл",
+      "ARTEFACT_TECH_LABEL": "doc_rest_service",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Формирование обвязки модели",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 226,
+      "ARTEFACT_LABEL": "Документация REST сервиса",
+      "ARTEFACT_DESC": "Прикрепить файл",
+      "ARTEFACT_TECH_LABEL": "spk_rest_service",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Формирование обвязки модели",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 227,
+      "ARTEFACT_LABEL": "Анализ результатов ИТ",
+      "ARTEFACT_DESC": "Прикрепите файл анализа результатов ИТ",
+      "ARTEFACT_TECH_LABEL": "integration_test_resuslt_analysis",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Проведение нагрузочного, функционального, интеграционного, регрессионнного тестирования",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 228,
+      "ARTEFACT_LABEL": "Результаты тестирования",
+      "ARTEFACT_DESC": "Тесты проведены успешно?",
+      "ARTEFACT_TECH_LABEL": "test_after_correct_model_bind_succes_flg",
+      "ARTEFACT_TYPE_DESC": "boolean",
+      "ARTEFACT_TYPE_ID": 6,
+      "TASK_NAME": "Согласование протокола ПСИ",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 229,
+      "ARTEFACT_LABEL": "Согласованный протокол ПСИ скорректированной обвязки модели",
+      "ARTEFACT_DESC": "Добавить файл",
+      "ARTEFACT_TECH_LABEL": "protocol_after_correct_model_bind",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Согласование протокола ПСИ",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "integration",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 230,
+      "ARTEFACT_LABEL": "Код ETL процесса мониторинга модели",
+      "ARTEFACT_DESC": "Вставить ссылку",
+      "ARTEFACT_TECH_LABEL": "code_etl_model_monitoring",
+      "ARTEFACT_TYPE_DESC": "link",
+      "ARTEFACT_TYPE_ID": 7,
+      "TASK_NAME": "Формирование требований для автомониторинга",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "model",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 231,
+      "ARTEFACT_LABEL": "Результаты согласования пилотной выгрузки",
+      "ARTEFACT_DESC": "Прикрепить файл с результатами",
+      "ARTEFACT_TECH_LABEL": "pilot_results_approving_file",
+      "ARTEFACT_TYPE_DESC": "file_object_storage",
+      "ARTEFACT_TYPE_ID": 2,
+      "TASK_NAME": "Согласование результатов пилота",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "data",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 232,
+      "ARTEFACT_LABEL": "Ссылка на аналитический мониторинг",
+      "ARTEFACT_DESC": "Вставьте ссылку на аналитический мониторинг",
+      "ARTEFACT_TECH_LABEL": "analit_monitoring_link",
+      "ARTEFACT_TYPE_DESC": "link",
+      "ARTEFACT_TYPE_ID": 7,
+      "TASK_NAME": "Прикрепление ссылки на аналитический мониторинг",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "monitoring",
+      "VALUES": []
+    },
+    {
+      "ARTEFACT_ID": 233,
+      "ARTEFACT_LABEL": "Выбор опции при успешном мониторинге",
+      "ARTEFACT_DESC": "Выбер опции",
+      "ARTEFACT_TECH_LABEL": "monitoring_option",
+      "ARTEFACT_TYPE_DESC": "dropdown",
+      "ARTEFACT_TYPE_ID": 3,
+      "TASK_NAME": "Корректировка списков тестов или параметров мониторинга",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "monitoring",
+      "VALUES": [
+        {
+          "ARTEFACT_VALUE_ID": 193,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 233,
+          "ARTEFACT_VALUE": "Корректировка параметров мониторинга ролью DE",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 193,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 233,
+          "ARTEFACT_VALUE": "Корректировка параметров мониторинга ролью DE",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 194,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 233,
+          "ARTEFACT_VALUE": "Приложить ссылку на аналитический мониторинг",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 194,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 233,
+          "ARTEFACT_VALUE": "Приложить ссылку на аналитический мониторинг",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 195,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 233,
+          "ARTEFACT_VALUE": "Корректировка параметров мониторинга ролью DS",
+          "IS_ACTIVE_FLG": "1"
+        },
+        {
+          "ARTEFACT_VALUE_ID": 195,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 233,
+          "ARTEFACT_VALUE": "Корректировка параметров мониторинга ролью DS",
+          "IS_ACTIVE_FLG": "1"
+        }
+      ]
+    },
+    {
+      "ARTEFACT_ID": 234,
+      "ARTEFACT_LABEL": "test2",
+      "ARTEFACT_DESC": "test2",
+      "ARTEFACT_TECH_LABEL": "manual_validation_result",
+      "ARTEFACT_TYPE_DESC": "dropdown",
+      "ARTEFACT_TYPE_ID": 3,
+      "TASK_NAME": "Проведение ручной плановой валидации вне СУМ",
+      "IS_MAIN_INFO_FLG": "0",
+      "IS_CLASS_FLG": 0,
+      "BPMN_NAME": "validation",
+      "VALUES": [
+        {
+          "ARTEFACT_VALUE_ID": 198,
+          "ARTEFACT_PARENT_VALUE_ID": null,
+          "ARTEFACT_ID": 234,
+          "ARTEFACT_VALUE": "aaaaaaaaaaaaa",
+          "IS_ACTIVE_FLG": "1"
+        }
+      ]
+    }
+  ],
+  "TYPES": [
+    {
+      "ARTEFACT_TYPE_ID": 1,
+      "ARTEFACT_TYPE_DESC": "text"
+    },
+    {
+      "ARTEFACT_TYPE_ID": 2,
+      "ARTEFACT_TYPE_DESC": "file_object_storage"
+    },
+    {
+      "ARTEFACT_TYPE_ID": 3,
+      "ARTEFACT_TYPE_DESC": "dropdown"
+    },
+    {
+      "ARTEFACT_TYPE_ID": 4,
+      "ARTEFACT_TYPE_DESC": "date"
+    },
+    {
+      "ARTEFACT_TYPE_ID": 5,
+      "ARTEFACT_TYPE_DESC": "multi-dropdown"
+    },
+    {
+      "ARTEFACT_TYPE_ID": 6,
+      "ARTEFACT_TYPE_DESC": "boolean"
+    },
+    {
+      "ARTEFACT_TYPE_ID": 7,
+      "ARTEFACT_TYPE_DESC": "link"
+    },
+    {
+      "ARTEFACT_TYPE_ID": 8,
+      "ARTEFACT_TYPE_DESC": "user"
+    },
+    {
+      "ARTEFACT_TYPE_ID": 9,
+      "ARTEFACT_TYPE_DESC": "file_git"
+    },
+    {
+      "ARTEFACT_TYPE_ID": 10,
+      "ARTEFACT_TYPE_DESC": "file_nexus"
+    }
+  ]
+}

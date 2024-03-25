@@ -1,0 +1,74 @@
+type Query {
+    users(groups: [String] = ["mipm"], db: Boolean = false ): [User]
+    
+    keycloakGroups: [KeycloakGroup]
+
+    keycloakUsers(groups: [String]): [KeycloakUser]
+    keycloakUser(id: String!): KeycloakUserInfo!
+}
+
+type UserInfo {
+    id: String
+    groups: [String]
+    keycloakGroups: [String]
+    roles: [String]
+    email: String
+    session: String
+    family_name: String
+    given_name: String
+    preferred_username: String
+}
+
+type KeycloakGroup {
+    id: String
+    name: String
+}
+
+type KeycloakUser {
+    id: String!
+    username: String
+    firstName: String
+    lastName: String
+    email: String
+    group: String
+}
+
+type KeycloakUserInfo {
+    id: String!
+}
+
+type Lead {
+    users: [User]
+    tasks: [Task]
+}
+
+type User {
+    id: String
+    username: String
+    firstName: String
+    lastName: String
+    groups: [String]
+    group: String
+}
+
+input InputUser {
+    id: String
+    username: String
+    firstName: String
+    lastName: String
+    email: String
+    group: String
+    groups: [String]
+}
+
+type DbUser {
+    username: String
+    role: String
+    lead: String
+}
+
+input DbUserInput {
+    username: String
+    role: String
+    lead: String
+}

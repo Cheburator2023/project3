@@ -1,0 +1,4 @@
+apiVersion: v1
+description: A Helm chart defining backend service.
+name: backend
+version: 0.0.1

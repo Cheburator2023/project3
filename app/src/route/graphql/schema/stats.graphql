@@ -1,0 +1,8 @@
+type Query {
+    stats (type: String): [GraphqData]
+}
+
+type GraphqData {
+    VALUE: BigInt
+    LABEL: String
+}

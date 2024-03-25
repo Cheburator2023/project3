@@ -1,0 +1,12 @@
+module.exports = {
+  new: require('./new'),
+  update: require('./update'),
+  check: require('./check'),
+  model: require('./model'),
+  info: require('./info'),
+  version: require('./version'),
+  id: require('./id'),
+  key: require('./key'),
+  instancesByModelId: require('./instancesByModelId'),
+  deleteBpmnInstance: require('./deleteBpmnInstance')
+}

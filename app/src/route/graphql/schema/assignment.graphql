@@ -1,0 +1,55 @@
+type Query {
+    rootAssignments: [RootAssignment]
+    rootAssignment(
+        ROOT_ASSIGNMENT_ID: Int!
+    ): RootAssignment
+    assignment(
+        ASSIGNMENT_ID: Int!
+    ): Assignment
+}
+
+type RootAssignment {
+    ID: Int
+    STATUS: String
+    CREATE_DATE: Date
+    EFFECTIVE_FROM: DateItem
+    EFFECTIVE_TO: Date
+    ASSIGNMENTS: [Assignment]
+    MODELS: [Card]
+    END_DATE: Date
+    END_EVENT: String
+}
+
+type Assignment {
+    ID: Int
+    ROOT_ASSIGNMENT_ID: Int
+    CREATE_DATE: Date
+    EFFECTIVE_FROM: Date
+    EFFECTIVE_TO: Date
+    ARTEFACTS: [Artefact]
+}
+
+type Mutation {
+    newAssignment(
+        ARTEFACTS: [InputArtefact]
+        MODELS: [String],
+        END_DATE: Date,
+        END_EVENT: String
+    ): Int
+    editAssignment(
+        ARTEFACTS: [InputArtefact]
+        MODELS: [String]
+        ROOT_ASSIGNMENT_ID: Int!
+    ): Int
+    updateStatus(
+        STATUS: String!
+        ROOT_ASSIGNMENT_ID: Int!
+    ): String
+    editAssignmentArtefact(
+        ASSIGNMENT_ID: Int!
+        ARTEFACT_ID: Int!
+        ARTEFACT_VALUE_ID: BigInt
+        ARTEFACT_STRING_VALUE: String
+        ARTEFACT_ORIGINAL_VALUE: String
+    ): Boolean
+}

@@ -1,0 +1,67 @@
+type Query {
+    artefacts: AdminArtefactInfo
+    classificators: [AdminArtefact]
+    status: [String]
+}
+
+type Mutation {
+    addArtefact(artefact: InputNewArtefact!): Boolean
+    addArtefactValues: Boolean
+    editArtefact(artefact: InputNewArtefact!): Boolean
+    editArtefactValues(values: [InputNewArtefactValue]): Boolean
+}
+
+type AdminArtefactInfo {
+    TYPES: [ArtefactType]
+    ARTEFACTS: [AdminArtefact]
+}
+
+type ArtefactType {
+    ARTEFACT_TYPE_ID: BigInt
+    ARTEFACT_TYPE_DESC: String
+}
+
+type AdminArtefact {
+    ARTEFACT_ID: BigInt
+    ARTEFACT_TECH_LABEL: String
+    ARTEFACT_LABEL: String
+    ARTEFACT_DESC: String
+    ARTEFACT_HINT: String
+    IS_MAIN_INFO_FLG: String
+    IS_MULTI_FILL_FLG: Int
+    IS_CLASS_FLG: Int
+    IS_EDIT_FLG: String
+    ARTEFACT_TYPE_ID: BigInt
+    ARTEFACT_TYPE_DESC: String
+    TASK_NAME: String
+    BPMN_NAME: String
+    VALUES: [AdminArtefactValue]
+}
+
+type AdminArtefactValue {
+    ARTEFACT_VALUE_ID: BigInt
+    ARTEFACT_PARENT_VALUE_ID: BigInt
+    ARTEFACT_ID: BigInt
+    ARTEFACT_VALUE: String
+    IS_ACTIVE_FLG: String
+}
+
+input InputNewArtefact {
+    ARTEFACT_ID: BigInt!
+    ARTEFACT_TECH_LABEL: String!
+    ARTEFACT_LABEL: String!
+    ARTEFACT_DESC: String!
+    IS_MAIN_INFO_FLG: String
+    IS_CLASS_FLG: Int
+    IS_EDIT_FLG: String
+    ARTEFACT_TYPE_ID: BigInt!
+    ARTEFACT_TYPE_DESC: String
+}
+
+input InputNewArtefactValue {
+    ARTEFACT_VALUE_ID: BigInt
+    ARTEFACT_PARENT_VALUE_ID: BigInt
+    ARTEFACT_ID: BigInt
+    ARTEFACT_VALUE: String
+    IS_ACTIVE_FLG: String
+}

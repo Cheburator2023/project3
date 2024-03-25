@@ -1,0 +1,16 @@
+type Query {
+    MCoefficients: [MCoefficient]
+}
+
+type Mutation {
+    newMCoefficient(
+        AUTHOR: String!
+        VALUE: Float
+    ): Boolean
+}
+
+type MCoefficient{
+    AUTHOR: String
+    VALUE: Float
+    EFFECTIVE_FROM: DateItem
+}

@@ -1,0 +1,124 @@
+# Values for "backend" for ds1-ldap01 environment.
+
+replicaCount: 1
+pullSecret: secret-name
+
+image:
+  repository: nexus-ci.corp.dev.vtb/sumd-docker-lib/backend
+  tag: v10
+  pullPolicy: IfNotPresent
+
+resources:
+  limits:
+    cpu: 600m
+    memory: 2Gi
+  requests:
+    cpu: 300m
+    memory: 1Gi
+
+secretName: ingress-tls
+
+ingress:
+  enabled: true
+  annotations: {
+    haproxy.router.openshift.io/timeout: "300s"
+  }
+  hosts:
+    - host: backend-ds1-lpad01-sumd-system.apps.ds1-lpad01.corp.dev.vtb
+      paths:
+        - pathType: ImplementationSpecific
+          backend:
+            service:
+              name: backend
+              port:
+                number: 4000
+  tls:
+    - secretName: ingress-tls
+      hosts:
+        - backend-ds1-lpad01-sumd-system.apps.ds1-lpad01.corp.dev.vtb
+
+###Выбор worker ноды без GPU
+affinity:
+  enabled: false
+#  nodeAffinity:
+#    requiredDuringSchedulingIgnoredDuringExecution:
+#      nodeSelectorTerms:
+#        - matchExpressions:
+#            - key: nvidia.com/gpu.product
+#              operator: DoesNotExist
+
+secrets:
+  immutable:
+    enabled: true
+
+### Выбор политики для автоскалирования количества подов - разкомментить требуемое
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 5
+  # targetCPUUtilizationPercentage: 80
+  # targetCPUAverageValue: 100m
+  # targetMemoryUtilizationPercentage: 80
+  # targetMemoryAverageValue: 200Mi
+
+### ENV
+db:
+ PGUSER: "some_user"
+ PGPASSWORD: "some_pass"
+ PGHOST: "d5sumd-pgc001lk.corp.dev.vtb"
+ PGDATABASE: "postgres"
+ PGPORT: 5432
+
+keycloak:
+ KEYCLOAK_URL: "https://d5drpc-apc004ln:7001"
+ KEYCLOAK_REALMS: "sum"
+ KEYCLOAK_CLIENT: "frontend"
+ KEYCLOAK_USER: "sum_user"
+ KEYCLOAK_PWD: "sum_password"
+
+bpmn:
+ BPMN_API: "http://camunda.ds1-lpad01-sumd-system.svc.cluster.local:8080/engine-rest"
+ BPMN_USER: "demo"
+ BPMN_PWD: "demo"
+ BPMN_KEY: "main"
+ NODE_ENV: "production"
+
+tracing:
+  enabled: false
+  name: jaeger-agent
+  image:
+    repository: nexus-ci.corp.dev.vtb/sumd-docker-lib/jaeger-agent-rhel8
+    digest: sha256:fd1a2928989efb497dd2d8a22ec95eb30d679bb026c140c222d14cb1e1f65b26
+    pullPolicy: IfNotPresent
+  args:
+    reporter.grpc.host-port: dns:///tstr-collector.apps.ds1-genr01.corp.dev.vtb:443
+    reporter.type: grpc
+    log-level: debug
+  resources:
+    requests:
+      cpu: 50m
+      memory: 50Mi
+    limits:
+      cpu: 100m
+      memory: 100Mi
+  secrets:
+    name: jaeger-agent-tls-secret
+  certs:
+    ca: ""
+    client: ""
+    key: ""
+
+DS_DEPARTMENT_ARTEFACT_ID: 7
+IMAGE_LOGICAL_NAME: "backend"
+HOST: "0.0.0.0"
+PORT: "4000"
+NODE_TLS_REJECT_UNAUTHORIZED: 0
+GIT_API: "http://integration.ds1-lpad01-sumd-system.svc.cluster.local:5777/"
+GIT_STORAGE: "s3"
+SMTP_HOST: "http://notification.ds1-lpad01-sumd-system.svc.cluster.local:5025/"
+SMTP_USER: "sum_notification@corp.dev.vtb"
+JIRA_API: "http://integration.ds1-lpad01-sumd-system.svc.cluster.local:5777/"
+TEAMCITY_API: "http://integration.ds1-lpad01-sumd-system.svc.cluster.local:5777/"
+INTERFACE_URL: "http://frontend-svc.ds1-lpad01-sumd-system.svc.cluster.local/"
+KAFKA_API: "http://integration.ds1-lpad01-sumd-system.svc.cluster.local:5777/"
+TZ: "Europe/Moscow"

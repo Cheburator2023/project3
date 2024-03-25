@@ -1,0 +1,17 @@
+scalar Date
+scalar BigInt
+scalar Timestamptz
+
+type Query {
+  healthCheck: Boolean
+  me: UserInfo
+}
+
+type Mutation {
+  healthCheckMutation: Boolean
+}
+
+type DateItem {
+  timestampt: Timestamptz
+  dateFormatted: Date
+}

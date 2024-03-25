@@ -1,0 +1,164 @@
+[
+    {
+        "ARTEFACT_ID": "54",
+        "ARTEFACT_TECH_LABEL": "model_id",
+        "ARTEFACT_STRING_VALUE": "",
+        "ARTEFACT_VALUE_ID": null
+    },
+    {
+        "ARTEFACT_ID": "7",
+        "ARTEFACT_TECH_LABEL": "Departament",
+        "ARTEFACT_STRING_VALUE": "AutoML",
+        "ARTEFACT_VALUE_ID": 372
+    },
+    {
+        "ARTEFACT_ID": "111",
+        "ARTEFACT_TECH_LABEL": "model_image_nexus_link",
+        "ARTEFACT_STRING_VALUE": "",
+        "ARTEFACT_VALUE_ID": null
+    },
+    {
+        "ARTEFACT_ID": "118",
+        "ARTEFACT_TECH_LABEL": "monitoring_datamart_attribute",
+        "ARTEFACT_STRING_VALUE": "",
+        "ARTEFACT_VALUE_ID": null
+    },
+    {
+        "ARTEFACT_ID": "190",
+        "ARTEFACT_TECH_LABEL": "validation_datamart_attributes",
+        "ARTEFACT_STRING_VALUE": "",
+        "ARTEFACT_VALUE_ID": null
+    },
+    {
+        "ARTEFACT_ID": "67",
+        "ARTEFACT_TECH_LABEL": "significance_validity",
+        "ARTEFACT_STRING_VALUE": "",
+        "ARTEFACT_VALUE_ID": null
+    },
+    {
+        "ARTEFACT_ID": "61",
+        "ARTEFACT_TECH_LABEL": "using_mode",
+        "ARTEFACT_STRING_VALUE": "Онлайн",
+        "ARTEFACT_VALUE_ID": 178
+    },
+    {
+        "ARTEFACT_ID": "80",
+        "ARTEFACT_TECH_LABEL": "integration_necessery",
+        "ARTEFACT_STRING_VALUE": "",
+        "ARTEFACT_VALUE_ID": null
+    },
+    {
+        "ARTEFACT_ID": "63",
+        "ARTEFACT_TECH_LABEL": "plan_date_integration",
+        "ARTEFACT_STRING_VALUE": "",
+        "ARTEFACT_VALUE_ID": null
+    },
+    {
+        "ARTEFACT_ID": "57",
+        "ARTEFACT_TECH_LABEL": "product_name",
+        "ARTEFACT_STRING_VALUE": "Иное",
+        "ARTEFACT_VALUE_ID": 147
+    },
+    {
+        "ARTEFACT_ID": "293",
+        "ARTEFACT_TECH_LABEL": "developing_model_datamart_not_split",
+        "ARTEFACT_STRING_VALUE": "",
+        "ARTEFACT_VALUE_ID": null
+    },
+    {
+        "ARTEFACT_ID": "33",
+        "ARTEFACT_TECH_LABEL": "developing_start_date",
+        "ARTEFACT_STRING_VALUE": "",
+        "ARTEFACT_VALUE_ID": null
+    },
+    {
+        "ARTEFACT_ID": "34",
+        "ARTEFACT_TECH_LABEL": "developing_end_date",
+        "ARTEFACT_STRING_VALUE": "",
+        "ARTEFACT_VALUE_ID": null
+    },
+    {
+        "ARTEFACT_ID": "201",
+        "ARTEFACT_TECH_LABEL": "pim_integration_flg",
+        "ARTEFACT_STRING_VALUE": "Внедряется в ПИМ",
+        "ARTEFACT_VALUE_ID": 313
+    },
+    {
+        "ARTEFACT_ID": "172",
+        "ARTEFACT_TECH_LABEL": "modeldev_name",
+        "ARTEFACT_STRING_VALUE": "",
+        "ARTEFACT_VALUE_ID": null
+    },
+    {
+        "ARTEFACT_ID": "50",
+        "ARTEFACT_TECH_LABEL": "callibration_type",
+        "ARTEFACT_STRING_VALUE": "",
+        "ARTEFACT_VALUE_ID": null
+    },
+    {
+        "ARTEFACT_ID": "52",
+        "ARTEFACT_TECH_LABEL": "decision_of_model_efficiency_flg",
+        "ARTEFACT_STRING_VALUE": "",
+        "ARTEFACT_VALUE_ID": 16
+    },
+    {
+        "ARTEFACT_ID": "87",
+        "ARTEFACT_TECH_LABEL": "need_first_validation_flg",
+        "ARTEFACT_STRING_VALUE": "",
+        "ARTEFACT_VALUE_ID": null
+    },
+    {
+        "ARTEFACT_ID": "206",
+        "ARTEFACT_TECH_LABEL": "validation_parameters_approving_flg",
+        "ARTEFACT_STRING_VALUE": "",
+        "ARTEFACT_VALUE_ID": null
+    },
+    {
+        "ARTEFACT_ID": "174",
+        "ARTEFACT_TECH_LABEL": "model_deployment_approving_flg",
+        "ARTEFACT_STRING_VALUE": "",
+        "ARTEFACT_VALUE_ID": null
+    },
+    {
+        "ARTEFACT_ID": "367",
+        "ARTEFACT_TECH_LABEL": "model_deployment_approving_flg",
+        "ARTEFACT_STRING_VALUE": "",
+        "ARTEFACT_VALUE_ID": null
+    },
+    {
+        "ARTEFACT_ID": "373",
+        "ARTEFACT_TECH_LABEL": "model_deployment_approving_flg",
+        "ARTEFACT_STRING_VALUE": "",
+        "ARTEFACT_VALUE_ID": null
+    },
+    {
+        "ARTEFACT_ID": "88",
+        "ARTEFACT_TECH_LABEL": "need_actualize_arch_requirements_flg",
+        "ARTEFACT_STRING_VALUE": "",
+        "ARTEFACT_VALUE_ID": null
+    },
+    {
+        "ARTEFACT_ID": "51",
+        "ARTEFACT_TECH_LABEL": "need_recreate_data_flg",
+        "ARTEFACT_STRING_VALUE": "",
+        "ARTEFACT_VALUE_ID": null
+    },
+    {
+        "ARTEFACT_ID": "9",
+        "ARTEFACT_TECH_LABEL": "model_lang",
+        "ARTEFACT_STRING_VALUE": "Python",
+        "ARTEFACT_VALUE_ID": 5
+    },
+    {
+        "ARTEFACT_ID": "323",
+        "ARTEFACT_TECH_LABEL": "development_results_approving_flg",
+        "ARTEFACT_STRING_VALUE": "",
+        "ARTEFACT_VALUE_ID": null
+    },
+    {
+        "ARTEFACT_ID": "new",
+        "ARTEFACT_TECH_LABEL": "automl_model_customer",
+        "ARTEFACT_STRING_VALUE": "Чат бот и Голосовой Помощник",
+        "ARTEFACT_VALUE_ID": null
+    }
+]

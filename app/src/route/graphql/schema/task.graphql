@@ -1,0 +1,70 @@
+type Query {
+    tasks: [Task]
+    task( id: String!, modelId: String! ): Task
+    lead: Lead
+    tasksOperations( modelId: String!): TasksOperationsLogs
+}
+
+type Mutation {
+    taskComplete( id: String, ARTEFACTS: [InputArtefact] ): Boolean
+    taskSave( id: String, ARTEFACTS: [InputArtefact] ): Boolean
+    taskAssigned(assignee: String, newAssignee: InputAssignee, TASK_ID: String!): Boolean
+}
+
+type TaskCompleteOperation {
+    id: String
+    modelId: String
+    createDate: DateItem
+    userName: String
+    operationType: String
+    task: OperationTask
+}
+
+type TaskRollbackOperation {
+    id: String
+    modelId: String
+    createDate: DateItem
+    userName: String
+    operationType: String
+    taskTo: OperationTask
+    taskFrom: OperationTask
+}
+
+type OperationTask {
+    id: String
+    name: String
+}
+
+type TasksOperationsLogs {
+    complete: [TaskCompleteOperation]
+    rollback: [TaskRollbackOperation]
+}
+
+type Task {
+    id: String
+    name: String
+    assignee: String
+    created: String
+    endTime: String
+    executionId: String
+    processInstanceId: String
+    taskDefinitionKey: String
+    priority: BigInt
+
+    TASK_ID: String
+    TASK_NAME: String
+    TASK_DESC: String
+    USER_GROUPS: [String]
+
+    MODEL: Card
+    ARTEFACTS: [TaskArtefact]
+    operations: TasksOperationsLogs
+}
+
+input InputAssignee {
+    id: String
+    username: String
+    firstName: String
+    lastName: String
+    group: String
+}

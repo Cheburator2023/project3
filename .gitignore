@@ -1,0 +1,20 @@
+# Compiled binary addons (https://nodejs.org/api/addons.html)
+**build
+
+# Dependency directories
+**node_modules/
+
+# Optional npm cache directory
+**.npm
+
+# Dependency info
+**package-lock.json
+
+# dotenv environment variables file
+**.env
+
+# Others
+**uploads
+.vscode/*
+.idea/*
+.idea

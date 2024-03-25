@@ -1,0 +1,84 @@
+type Query {
+    riskScales: [RiskScale]
+    riskScale(
+        ROOT_RISK_SCALE_ID: Int!
+    ): RiskScale
+    riskScaleInputArtefacts: [TaskArtefact]
+}
+
+type Mutation {
+    newRiskScale(
+        RISK_SCALE_NAME: String
+        RISK_SCALE_DESC: String
+        ARTEFACTS: [InputArtefact]
+        RISK_SCALE_MODELS: [String]
+        RISK_SCALE_RANKS: [RankInput]
+        VERSION: Int
+        PARENT_SCALE_ID: Int
+    ): String
+    addRiskScaleArtefact(data: InputArtefact, ROOT_RISK_SCALE_ID: Int!): Boolean
+    editRiskScaleArtefact(
+        ROOT_RISK_SCALE_ID: Int!
+        ARTEFACT_ID: Int!
+        ARTEFACT_VALUE_ID: BigInt
+        ARTEFACT_STRING_VALUE: String
+    ): Boolean
+    editRiskScale(
+        ROOT_RISK_SCALE_ID: Int!
+        RISK_SCALE_NAME: String
+        RISK_SCALE_DESC: String
+        RISK_SCALE_STATUS: Int
+    ): Boolean
+    addModels(
+        ROOT_RISK_SCALE_ID: Int!
+        RISK_SCALE_MODELS: [String]
+    ): Boolean
+    deleteModels(
+        ROOT_RISK_SCALE_ID: Int!
+        RISK_SCALE_MODELS: [String]
+    ): Boolean
+    addRank(data: RankInput, ROOT_RISK_SCALE_ID: Int!): Boolean
+    editRank(data: RankInput): Boolean
+    removeRank(data: RankInput): Boolean
+}
+
+type RiskScale {
+    ROOT_RISK_SCALE_ID: String
+    RISK_SCALE_NAME: String
+    RISK_SCALE_DESC: String
+    CREATE_DATE: String
+    UPDATE_DATE: String
+    VERSION: String
+    PARENT_SCALE_ID: String
+    RISK_SCALE_IS_ACTIVE_FLG: String
+    MODELS: [Card]
+    RELATED_MODELS: [RelatedModel]
+    RANKS: [RiskRank]
+    ARTEFACTS: [Artefact]
+    EFFECTIVE_FROM: String
+    EFFECTIVE_TO: String
+}
+
+type RiskRank {
+    ROOT_RISK_SCALE_ID: Int
+    SYS_SCALE_RANK_ID: String
+    SCALE_RANK_ID: String
+    SCALE_RANK_CAT: String
+    SCALE_RANK_MIN: String
+    SCALE_RANK_AVG: String
+    SCALE_RANK_MAX: String
+}
+
+input RankInput {
+    ROOT_RISK_SCALE_ID: Int
+    SYS_SCALE_RANK_ID: String
+    SCALE_RANK_ID: String
+    SCALE_RANK_CAT: String
+    SCALE_RANK_MIN: String
+    SCALE_RANK_AVG: String
+    SCALE_RANK_MAX: String
+}
+
+type RelatedModel {
+    MODEL_ID: String
+}

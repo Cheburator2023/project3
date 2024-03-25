@@ -1,0 +1,126 @@
+type Query {
+  cards(type: [String] = ["initialization"], active: Boolean = true): [Card]
+  card(
+    type: [String] = ["initialization", "model"]
+    ROOT_MODEL_ID: BigInt
+    MODEL_VERSION: BigInt
+  ): Card
+  bpmn(id: String, history: Boolean = false): Bpmn
+  bpmnInstancesByKey(modelId: String!, key: String!): [Instance]
+}
+
+type Mutation {
+  newCard(
+    MODEL_NAME: String
+    MODEL_DESC: String
+    PARENT_MODEL_ID: String
+    MIPM: String!
+    business_customer: String
+    ARTEFACTS: [InputArtefact]
+  ): Card
+  rollbackCard(activity: [InputActivity]): Boolean
+  addUser(MODEL_ID: String!, user: InputUser!): Boolean
+  removeUser(MODEL_ID: String!, user: DbUserInput!): Boolean
+  cancelModel(MODEL_ID: String!): String
+  removeModel(MODEL_ID: String!): String
+  updateArtefactsHistory(MODEL_ID: String!, ARTEFACT: InputArtefact): Boolean
+  updateMetaInfo(
+    MODEL_ID: String!
+    MODEL_NAME: String
+    MODEL_DESC: String
+  ): Boolean
+}
+
+type Card {
+  ROOT_MODEL_ID: Int
+  MODEL_ALIAS: String
+  MODEL_ID: String
+  BPMN_INSTANCE_ID: String
+  PARENT_MODEL_ID: String
+  MODEL_NAME: String
+  MODEL_CREATOR: String
+  MODEL_DESC: String
+  MODEL_VERSION: Int
+  CREATE_DATE: DateItem
+  UPDATE_DATE: Date
+  UPDATE_AUTHOR: String
+  MODELS_IS_ACTIVE_FLG: Int
+  TYPE: String
+  VERSIONS: [Int]
+  BUSINESS_CUSTOMER_DEPARTAMENT: String
+  DEPARTMENT_VALUE: String
+  MIPM_VALUE: String
+  DEPLOYMENT_ID: BigInt
+  STATUS: String
+  BUSINESS_STATUS: String
+  INSTANCES: [Instance]
+  TASKS: [Task]
+  ARTEFACTS: [Artefact]
+  CLASSIFICATORS: [Artefact]
+  USERS: [DbUser]
+  RISK_SCALE: [RiskScale]
+  ASSIGNMENTS: [RootAssignment]
+  AUTOML_MODEL_CUSTOMER: String
+  AUTOML_FLG: String
+}
+
+type Instance {
+  BPMN_KEY_DESC: String
+  BPMN_KEY_ID: BigInt
+  CREATE_DTTM: String
+  EFFECTIVE_FROM: Date
+  EFFECTIVE_TO: Date
+  MODEL_ID: String
+  BPMN_INSTANCE_ID: String
+}
+
+input CardInput {
+  name: String
+}
+
+type Bpmn {
+  id: String
+  endTime: BigInt
+  name: String
+  diagram: String
+  activity: [Activity]
+  history: [Activity]
+}
+
+type Activity {
+  id: String!
+  activityName: String
+  parentActivityInstanceId: String
+  activityId: String
+  activityType: String
+  processDefinitionKey: String
+  processDefinitionId: String
+  processInstanceId: String
+  executionId: String
+  taskId: String
+  calledProcessInstanceId: String
+  calledCaseInstanceId: String
+  assignee: String
+  startTime: String
+  endTime: String
+  durationInMillis: BigInt
+}
+
+input InputActivity {
+  id: String!
+  activityName: String
+  parentActivityInstanceId: String
+  activityId: String
+  activityType: String
+  processDefinitionKey: String
+  processDefinitionId: String
+  processInstanceId: String
+  executionId: String
+  taskId: String
+  calledProcessInstanceId: String
+  calledCaseInstanceId: String
+  assignee: String
+  startTime: String
+  endTime: String
+  durationInMillis: BigInt
+}

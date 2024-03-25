@@ -1,0 +1,140 @@
+type Query {
+  fileDownload(name: String!, model: String!): String
+  artefactHistory(MODEL_ID: String!, ARTEFACT_ID: BigInt!): [ArtefactHistory]
+  possibleValues(ARTEFACT_ID: Int!): [TaskArtefactValue]
+  inputArtefacts(TASK_ID: String!): [TaskArtefact]
+  filledArtefact(ARTEFACT_ID: Int!): [String]
+  artefactById(artefactId: Int!): TableArtefact
+}
+
+type TableArtefact {
+  ARTEFACT_ID: BigInt
+  ARTEFACT_TECH_LABEL: String
+  ARTEFACT_LABEL: String
+  ARTEFACT_DESC: String
+  ARTEFACT_HINT: String
+  IS_MAIN_INFO_FLG: String
+  IS_MULTI_FILL_FLG: Int
+  IS_CLASS_FLG: Int
+  IS_EDIT_FLG: String
+  ARTEFACT_TYPE_ID: BigInt
+  VALUES: [TableArtefactValue]
+}
+
+type TableArtefactValue {
+  ARTEFACT_VALUE_ID: BigInt
+  ARTEFACT_PARENT_VALUE_ID: BigInt
+  ARTEFACT_ID: BigInt
+  ARTEFACT_VALUE: String
+  IS_ACTIVE_FLG: String
+}
+
+type Artefact {
+  ARTEFACT_ID: Int!
+  ARTEFACT_TECH_LABEL: String
+  ARTEFACT_LABEL: String
+  ARTEFACT_DESC: String
+  ARTEFACT_TYPE_ID: Int!
+  ARTEFACT_TYPE_DESC: String
+
+  BPMN_NAME: String
+
+  BUSINESS_GROUP_LABEL: String
+  IS_REQUIRED_FLG: String
+  IS_MAIN_INFO_FLG: Int!
+  IS_CLASS_FLG: Int!
+  IS_EDIT_FLG: String
+  IS_MULTI_FILL_FLG: Int
+
+  EFFECTIVE_FROM: DateItem
+  EFFECTIVE_TO: Date
+
+  MODEL_ID: String!
+
+  VALUES: [ArtefactValue]
+}
+
+type Classificator {
+  ARTEFACT_ID: Int!
+  ARTEFACT_LABEL: String
+  ARTEFACT_DESC: String
+  MODEL_ID: String
+
+  EFFECTIVE_FROM: String
+  EFFECTIVE_TO: String
+
+  VALUES: [ArtefactValue]
+}
+
+type ArtefactValue {
+  ARTEFACT_VALUE: String
+  ARTEFACT_VALUE_ID: BigInt
+  ARTEFACT_VALUE_LABEL: String
+  ARTEFACT_STRING_VALUE: String
+  ARTEFACT_ORIGINAL_VALUE: String
+  ARTEFACT_PARENT_VALUE_ID: BigInt
+}
+
+type TaskArtefact {
+  ARTEFACT_ID: BigInt
+  ARTEFACT_TECH_LABEL: String
+  ARTEFACT_LABEL: String
+  ARTEFACT_DESC: String
+  ARTEFACT_HINT: String
+  ARTEFACT_TYPE_ID: Int!
+  ARTEFACT_TYPE_DESC: String
+  ARTEFACT_CONTEXT: String
+  ARTEFACT_IO_TYPE: Int
+  ARTEFACT_REGULAR_EXPRESSION: String
+
+  IS_REQUIRED_FLG: Int
+  IS_CLASS_FLG: Int
+  IS_MULTI_FILL_FLG: Int
+  IS_DEFAULT_VALUE_FLG: Int
+  ARTEFACT_DEFAULT_VALUE: String
+
+  VALUES: [TaskArtefactValue]
+
+  CURRENT_VALUES: [ArtefactValue]
+}
+
+type TaskArtefactValue {
+  ARTEFACT_VALUE: String
+  ARTEFACT_VALUE_ID: BigInt
+  ARTEFACT_VALUE_LABEL: String
+  ARTEFACT_PARENT_VALUE_ID: BigInt
+}
+
+input InputArtefact {
+  ARTEFACT_ID: Int!
+  ARTEFACT_STRING_VALUE: String
+  ARTEFACT_TECH_LABEL: String!
+  ARTEFACT_VALUE_ID: BigInt
+  ARTEFACT_ORIGINAL_VALUE: String
+}
+
+type ArtefactHistory {
+  ARTEFACT_ID: Int!
+  ARTEFACT_TECH_LABEL: String
+  ARTEFACT_LABEL: String
+  ARTEFACT_DESC: String
+  ARTEFACT_TYPE_ID: Int!
+  ARTEFACT_TYPE_DESC: String
+
+  BPMN_NAME: String
+
+  BUSINESS_GROUP_LABEL: String
+  IS_REQUIRED_FLG: String
+  IS_MAIN_INFO_FLG: Int!
+  IS_CLASS_FLG: Int!
+
+  EFFECTIVE_FROM: DateItem
+  EFFECTIVE_TO: Date
+
+  MODEL_ID: String!
+
+  ARTEFACT_VALUE: String
+  ARTEFACT_VALUE_ID: BigInt
+  ARTEFACT_STRING_VALUE: String
+  ARTEFACT_PARENT_VALUE_ID: BigInt
+}
