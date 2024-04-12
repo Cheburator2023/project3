@@ -1,4 +1,4 @@
-FROM nexus-ci.corp.dev.vtb/sumd-docker-lib/ubi8-base-backend:1.1
+FROM docker.repo-ci.sfera.inno.local/sumd-docker-lib/ubi8-base-backend:1.1
 
 ARG NPM_REGISTRY
 ARG NPM_EMAIL
