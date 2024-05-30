@@ -1,4 +1,3 @@
-// Test 2
 require('dotenv').config()
 require('./utils/logger')
 
