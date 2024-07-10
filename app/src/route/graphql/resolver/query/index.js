@@ -106,6 +106,11 @@ module.exports = {
   filledArtefact: (root, args, context) =>
     context.db.assignment.filledArtefact(args),
   MCoefficients: (root, args, context) => context.db.model_risk.all(args),
+  allocations: (root, args, context) => context.db.allocations.getAllocations(),
+  allocationUsage: (root, args, context) => context.db.allocations.getUsage(args),
+  allocationUsageHist: (root, args, context) => context.db.allocations.getUsageHistory(args),
+  getModelUsageConfirmation: (root, args, context) => context.db.allocations.getModelUsageConfirmation(args),
+  getModelUsageConfirmationHistory: (root, args, context) => context.db.allocations.getModelUsageConfirmationHistory(args),
   // Frame
   // frameForm: (root, args, context) =>
   //     context.db.frame.form(args.id)

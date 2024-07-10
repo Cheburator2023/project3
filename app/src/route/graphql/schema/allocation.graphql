@@ -1,0 +1,69 @@
+type Query {
+    allocations: [Allocation]
+    allocationUsage(model_id: String): [AllocationUsage]
+    allocationUsageHist(usage_id: Int, field: String): [AllocationUsageHist]
+    getModelUsageConfirmation(model_id: String): [UsageConfirmation]
+    getModelUsageConfirmationHistory(model_id: String!, quarter: Int!, effective_year: Int!): [InputUsageConfirmationHistory]
+}
+
+type Mutation {
+    updateAllocationUsage(
+        MODEL_ID: String,
+        DATA: [InputAllocationUsage]
+    ): Boolean,
+    updateModelUsageConfirmation(
+        MODEL_ID: String,
+        DATA: [InputUsageConfirmation]
+    ): Boolean
+}
+
+type Allocation {
+    ALLOCATION_ID: Int
+    ALLOCATION_NAME: String
+}
+
+type AllocationUsage {
+    USAGE_ID: Int
+    ALLOCATION_ID: Int
+    MODEL_ID: String
+    PERCENTAGE: Int
+    COMMENT: String
+}
+
+type AllocationUsageHist {
+    USAGE_ID: Int
+    FIELD: String
+    VALUE: String
+    CREATOR_FULL_NAME: String
+    EFFECTIVE_FROM: Date
+}
+
+type UsageConfirmation {
+    MODEL_ID: String
+    QUARTER: Int
+    ARTIFACT_LINK: String
+    CONFIRMATION_DATE: Date
+    CONFIRMATION_YEAR: String
+}
+
+type InputUsageConfirmationHistory {
+    MODEL_ID: String
+    QUARTER: Int
+    ARTIFACT_LINK: String
+    EFFECTIVE_YEAR: Int
+    CREATOR_FULL_NAME: String
+    EFFECTIVE_FROM: Date
+}
+
+input InputAllocationUsage {
+    ALLOCATION_ID: Int!
+    PERCENTAGE: Int
+    COMMENT: String
+}
+
+input InputUsageConfirmation {
+    QUARTER: Int!
+    ARTIFACT_LINK: String!
+    CONFIRMATION_DATE: Date
+    CONFIRMATION_YEAR: Int!
+}

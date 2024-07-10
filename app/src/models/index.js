@@ -11,6 +11,7 @@ const RiskScale = require("./risk_scale");
 const Frame = require("./frame");
 const Assignment = require("./assignments");
 const ModelRisk = require("./model_risk");
+const Allocations = require("./allocation");
 
 module.exports = (db, bpmn, integration) => ({
   card: new Card(db, bpmn, integration),
@@ -25,6 +26,7 @@ module.exports = (db, bpmn, integration) => ({
   risk_scale: new RiskScale(db),
   assignment: new Assignment(db),
   model_risk: new ModelRisk(db),
+  allocations: new Allocations(db),
   // frame: new Frame(db),
   oracle: db,
 });

@@ -47,7 +47,7 @@ module.exports = {
     RISK_SCALE: (root, args, context) => context.db.card.risk(root.MODEL_ID),
     AUTOML_FLG: (root) => (root.AUTOML_FLG == "true" ? "Да" : "Нет"),
     ASSIGNMENTS: (root, args, context) =>
-      context.db.card.assignments(root.MODEL_ID),
+      context.db.card.assignments(root.MODEL_ID)
   },
   Task: {
     USER_GROUPS: (root, args, context) =>
@@ -187,5 +187,5 @@ module.exports = {
   DateItem: {
     dateFormatted: (root) => moment(root).format("DD.MM.YYYY HH:mm"),
     timestampt: (root) => root,
-  },
+  }
 };
