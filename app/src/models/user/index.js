@@ -146,7 +146,17 @@ class User {
         sql: sql.role,
         args: { group_name: group },
       })
-      .then((d) => d.rows);
+      .then((d) => {
+        return d.rows.map(obj => {
+          const newObj = {};
+          for (let key in obj) {
+            if (obj.hasOwnProperty(key)) {
+              newObj[key.toLowerCase()] = obj[key];
+            }
+          }
+          return newObj;
+        });
+      });
   };
 }
 
