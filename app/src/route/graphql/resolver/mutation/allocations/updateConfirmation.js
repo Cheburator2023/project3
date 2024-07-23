@@ -6,8 +6,6 @@ module.exports = async (root, args, context) => {
     DATA
   });
 
-  console.log(updatedUsageData, '!@#!@#')
-
   await context.db.allocations.updateModelUsageConfirmationHistory({
     DATA: updatedUsageData,
     USER: context.user

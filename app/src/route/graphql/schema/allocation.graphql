@@ -41,6 +41,7 @@ type AllocationUsageHist {
 type UsageConfirmation {
     MODEL_ID: String
     QUARTER: Int
+    CONFIRMED: Boolean
     ARTIFACT_LINK: String
     CONFIRMATION_DATE: Date
     CONFIRMATION_YEAR: String
@@ -63,7 +64,8 @@ input InputAllocationUsage {
 
 input InputUsageConfirmation {
     QUARTER: Int!
-    ARTIFACT_LINK: String!
+    CONFIRMED: Boolean
+    ARTIFACT_LINK: String
     CONFIRMATION_DATE: Date
     CONFIRMATION_YEAR: Int!
 }

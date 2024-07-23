@@ -51,10 +51,11 @@ class Allocation {
   async updateModelUsageConfirmation({ MODEL_ID, DATA }) {
     const args = DATA.map(item => ({
       CONFIRMATION_DATE: null,
+      ARTIFACT_LINK: null,
+      CONFIRMED: false,
       MODEL_ID,
       ...item
     }));
-
 
     const dataArr = await this.db.executeMany({ sql: sql.updateModelUsageConfirmation, args });
     return dataArr.map(data => data.rows[0]);
