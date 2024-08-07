@@ -50,6 +50,7 @@ type UsageConfirmation {
 type InputUsageConfirmationHistory {
     MODEL_ID: String
     QUARTER: Int
+    CONFIRMED: Boolean
     ARTIFACT_LINK: String
     EFFECTIVE_YEAR: Int
     CREATOR_FULL_NAME: String
