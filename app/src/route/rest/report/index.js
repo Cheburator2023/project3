@@ -1,4 +1,4 @@
-const xlsx = require("excel4node");
+const xlsx = require('excel4node')
 
 const status = {
   main: "Процесс родитель",
@@ -48,35 +48,43 @@ const cutWorksheetName = (name) => {
 };
 
 module.exports = async (req, res, next) => {
-  const { report, params } = req.body;
-  const { db, user } = req.context;
-  // Get Data by report name
-  const { pagesHeaders, pagesData } = await db.report[report](params, user);
+    try {
+        const { report, params } = req.body
+        const { db, user } = req.context
+        // Get Data by report name
+        const { pagesHeaders, pagesData } = await db.report[report](params, user)
 
-  // Create Excel
-  const wb = new xlsx.Workbook();
+        // Create Excel
+        const wb = new xlsx.Workbook()
 
-  pagesData.forEach((pageData, index) => {
-    const { name, headers } = pagesHeaders[index];
+        pagesData.forEach((pageData, index) => {
+            const { name, headers } = pagesHeaders[index]
 
-    // NOTE: Excel has a limit on the character count of worksheet names (31)
-    const ws = wb.addWorksheet(cutWorksheetName(name));
+            // NOTE: Excel has a limit on the character count of worksheet names (31)
+            const ws = wb.addWorksheet(cutWorksheetName(name))
 
-    ws.row(1).filter();
-    headers.reduce((p, c, i) => {
-      ws.column(1 + i).setWidth(c.title.length + 15);
-      ws.cell(1, 1 + i).string(c.title);
-      return null;
-    }, null);
+            ws.row(1).filter()
+            headers.reduce((p, c, i) => {
+                ws.column(1 + i).setWidth(c.title.length + 15)
+                ws.cell(1, 1 + i).string(c.title)
+                return null
+            }, null)
 
-    pageData.reduce((_, item, i) => {
-      headers.reduce((_, h, j) => {
-        setCellValue(ws.cell(2 + i, 1 + j), h, item);
-        return null;
-      }, null);
-      return null;
-    }, null);
-  });
+            pageData.reduce((_, item, i) => {
+                headers.reduce((_, h, j) => {
+                    setCellValue(ws.cell(2 + i, 1 + j), h, item)
+                    return null
+                }, null)
+                return null
+            }, null)
+        })
 
-  wb.write("report.xlsx", res);
-};
+        wb.write('report.xlsx', res)
+    } catch (error) {
+        console.error('Error generating report:', error.message)
+        res.status(500).json({
+            error: 'An error occurred while generating the report. Please try again later.',
+            details: error.message
+        })
+    }
+}

@@ -372,71 +372,81 @@ class Report {
       }));
   };
 
-  usersActiveTasks = async ({
-    days_of_delay
-  }) => {
-    const userTasksPromises = user_roles.map((userRole) =>
-      this.bpmn.tasks([userRole])
-    );
+  usersActiveTasks = async ({ days_of_delay }) => {
+    try {
+      const userTasksPromises = user_roles.map((userRole) =>
+        this.bpmn.tasks([userRole])
+      )
 
-    const userTasks = formatUserTasks(await Promise.all(userTasksPromises));
+      const userTasks = formatUserTasks(await Promise.all(userTasksPromises))
 
-    const bpmnInstances = (
-      await this.db.execute({
+      const bpmnInstancesResults = await this.db.execute({
         sql: sql.instancesByIds,
         args: {
-          bpmnIds: userTasks.map(({ processInstanceId }) => processInstanceId),
-        },
+          bpmnIds: userTasks.map(({ processInstanceId }) => processInstanceId)
+        }
       })
-    )?.rows;
 
-    const assigneeHist = (
-      await this.db.execute({
+      if (!bpmnInstancesResults) {
+        throw new Error('Failed to fetch BPMN instances')
+      }
+
+      const bpmnInstances = bpmnInstancesResults.rows
+
+      const assigneeHistResults = await this.db.execute({
         sql: sql.assigneeHistByModelIds,
         args: {
           modelIds: bpmnInstances.map(({ MODEL_ID }) => MODEL_ID),
-          dateOfDelay: moment().subtract(days_of_delay * 1, "days").format("YYYY-MM-DD HH:MM:ss")
-        },
+          dateOfDelay: moment().subtract(days_of_delay * 1, 'days').format('YYYY-MM-DD HH:MM:ss')
+        }
       })
-    )?.rows;
 
-    const assigneeHistWithTasks = assigneeHist.reduce(
-      (userTasksWithNames, assigneeHist) => {
+      if (!assigneeHistResults) {
+        throw new Error('Failed to fetch assignee history')
+      }
+
+      const assigneeHist = assigneeHistResults.rows
+
+      const assigneeHistWithTasks = assigneeHist.reduce((userTasksWithNames, assigneeHistEntry) => {
         const currentProcessInstanceId = bpmnInstances.find(
-          (bpmnInstance) => bpmnInstance.MODEL_ID === assigneeHist.MODEL_ID
-        )?.BPMN_INSTANCE_ID;
+          (bpmnInstance) => bpmnInstance.MODEL_ID === assigneeHistEntry.MODEL_ID
+        )?.BPMN_INSTANCE_ID
 
         const currentTask = userTasks.find(
           ({ processInstanceId, role }) =>
-            processInstanceId === currentProcessInstanceId &&
-            role === assigneeHist.FUNCTIONAL_ROLE
-        );
+            processInstanceId === currentProcessInstanceId && role === assigneeHistEntry.FUNCTIONAL_ROLE
+        )
 
         if (currentTask) {
           return [
             ...userTasksWithNames,
             {
-              MODEL_ID: assigneeHist.MODEL_ID,
-              MODEL_NAME: assigneeHist.MODEL_NAME,
-              MODEL_ALIAS: `model${assigneeHist.ROOT_MODEL_ID}-v${assigneeHist.MODEL_VERSION}`,
-              UPDATE_DATE: assigneeHist.UPDATE_DATE,
-              STATUS: assigneeHist.STATUS,
+              MODEL_ID: assigneeHistEntry.MODEL_ID,
+              MODEL_NAME: assigneeHistEntry.MODEL_NAME,
+              MODEL_ALIAS: `model${ assigneeHistEntry.ROOT_MODEL_ID }-v${ assigneeHistEntry.MODEL_VERSION }`,
+              UPDATE_DATE: assigneeHistEntry.UPDATE_DATE,
+              STATUS: assigneeHistEntry.STATUS,
               TASK_NAME: currentTask.name,
               ROLE: currentTask.role,
-              USER_NAME: assigneeHist.ASSIGNEE_NAME,
-            },
-          ];
+              USER_NAME: assigneeHistEntry.ASSIGNEE_NAME
+            }
+          ]
         }
 
-        return userTasksWithNames;
-      },
-      []
-    );
+        return userTasksWithNames
+      }, [])
 
-    return {
-      pagesHeaders: usersActiveTasks,
-      pagesData: [assigneeHistWithTasks],
-    };
+      return {
+        pagesHeaders: usersActiveTasks,
+        pagesData: [assigneeHistWithTasks]
+      }
+
+    } catch (error) {
+      console.error('Error fetching user active tasks:', error)
+      return {
+        error: 'An error occurred while fetching user active tasks.'
+      }
+    }
   };
 }
 
