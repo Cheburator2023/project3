@@ -373,79 +373,56 @@ class Report {
   };
 
   usersActiveTasks = async ({ days_of_delay }) => {
-    try {
-      const userTasksPromises = user_roles.map((userRole) =>
-        this.bpmn.tasks([userRole])
-      )
+    const userTasksPromises = user_roles.map((userRole) => this.bpmn.tasks([userRole]))
+    const userTasks = formatUserTasks(await Promise.all(userTasksPromises))
+    const taskMap = new Map(userTasks.map(task => [task.processInstanceId + task.role, task]))
 
-      const userTasks = formatUserTasks(await Promise.all(userTasksPromises))
-
-      const bpmnInstancesResults = await this.db.execute({
+    const bpmnInstances = (
+      await this.db.execute({
         sql: sql.instancesByIds,
         args: {
           bpmnIds: userTasks.map(({ processInstanceId }) => processInstanceId)
         }
       })
+    )?.rows
 
-      if (!bpmnInstancesResults) {
-        throw new Error('Failed to fetch BPMN instances')
-      }
+    const instanceMap = new Map(bpmnInstances.map(instance => [instance.MODEL_ID, instance]))
 
-      const bpmnInstances = bpmnInstancesResults.rows
-
-      const assigneeHistResults = await this.db.execute({
+    const assigneeHist = (
+      await this.db.execute({
         sql: sql.assigneeHistByModelIds,
         args: {
-          modelIds: bpmnInstances.map(({ MODEL_ID }) => MODEL_ID),
+          modelIds: Array.from(instanceMap.keys()),
           dateOfDelay: moment().subtract(days_of_delay * 1, 'days').format('YYYY-MM-DD HH:MM:ss')
         }
       })
+    )?.rows
 
-      if (!assigneeHistResults) {
-        throw new Error('Failed to fetch assignee history')
-      }
+    const assigneeHistWithTasks = assigneeHist.reduce((acc, assigneeHistItem) => {
+      const instance = instanceMap.get(assigneeHistItem.MODEL_ID)
+      if (!instance) return acc
 
-      const assigneeHist = assigneeHistResults.rows
+      const taskKey = instance.BPMN_INSTANCE_ID + assigneeHistItem.FUNCTIONAL_ROLE
+      const task = taskMap.get(taskKey)
+      if (!task || task.role !== assigneeHistItem.FUNCTIONAL_ROLE) return acc
 
-      const assigneeHistWithTasks = assigneeHist.reduce((userTasksWithNames, assigneeHistEntry) => {
-        const currentProcessInstanceId = bpmnInstances.find(
-          (bpmnInstance) => bpmnInstance.MODEL_ID === assigneeHistEntry.MODEL_ID
-        )?.BPMN_INSTANCE_ID
+      acc.push({
+        MODEL_ID: assigneeHistItem.MODEL_ID,
+        MODEL_NAME: assigneeHistItem.MODEL_NAME,
+        MODEL_ALIAS: `model${ assigneeHistItem.ROOT_MODEL_ID }-v${ assigneeHistItem.MODEL_VERSION }`,
+        UPDATE_DATE: assigneeHistItem.UPDATE_DATE,
+        STATUS: assigneeHistItem.STATUS,
+        TASK_NAME: task.name,
+        ROLE: task.role,
+        USER_NAME: assigneeHistItem.ASSIGNEE_NAME
+      })
 
-        const currentTask = userTasks.find(
-          ({ processInstanceId, role }) =>
-            processInstanceId === currentProcessInstanceId && role === assigneeHistEntry.FUNCTIONAL_ROLE
-        )
+      return acc
+    }, [])
 
-        if (currentTask) {
-          return [
-            ...userTasksWithNames,
-            {
-              MODEL_ID: assigneeHistEntry.MODEL_ID,
-              MODEL_NAME: assigneeHistEntry.MODEL_NAME,
-              MODEL_ALIAS: `model${ assigneeHistEntry.ROOT_MODEL_ID }-v${ assigneeHistEntry.MODEL_VERSION }`,
-              UPDATE_DATE: assigneeHistEntry.UPDATE_DATE,
-              STATUS: assigneeHistEntry.STATUS,
-              TASK_NAME: currentTask.name,
-              ROLE: currentTask.role,
-              USER_NAME: assigneeHistEntry.ASSIGNEE_NAME
-            }
-          ]
-        }
-
-        return userTasksWithNames
-      }, [])
-
-      return {
-        pagesHeaders: usersActiveTasks,
-        pagesData: [assigneeHistWithTasks]
-      }
-
-    } catch (error) {
-      console.error('Error fetching user active tasks:', error)
-      return {
-        error: 'An error occurred while fetching user active tasks.'
-      }
+    return {
+      pagesHeaders: usersActiveTasks,
+      pagesData: [assigneeHistWithTasks]
     }
   };
 }
