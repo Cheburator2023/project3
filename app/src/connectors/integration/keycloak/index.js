@@ -197,6 +197,50 @@ class Keycloak {
         path: `auth/realms/${realms}/protocol/openid-connect/userinfo`,
         token
     })
+
+    getSubGroupsByGroupsName = (groupNames = []) => this
+        .getToken()
+        .then(token => {
+            return connector({
+                path: `auth/admin/realms/${ realms }/groups`,
+                token
+            })
+        })
+        .then(groups => {
+            const subGroups = []
+            for (const group of groups) {
+                if (!groupNames.includes(group.name)) {
+                    continue
+                }
+
+                if (!group.subGroups || !group.subGroups.length) {
+                    continue
+                }
+
+                for (const subGroup of group.subGroups) {
+                    subGroups.push(subGroup)
+                }
+            }
+
+            return subGroups
+        })
+        .catch(e => {
+            console.error(e)
+            return []
+        })
+
+    getUsersInGroup = (groupId) => this
+        .getToken()
+        .then(token => {
+            return connector({
+                path: `auth/admin/realms/${ realms }/groups/${ groupId }/members`,
+                token
+            })
+        })
+        .catch(e => {
+            console.error(e)
+            return []
+        })
 }
 
 module.exports = Keycloak

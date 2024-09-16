@@ -494,6 +494,7 @@ const usersActiveTasks = [
       { key: "TASK_NAME", title: "Название задачи" },
       { key: "ROLE", title: "Роль" },
       { key: "USER_NAME", title: "Исполнитель"},
+      { key: "STREAMS", title: "Стрим"}
     ],
   },
 ];

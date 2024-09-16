@@ -23,9 +23,10 @@ const {
 } = require("./headers");
 
 class Report {
-  constructor(db, bpmn) {
+  constructor(db, bpmn, integration) {
     this.db = db;
     this.bpmn = bpmn;
+    this.integration = integration;
   }
 
   models = async ({
@@ -398,6 +399,29 @@ class Report {
       })
     )?.rows
 
+    const allGroups = await this.integration.keycloak.getSubGroupsByGroupsName(['departament', 'departament_business_customer'])
+    const getUsersInGroups = (groups) => {
+      const userGroupsMap = {}
+      const getUsersInGroup = async (groupId, groupName) => {
+        const users = await this.integration.keycloak.getUsersInGroup(groupId)
+        users.forEach(user => {
+          const username = user.username
+          if (!userGroupsMap[username]) {
+            userGroupsMap[username] = []
+          }
+          userGroupsMap[username].push(groupName)
+        })
+      }
+      const groupPromises = groups.map(group => {
+        const groupId = group.id
+        const groupName = group.name
+        return getUsersInGroup(groupId, groupName)
+      })
+      return Promise.all(groupPromises)
+        .then(() => userGroupsMap)
+    }
+    const users = await getUsersInGroups(allGroups)
+
     const assigneeHistWithTasks = assigneeHist.reduce((acc, assigneeHistItem) => {
       const instance = instanceMap.get(assigneeHistItem.MODEL_ID)
       if (!instance) return acc
@@ -405,6 +429,15 @@ class Report {
       const taskKey = instance.BPMN_INSTANCE_ID + assigneeHistItem.FUNCTIONAL_ROLE
       const task = taskMap.get(taskKey)
       if (!task || task.role !== assigneeHistItem.FUNCTIONAL_ROLE) return acc
+
+      const streams = new Set()
+      assigneeHist.ASSIGNEE_NAME
+        .split(', ')
+        .map((username) => {
+          if (username in users) {
+            users[username].map(stream => streams.add(stream))
+          }
+        })
 
       acc.push({
         MODEL_ID: assigneeHistItem.MODEL_ID,
@@ -414,7 +447,8 @@ class Report {
         STATUS: assigneeHistItem.STATUS,
         TASK_NAME: task.name,
         ROLE: task.role,
-        USER_NAME: assigneeHistItem.ASSIGNEE_NAME
+        USER_NAME: assigneeHistItem.ASSIGNEE_NAME,
+        STREAMS: Array.from(streams).join(', ')
       })
 
       return acc

@@ -21,7 +21,7 @@ module.exports = (db, bpmn, integration) => ({
   artefact: new Artefact(db),
   instance: new Instance(db, bpmn),
   integration: new Integration(db),
-  report: new Report(db, bpmn),
+  report: new Report(db, bpmn, integration),
   cascade: new Cascade(db),
   risk_scale: new RiskScale(db),
   assignment: new Assignment(db),
