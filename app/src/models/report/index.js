@@ -431,7 +431,7 @@ class Report {
       if (!task || task.role !== assigneeHistItem.FUNCTIONAL_ROLE) return acc
 
       const streams = new Set()
-      assigneeHist.ASSIGNEE_NAME
+      assigneeHistItem.ASSIGNEE_NAME
         .split(', ')
         .map((username) => {
           if (username in users) {
