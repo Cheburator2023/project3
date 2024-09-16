@@ -1,5 +1,7 @@
 # Semantic Versioning Changelog
 
+## [1.3.8](https://git.sfera.inno.local/SUMD/backend/compare/v1.3.7...v1.3.8) (2024-09-16)
+
 ## [1.3.7](https://git.sfera.inno.local/SUMD/backend/compare/v1.3.6...v1.3.7) (2024-09-04)
 
 ## [1.3.6](https://git.sfera.inno.local/SUMD/backend/compare/v1.3.5...v1.3.6) (2024-08-13)
