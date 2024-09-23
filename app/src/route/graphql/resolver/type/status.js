@@ -18,7 +18,16 @@ const status = {
     "monitoring_auto_correct": "Автоматизированная корректировка",
     "removal": "Вывод модели из эксплуатации",
     "cancel": "Отмена разработки модели",
-    "jira": "Создание задачи Jira"
+    "jira": "Создание задачи Jira",
+    "developed_not_implemented": "Разработана, не внедрена",
+    "rollback_version": "",
+    "rollback": "Откат",
+    "fast_model_process": "Сокращенное заведение разработанных моделей",
+    "model_pilot": "Пилотирование модели",
+    "fullvalidation_datamart": "Разработка витрины для полной валидации",
+    "inegration_model": "Продуктивизация модели",
+    "test_preprod_transfer_prod": "Тестирование на препрод и перенос на прод контур",
+    "fullvalidation": "Полная валидация",
 }
 
 module.exports = status
