@@ -12,6 +12,7 @@
 
 # dotenv environment variables file
 **.env
+**.env.*
 
 # Others
 **uploads
