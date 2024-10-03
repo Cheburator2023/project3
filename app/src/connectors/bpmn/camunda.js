@@ -14,6 +14,20 @@ class Bpmn {
       body,
     });
 
+  // Start process by Definition Version.
+  startByVersion = (key, version, body) =>
+    this.connector({
+      path: `/process-definition/?key=${key}&version=${version}`
+    })
+      .then(d => d[0].id) // Example ID: initialization:2:7b9e3fab-4b50-11ef-a145-b6cb02d3563b (key:version:deploymentId)
+      .then(id => {
+        return this.connector({
+          method: 'POST',
+          path: `/process-definition/${id}/start`,
+          body
+        })
+      })
+
   message = (body) =>
     this.connector({
       method: 'POST',
@@ -44,6 +58,12 @@ class Bpmn {
         path: `/history/process-instance/${id}`,
       })
     );
+
+  // Get Definition by id
+  definition = (id) =>
+    this.connector({
+      path: `/process-definition/${id}/`,
+    });
 
   // Get Process Definition Diagram
   diagram = (id) => this.connector({ path: `/process-definition/${id}/xml` }).then((data) => data.bpmn20Xml);
