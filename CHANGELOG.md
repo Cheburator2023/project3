@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.3.13](https://git.sfera.inno.local/SUMD/backend/compare/v1.3.12...v1.3.13) (2024-10-13)
+
+
+### Bug Fixes
+
+* **reports:** Добавление developing_end_date и model_epic_05_date в report отчеты ([1071096](https://git.sfera.inno.local/SUMD/backend/commit/1071096c73ee8789b3668a6f56c83f3affaacbb2))
+
 ## [1.3.12](https://git.sfera.inno.local/SUMD/backend/compare/v1.3.11...v1.3.12) (2024-10-03)
 
 ## [1.3.11](https://git.sfera.inno.local/SUMD/backend/compare/v1.3.10...v1.3.11) (2024-09-26)
