@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.3.15](https://git.sfera.inno.local/SUMD/backend/compare/v1.3.14...v1.3.15) (2024-10-14)
+
+
+### Bug Fixes
+
+* **reports:** fix missed headers ([43b87ac](https://git.sfera.inno.local/SUMD/backend/commit/43b87accb66b7da3f0e0021a5954a67a2618af33))
+
 ## [1.3.14](https://git.sfera.inno.local/SUMD/backend/compare/v1.3.13...v1.3.14) (2024-10-14)
 
 
