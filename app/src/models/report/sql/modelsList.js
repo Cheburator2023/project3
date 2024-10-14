@@ -81,7 +81,7 @@ from
     select
       ar_.model_id,
       STRING_AGG(
-        (case when ar_.artefact_id = 43 then av_.artefact_value else null end)::varchar,
+        (case when ar_.artefact_id = 34 then av_.artefact_value else null end)::varchar,
         ' > ' ORDER BY
             ar_.artefact_value_id
       ) AS developing_end_date,
