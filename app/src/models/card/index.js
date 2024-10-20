@@ -70,6 +70,46 @@ class Card {
     });
   };
 
+  createNewByGeneralModelId = async ({
+    MODEL_ID,
+    MODEL_NAME,
+    MODEL_DESC,
+    generalModelId,
+    MODEL_CREATOR,
+  }) => {
+
+    const rootModel = await this.db.execute({
+      sql: sql.rootModelByGeneralModelId,
+      args: { general_model_id: generalModelId },
+    }).then((data) => data.rowCount > 0 ? data.rows[0] : null);
+
+    if (rootModel) {
+      return this.db.execute({
+        sql: sql.copy,
+        args: { 
+          MODEL_ID, 
+          MODEL_NAME, 
+          MODEL_DESC, 
+          MODEL_CREATOR, 
+          ROOT_MODEL_ID: rootModel.ROOT_MODEL_ID,
+          MODEL_VERSION: rootModel.MODEL_VERSION + 1,
+          GENERAL_MODEL_ID: generalModelId,
+        },
+      });
+    }
+
+    return this.db.execute({
+      sql: sql.new,
+      args: { 
+        MODEL_ID, 
+        MODEL_NAME, 
+        MODEL_DESC, 
+        MODEL_CREATOR, 
+        GENERAL_MODEL_ID: generalModelId,
+      },
+    });
+  };
+
   // Получить все карточки по типу
   all = ({ type = [], active }, user) => {
     const groupsAfterMapping = this.getGroupsAfterMapping(user.groups);

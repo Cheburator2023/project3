@@ -6,6 +6,9 @@ const download = require('./download');
 const report = require('./report');
 const deleteModel = require('./deleteModel');
 const deleteAssignment = require('./deleteAssignment');
+const createNlpModel = require('./nlp/createNlpModel');
+const changeStatus = require('./nlp/changeStatus');
+const auth = require('../../middleware/auth')
 
 const router = new ExpressRouter();
 
@@ -22,5 +25,9 @@ router.delete('/deleteModel', deleteModel);
 
 // Delete assignment
 router.delete('/deleteAssignment', deleteAssignment);
+
+// NPL API
+router.post('/v1/create-nlp-model', auth.authMiddleware, createNlpModel);
+router.patch('/v1/change-status/:versionId', auth.authMiddleware, changeStatus);
 
 module.exports = router;

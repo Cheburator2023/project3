@@ -15,6 +15,7 @@ const graphqlRoute = require('./route/graphql');
 
 // Rest Route
 const apiRoute = require('./route/rest');
+const nlpAdAuthRoute = require('./route/rest/nlp/adAuth');
 
 // Connetors
 const database = require('./connectors/database');
@@ -41,6 +42,8 @@ const server = async () => {
   app.use(bodyParser.json());
   app.use(cookieParser());
   app.use('/health', (req, res) => res.status(200).end());
+  app.use('/v1/ad-auth', context(integration), nlpAdAuthRoute);
+
   app.use(keycloak.middleware(), keycloak.protect());
   app.use(authMiddleware);
   app.use(errorMiddleware);

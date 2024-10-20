@@ -15,6 +15,7 @@ module.exports = {
   artefacts: require('./artefacts'),
   modelsByBpmnIds: require('./modelsByBpmnIds'),
   autoMLRootModel: require('./autoMLRootModel'),
+  rootModelByGeneralModelId: require('./rootModelByGeneralModelId'),
   edit_name: require('./edit_name'),
   edit_desc: require('./edit_desc'),
   edit_status: require('./edit_status'),

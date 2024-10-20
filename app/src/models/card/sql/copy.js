@@ -7,7 +7,8 @@ const sql = `
         MODEL_CREATOR,
         ROOT_MODEL_ID,
         MODEL_VERSION,
-        DEPLOYMENT_ID
+        DEPLOYMENT_ID,
+        GENERAL_MODEL_ID
     )
     VALUES
     (
@@ -24,7 +25,8 @@ const sql = `
                 order by DEPLOYMENT_ID desc
             ) as dummy
             LIMIT 1
-        )
+        ),
+        :GENERAL_MODEL_ID
     )
 `
 

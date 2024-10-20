@@ -31,6 +31,24 @@ class Keycloak {
     .then(d => d.json())
     .then(d=> d.access_token)
 
+    getTokenByUsername = (username, password) => fetch(
+        `${keycloakHost}auth/realms/${realms}/protocol/openid-connect/token`,
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: qs.stringify({
+                grant_type: 'password',
+                client_id: keycloakClient,
+                username: username,
+                password: password
+            })
+        }
+    )
+    .then(d => d.json())
+    .then(d => d.access_token ? d.access_token : d)
+
     getUsersByGroupSystem = name => this
         .getToken()
         .then(token => this.usersByGroup(name, token))
