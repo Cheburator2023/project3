@@ -33,6 +33,10 @@ spec:
           {{- end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
+          {{- range $key, $val := .Values.env }}
+            - name: {{ $key }}
+              value: {{ $val | quote }}
+          {{- end }}
             - name: PGUSER
               valueFrom:
                 secretKeyRef:
@@ -84,34 +88,6 @@ spec:
                   key: "BPMN_KEY"
             - name: NODE_ENV
               value: "{{ .Values.bpmn.NODE_ENV }}"
-            - name: DS_DEPARTMENT_ARTEFACT_ID
-              value: "{{ .Values.DS_DEPARTMENT_ARTEFACT_ID }}"
-            - name: IMAGE_LOGICAL_NAME
-              value: "{{ .Values.IMAGE_LOGICAL_NAME}}"
-            - name: HOST
-              value: "{{ .Values.HOST }}"
-            - name: PORT
-              value: "{{ .Values.PORT }}"
-            - name: NODE_TLS_REJECT_UNAUTHORIZED
-              value: "{{ .Values.NODE_TLS_REJECT_UNAUTHORIZED }}"
-            - name: GIT_API
-              value: "{{ .Values.GIT_API }}"
-            - name: GIT_STORAGE
-              value: "{{ .Values.GIT_STORAGE }}"
-            - name: SMTP_HOST
-              value: "{{ .Values.SMTP_HOST }}"
-            - name: SMTP_USER
-              value: "{{ .Values.SMTP_USER }}"
-            - name: JIRA_API
-              value: "{{ .Values.JIRA_API }}"
-            - name: TEAMCITY_API
-              value: "{{ .Values.TEAMCITY_API }}"
-            - name: INTERFACE_URL
-              value: "{{ .Values.INTERFACE_URL}}"
-            - name: KAFKA_API
-              value: "{{ .Values.KAFKA_API }}"
-            - name: TZ
-              value: "{{ .Values.TZ }}"
           ports:
             - containerPort: 4000
               protocol: TCP
