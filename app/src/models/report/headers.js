@@ -54,6 +54,14 @@ const models = [
       { key: "BUISENESS_PROCESS_NAME", title: "Бизнес-процесс" },
       { key: "MODEL_ALGORITHM", title: "Тип алгорима" },
       { key: "USING_MODE", title: "Режим применения" },
+      {
+        key: "DEVELOPING_END_DATE",
+        title: "Дата окончания разработки",
+      },
+      {
+        key: "MODEL_EPIC_05",
+        title: "Дата завершения разработки 05 этапа",
+      },
     ],
   },
   {

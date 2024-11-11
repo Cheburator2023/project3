@@ -1,5 +1,36 @@
 # Semantic Versioning Changelog
 
+## [1.3.15](https://git.sfera.inno.local/SUMD/backend/compare/v1.3.14...v1.3.15) (2024-10-14)
+
+
+### Bug Fixes
+
+* **reports:** fix missed headers ([43b87ac](https://git.sfera.inno.local/SUMD/backend/commit/43b87accb66b7da3f0e0021a5954a67a2618af33))
+
+## [1.3.14](https://git.sfera.inno.local/SUMD/backend/compare/v1.3.13...v1.3.14) (2024-10-14)
+
+
+### Bug Fixes
+
+* **reports:** fix missed id ([7218f02](https://git.sfera.inno.local/SUMD/backend/commit/7218f02e79db9564675a4298adc68cbe116467da))
+
+## [1.3.13](https://git.sfera.inno.local/SUMD/backend/compare/v1.3.12...v1.3.13) (2024-10-13)
+
+
+### Bug Fixes
+
+* **reports:** Добавление developing_end_date и model_epic_05_date в report отчеты ([1071096](https://git.sfera.inno.local/SUMD/backend/commit/1071096c73ee8789b3668a6f56c83f3affaacbb2))
+
+## [1.3.12](https://git.sfera.inno.local/SUMD/backend/compare/v1.3.11...v1.3.12) (2024-10-03)
+
+## [1.3.11](https://git.sfera.inno.local/SUMD/backend/compare/v1.3.10...v1.3.11) (2024-09-26)
+
+## [1.3.10](https://git.sfera.inno.local/SUMD/backend/compare/v1.3.9...v1.3.10) (2024-09-23)
+
+## [1.3.9](https://git.sfera.inno.local/SUMD/backend/compare/v1.3.8...v1.3.9) (2024-09-16)
+
+## [1.3.8](https://git.sfera.inno.local/SUMD/backend/compare/v1.3.7...v1.3.8) (2024-09-16)
+
 ## [1.3.7](https://git.sfera.inno.local/SUMD/backend/compare/v1.3.6...v1.3.7) (2024-09-04)
 
 ## [1.3.6](https://git.sfera.inno.local/SUMD/backend/compare/v1.3.5...v1.3.6) (2024-08-13)
