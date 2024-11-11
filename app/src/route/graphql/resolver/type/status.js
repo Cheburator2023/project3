@@ -6,7 +6,7 @@ const status = {
     "data_build": "Разработка витрины",
     "data_search": "Поиск данных",
     "monitoring": "Мониторинг",
-    "validation": "Плановая валидация",
+    "validation": "Внедрена",
     "integration": "Внедрение",
     "data_pilot": "Пилот данных",
     "model_validation": "Первичная валидация",
