@@ -73,6 +73,9 @@ SELECT model_id,
                 WHEN (artefact_id = 872)
                     AND (artefact_value_id IN (667))
                     THEN 'Разработана, внедрена в ПИМ'
+                WHEN (artefact_id = 890)
+                    AND (artefact_value_id IN (670))
+                    THEN 'Разработана, внедрена в ПИМ'
 
                 WHEN (artefact_id = 827)
                     AND (artefact_value_id IN (641))
