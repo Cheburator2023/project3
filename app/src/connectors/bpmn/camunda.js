@@ -15,11 +15,16 @@ class Bpmn {
     });
 
   // Start process by Definition Version.
-  startByVersion = (key, version, body) =>
+  startByVersion = (key, versionTag, body) =>
     this.connector({
-      path: `/process-definition/?key=${key}&version=${version}`
+      path: `/process-definition/?key=${key}&versionTag=${versionTag}`
     })
-      .then(d => d[0].id) // Example ID: initialization:2:7b9e3fab-4b50-11ef-a145-b6cb02d3563b (key:version:deploymentId)
+      .then(d => {
+        if (d.length == 0) {
+          throw new Error(`Process definition is not found with key ${key} and version tag ${versionTag}`)
+        }
+        return d[0].id
+      }) // Example ID: initialization:2:7b9e3fab-4b50-11ef-a145-b6cb02d3563b (key:version:deploymentId)
       .then(id => {
         return this.connector({
           method: 'POST',
