@@ -8,5 +8,6 @@ module.exports = {
   id: require('./id'),
   key: require('./key'),
   instancesByModelId: require('./instancesByModelId'),
+  instancesByModelIdAndKey: require('./instancesByModelIdAndKey'),
   deleteBpmnInstance: require('./deleteBpmnInstance')
 }

@@ -25,20 +25,20 @@ module.exports = async (root, args, context) => {
     if (groups.includes('mipm')) cancel_role = 'mipm'
 
     /* Get initialization instance by model_id */
-    const [initializationInstance] = await context.db.instance.check({ model, key: initializationInstanceKey })
+    const [initializationInstance] = await context.db.instance.getInstancesByModelIdAndKey({ model, key: initializationInstanceKey })
+
     if (!initializationInstance) {
       throw new Error('Initialization instance not found.')
     }
 
     /* Get initialization process definition ID and version */
     const { processDefinitionId } = await context.bpmn.instance(initializationInstance.BPMN_INSTANCE_ID)
-    const { version } = await context.bpmn.definition(processDefinitionId)
-
+    const { versionTag } = await context.bpmn.definition(processDefinitionId)
     /* Start cancel BPMN-instance by definition version */
     const instance = await context.bpmn
       .startByVersion(
         cancelInstanceKey,
-        version,
+        versionTag,
         JSON.stringify({
           variables: {
             model: { value: model },
@@ -47,9 +47,6 @@ module.exports = async (root, args, context) => {
         })
       )
       .then(d => d.id)
-
-    /* Save new cancel BPMN-instance in database */
-    await context.db.instance.new({ model, instance, key: cancelInstanceKey })
 
     return instance
   } catch (error) {

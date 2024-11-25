@@ -76,6 +76,15 @@ class Instance {
 
   rollback = () => {
   }
+
+  getInstancesByModelIdAndKey = ({ model, key }) => {
+    return this.db
+      .execute({
+        sql: sql.instancesByModelIdAndKey,
+        args: { model, key }
+      })
+      .then(d => d.rows)
+  }
 }
 
 module.exports = Instance
