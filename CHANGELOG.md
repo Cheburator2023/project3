@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.3.18](https://git.sfera.inno.local/SUMD/backend/compare/v1.3.17...v1.3.18) (2024-11-27)
+
+
+### Bug Fixes
+
+* Исправление функциональности отмены разработки модели ([e8ced01](https://git.sfera.inno.local/SUMD/backend/commit/e8ced01b589d44629f3c50dd3f8e26d73b3eed74))
+
 ## [1.3.17](https://git.sfera.inno.local/SUMD/backend/compare/v1.3.16...v1.3.17) (2024-11-22)
 
 ## [1.3.16](https://git.sfera.inno.local/SUMD/backend/compare/v1.3.15...v1.3.16) (2024-11-11)
