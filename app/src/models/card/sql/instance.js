@@ -7,18 +7,18 @@ const sql = `
         BIFLTR_.BPMN_INSTANCE_ID,
         BIFLTR_.MODEL_ID,
         BIFLTR_.CREATE_DTTM,
-        BIFLTR_.BPMN_KEY_ID, 
+        BIFLTR_.BPMN_KEY_ID,
         BIFLTR_.BPMN_PARENT_ID,
         BIFLTR_.EFFECTIVE_FROM,
         BIFLTR_.EFFECTIVE_TO,
         BIFLTR_.BPMN_KEY_DESC
-    FROM 
+    FROM
         (
         SELECT
             BI_.BPMN_INSTANCE_ID,
             BI_.MODEL_ID,
             BI_.CREATE_DTTM,
-            BI_.BPMN_KEY_ID, 
+            BI_.BPMN_KEY_ID,
             BI_.BPMN_PARENT_ID,
             BI_.EFFECTIVE_FROM,
             BI_.EFFECTIVE_TO,
@@ -28,9 +28,9 @@ const sql = `
         INNER JOIN BPMN_PROCESSES BP_
             ON BI_.BPMN_KEY_ID = BP_.BPMN_KEY_ID
         WHERE BI_.MODEL_ID = :MODEL_ID
-            AND BP_.BPMN_KEY_DESC IN ('initialization', 'data', 'model', 'integration', 'monitoring', 'validation', 'removal')
+            AND BP_.BPMN_KEY_DESC IN ('initialization', 'data', 'model', 'integration', 'monitoring', 'validation', 'removal', 'fullvalidation', 'fast_model_process', 'test_preprod_transfer_prod')
         ) BIFLTR_
     WHERE BIFLTR_.RN_ = 1
-`
+`;
 
-module.exports = sql
+module.exports = sql;
