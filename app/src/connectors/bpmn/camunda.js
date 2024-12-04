@@ -260,6 +260,13 @@ class Bpmn {
     /* CONTINUE MAIN PROCESS */
     await this.msg(model);
   };
+
+  getTaskVar = (taskId, varName) =>
+    this.connector({
+      path: `/task/${taskId}/variables/${varName}`,
+      method: 'GET',
+    }).then((data) => data.value)
+    .catch((e) => console.log(e));
 }
 
 module.exports = Bpmn;

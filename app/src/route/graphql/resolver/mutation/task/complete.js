@@ -22,6 +22,10 @@ module.exports = async (root, args, context) => {
         .add(args)
 
     console.sys(addNewArtefactStatus)
+
+    const modelStatus = await context.bpmn.getTaskVar(args.id, 'model_status')
+    console.log(`Получен новый статус модели model${taskInfo.MODEL.ROOT_MODEL_ID}-v${taskInfo.MODEL.MODEL_VERSION}: ${modelStatus}`)
+
     // Camunda close task
     return context.db
         .task
@@ -30,6 +34,13 @@ module.exports = async (root, args, context) => {
             context.log({
                 msg: `Завершение задачи ${taskInfo.TASK_NAME} для модели model${taskInfo.MODEL.ROOT_MODEL_ID}-v${taskInfo.MODEL.MODEL_VERSION}`
             })
+
+            if (modelStatus) {
+                context.db.card.changeStatus({ modelId: args.MODEL_ID, modelStatus })
+                    .then()
+                    .catch((err) => console.log(`Ошибка при смене статуса модели model${taskInfo.MODEL.ROOT_MODEL_ID}-v${taskInfo.MODEL.MODEL_VERSION}: ${err}`))
+            }
+           
             return data
         })
         .catch(e => {

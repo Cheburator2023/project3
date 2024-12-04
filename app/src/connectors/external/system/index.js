@@ -56,6 +56,10 @@ class System{
                     key: variables.key 
                 })
             await taskService.complete(task)
+            await this.db.card.addStage({
+                modelId: variables.model,
+                modelStage: variables.model_stage,
+            })
         }
         catch(e){console.sys(e)}
 
@@ -71,6 +75,13 @@ class System{
                     key: variables.key 
                 })
             await taskService.complete(task)
+            await this.db.card.removeStage({
+                modelId: variables.model,
+                modelStage: variables.model_stage,
+            })
+            if ('model_status' in variables) {
+                await this.db.card.changeStatus({ modelId: variables.model, modelStatus: variables.model_status ? variables.model_status : null })
+            }
         }
         catch(e){console.sys(e)}
 

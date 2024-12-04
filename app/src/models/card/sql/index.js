@@ -17,4 +17,6 @@ module.exports = {
   autoMLRootModel: require('./autoMLRootModel'),
   edit_name: require('./edit_name'),
   edit_desc: require('./edit_desc'),
+  edit_status: require('./edit_status'),
+  edit_stage: require('./edit_stage'),
 }
