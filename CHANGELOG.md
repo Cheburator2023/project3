@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.4.0](https://git.sfera.inno.local/SUMD/backend/compare/v1.3.19...v1.4.0) (2024-12-04)
+
+
+### Features
+
+* Переработанный функционал статусов и этапов ЖЦМ моделей ([659bb0b](https://git.sfera.inno.local/SUMD/backend/commit/659bb0bb5adcfa1d608cdff15b41eeb94531cc8c))
+
 ## [1.3.19](https://git.sfera.inno.local/SUMD/backend/compare/v1.3.18...v1.3.19) (2024-11-29)
 
 ## [1.3.18](https://git.sfera.inno.local/SUMD/backend/compare/v1.3.17...v1.3.18) (2024-11-27)
