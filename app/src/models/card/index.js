@@ -242,6 +242,63 @@ class Card {
       sql: sql.edit_desc,
       args: { MODEL_ID, MODEL_DESC },
     });
+
+  changeStatus = ({ modelId, modelStatus }) => 
+    this.db.execute({
+      sql: sql.edit_status,
+      args: { model_id: modelId, model_status: modelStatus },
+    });
+    
+  addStage = async ({ modelId, modelStage }) => {
+    if (!modelStage) {
+      return
+    }
+
+    const model = await this.db.execute({ sql: sql.info, args: { MODEL_ID: modelId }, }).then((data) => {
+      if (data.rows.length) {
+        return data.rows[0];
+      }
+
+      throw Error(`Model with id: ${ modelId } not found`);
+    });
+
+    let stages = model.model_stage ? model.model_stage.split(';') : [];
+    stages.push(modelStage);
+
+    this.db.execute({
+      sql: sql.edit_stage,
+      args: { model_id: modelId, model_stage: stages.join(';')},
+    });
+  };
+
+  removeStage = async ({ modelId, modelStage }) => {
+    if (!modelStage) {
+      return
+    }
+    
+    const model = await this.db.execute({ sql: sql.info, args: { MODEL_ID: modelId } }).then((data) => {
+      if (data.rows.length) {
+        return data.rows[0];
+      }
+
+      throw Error(`Model with id: ${ modelId } not found`);
+    });
+
+    if (!model.model_stage) {
+      return
+    }
+
+    let stages = model.model_stage.split(';');
+    const deleteIndex = stages.indexOf(modelStage);
+    if (deleteIndex > -1) {
+      stages.splice(deleteIndex, 1);
+    }
+
+    this.db.execute({
+      sql: sql.edit_stage,
+      args: { model_id: modelId, model_stage: (stages.length ? stages.join(';') : null)},
+    });
+  };
 }
 
 module.exports = Card;
