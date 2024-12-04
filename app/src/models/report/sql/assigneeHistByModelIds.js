@@ -25,7 +25,7 @@ FROM ASSIGNEE_HIST AH
                     BPMN_KEY_DESC,
                     ROW_NUMBER() OVER (
                         PARTITION BY BI.model_id
-                        ORDER BY bi.effective_to DESC, bi.effective_from DESC
+                        ORDER BY bi.effective_to DESC, bi.effective_from DESC, bi.bpmn_key_id DESC
                         ) AS rn
              FROM BPMN_INSTANCES BI
                       LEFT JOIN BPMN_PROCESSES BP

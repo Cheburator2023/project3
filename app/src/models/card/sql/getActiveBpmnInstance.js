@@ -35,7 +35,8 @@ const sql = `
                   partition by bbbiii.model_id
                   order by
                     bbbiii.effective_to desc,
-                    bbbiii.effective_from desc
+                    bbbiii.effective_from desc,
+                    bbbiii.bpmn_key_id desc
                 ) as rn_
               from
                 bpmn_instances bbbiii
