@@ -1,19 +1,55 @@
 const moment = require("moment");
 const activity = require("./bpmnActivity");
-const status = require("./status");
+const {status, model_status} = require("./status");
 
 const getLastActiveStatus = (activeStatuses) => {
   const activeStatusesList = activeStatuses?.split(";");
 
-  if (activeStatusesList?.includes("Вывод модели из эксплуатации")) {
-    return "Вывод модели из эксплуатации";
+  if (activeStatusesList?.includes(model_status.removed_from_operation)) {
+    return model_status.removed_from_operation;
   }
 
-  if (activeStatusesList?.includes("Разработана, не внедрена")) {
-    return "Разработана, не внедрена";
+  if (activeStatusesList?.includes(model_status.developed_not_implemented)) {
+    return model_status.developed_not_implemented;
   }
 
   return activeStatusesList?.[0];
+};
+
+const determineLifecycleStageToImplemented = (businessStatus, modelStatus) => {
+  switch (businessStatus) {
+    case status.fast_model_process:
+      if (
+        modelStatus === model_status.implemented_in_pim ||
+        modelStatus === model_status.validated_outside_pim
+      ) {
+        return status.validation;
+      }
+      break;
+
+    case status.model:
+      if (modelStatus === model_status.validated_outside_pim) {
+        return status.validation;
+      }
+      break;
+
+    case status.inegration_model:
+      if (modelStatus === model_status.implemented_outside_pim) {
+        return status.validation;
+      }
+      break;
+
+    case status.test_preprod_transfer_prod:
+      if (modelStatus === model_status.implemented_in_pim) {
+        return status.validation;
+      }
+      break;
+
+    default:
+      return businessStatus;
+  }
+
+  return businessStatus;
 };
 
 // Особенности маппинга статусов:
@@ -25,14 +61,17 @@ module.exports = {
     STATUS: ({ STATUS }) => getLastActiveStatus(STATUS),
     BUSINESS_STATUS: ({ STATUS, BPMN_INSTANCE_NAME }) => {
       const lastActiveStatus = getLastActiveStatus(STATUS);
+      let currentBusinessStatus = status?.[BPMN_INSTANCE_NAME.trim()]
+
+      currentBusinessStatus = determineLifecycleStageToImplemented(currentBusinessStatus, lastActiveStatus)
 
       switch (lastActiveStatus) {
-        case "Разработана, не внедрена":
+        case model_status.developed_not_implemented:
           return lastActiveStatus;
-        case "Вывод модели из эксплуатации":
+        case model_status.removed_from_operation:
           return lastActiveStatus;
         default:
-          return status?.[BPMN_INSTANCE_NAME.trim()];
+          return currentBusinessStatus;
       }
     },
     TASKS: (root, args, context) => context.db.task.model(root, context.user),

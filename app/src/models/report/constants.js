@@ -12,4 +12,44 @@ const user_roles = [
   "business_customer",
 ];
 
-module.exports = { user_roles };
+const model_status = {
+  developed_not_implemented: 'Разработана, не внедрена',
+  implemented_in_pim: 'Разработана, внедрена в ПИМ',
+  implemented_outside_pim: 'Разработана, внедрена вне ПИМ',
+  removed_from_operation: 'Вывод модели из эксплуатации',
+  validated_outside_pim: 'Внедрена вне ПИМ',
+};
+
+const status = {
+  "main": "Процесс родитель",
+  "initialization": "Инициализация",
+  "model": "Разработка модели",
+  "data": "Данные",
+  "data_build": "Разработка витрины",
+  "data_search": "Поиск данных",
+  "monitoring": "Мониторинг",
+  "validation": "Внедрена",
+  "integration": "Внедрение",
+  "data_pilot": "Пилот данных",
+  "model_validation": "Первичная валидация",
+  "integration_datamart": "Разработка промышленной витрины",
+  "integration_env_conf": "Настройка среды применения",
+  "integration_test": "Тестирование ДИТ",
+  "integration_user": "Пользовательское тестирование",
+  "integration_prod": "Перенос на промышленный стенд",
+  "monitoring_auto_correct": "Автоматизированная корректировка",
+  "removal": "Вывод модели из эксплуатации",
+  "cancel": "Отмена разработки модели",
+  "jira": "Создание задачи Jira",
+  "developed_not_implemented": "Разработана, не внедрена",
+  "rollback_version": "",
+  "rollback": "Откат",
+  "fast_model_process": "Сокращенное заведение разработанных моделей",
+  "model_pilot": "Пилотирование модели",
+  "fullvalidation_datamart": "Разработка витрины для полной валидации",
+  "inegration_model": "Продуктивизация модели",
+  "test_preprod_transfer_prod": "Тестирование на препрод и перенос на прод контур",
+  "fullvalidation": "Полная валидация",
+}
+
+module.exports = { user_roles, model_status, status };
