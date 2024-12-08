@@ -1,3 +1,6 @@
+const { model_status, status } = require("../constants");
+
+
 const getModelArtefactsLink = ({ ROOT_MODEL_ID, MODEL_VERSION }) => {
   const interface_url = process.env.INTERFACE_URL || "";
 
@@ -7,15 +10,61 @@ const getModelArtefactsLink = ({ ROOT_MODEL_ID, MODEL_VERSION }) => {
 const getLastImplementationStatus = (activeStatuses) => {
   const activeStatusesList = activeStatuses?.split(";");
 
-  if (activeStatusesList?.includes("Вывод модели из эксплуатации")) {
-    return "Вывод модели из эксплуатации";
-  };
+  if (activeStatusesList?.includes(model_status.removed_from_operation)) {
+    return model_status.removed_from_operation;
+  }
 
-  if (activeStatusesList?.includes("Разработана, не внедрена")) {
-    return "Разработана, не внедрена";
+  if (activeStatusesList?.includes(model_status.developed_not_implemented)) {
+    return model_status.developed_not_implemented;
   }
 
   return activeStatusesList?.[0];
+};
+
+const determineLifecycleStageToImplemented = (businessStatus, modelStatus) => {
+  switch (businessStatus) {
+    case "fast_model_process":
+      if (
+        modelStatus === model_status.implemented_in_pim ||
+        modelStatus === model_status.validated_outside_pim || 
+        modelStatus === model_status.implemented_outside_pim
+      ) {
+        return status.validation;
+      }
+      break;
+
+    case "model":
+      if (
+        modelStatus === model_status.validated_outside_pim || 
+        modelStatus === model_status.implemented_outside_pim
+      ) {
+        return status.validation;
+      }
+      break;
+
+    case "inegration_model":
+      if (
+        modelStatus === model_status.validated_outside_pim || 
+        modelStatus === model_status.implemented_outside_pim
+      ) {
+        return status.validation;
+      }
+      break;
+
+    case "test_preprod_transfer_prod":
+      if (
+        modelStatus === model_status.implemented_in_pim || 
+        modelStatus === model_status.validated_in_pim
+      ) {
+        return status.validation;
+      }
+      break;
+
+    default:
+      return businessStatus;
+  }
+
+  return businessStatus;
 };
 
 const getModelStatus = (modelStatus, modelStatusImplementation) => {
@@ -23,13 +72,17 @@ const getModelStatus = (modelStatus, modelStatusImplementation) => {
     modelStatusImplementation
   );
 
+  debugger
+
+  const updateModesStatus = determineLifecycleStageToImplemented(modelStatus, lastImplementationStatus)
+
   switch (lastImplementationStatus) {
-    case "Разработана, не внедрена":
+    case model_status.developed_not_implemented:
       return "developed_not_implemented";
-    case "Вывод модели из эксплуатации":
+    case model_status.removed_from_operation:
       return "removal";
     default:
-      return modelStatus;
+      return updateModesStatus;
   }
 };
 

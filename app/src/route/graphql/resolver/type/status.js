@@ -30,4 +30,13 @@ const status = {
     "fullvalidation": "Полная валидация",
 }
 
-module.exports = status
+const model_status = {
+    developed_not_implemented: 'Разработана, не внедрена',
+    implemented_in_pim: 'Разработана, внедрена в ПИМ',
+    implemented_outside_pim: 'Разработана, внедрена вне ПИМ',
+    removed_from_operation: 'Вывод модели из эксплуатации',
+    validated_outside_pim: 'Внедрена вне ПИМ',
+    validated_in_pim: 'Внедрена в ПИМ',
+};
+
+module.exports = { status, model_status };
