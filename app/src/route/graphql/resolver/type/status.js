@@ -36,6 +36,7 @@ const model_status = {
     implemented_outside_pim: 'Разработана, внедрена вне ПИМ',
     removed_from_operation: 'Вывод модели из эксплуатации',
     validated_outside_pim: 'Внедрена вне ПИМ',
+    validated_in_pim: 'Внедрена в ПИМ',
 };
 
 module.exports = { status, model_status };

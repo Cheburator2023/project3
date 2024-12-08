@@ -21,26 +21,36 @@ const determineLifecycleStageToImplemented = (businessStatus, modelStatus) => {
     case status.fast_model_process:
       if (
         modelStatus === model_status.implemented_in_pim ||
-        modelStatus === model_status.validated_outside_pim
+        modelStatus === model_status.validated_outside_pim || 
+        modelStatus === model_status.implemented_outside_pim
       ) {
         return status.validation;
       }
       break;
 
     case status.model:
-      if (modelStatus === model_status.validated_outside_pim) {
+      if (
+        modelStatus === model_status.validated_outside_pim || 
+        modelStatus === model_status.implemented_outside_pim
+      ) {
         return status.validation;
       }
       break;
 
     case status.inegration_model:
-      if (modelStatus === model_status.implemented_outside_pim) {
+      if (
+        modelStatus === model_status.validated_outside_pim || 
+        modelStatus === model_status.implemented_outside_pim
+      ) {
         return status.validation;
       }
       break;
 
     case status.test_preprod_transfer_prod:
-      if (modelStatus === model_status.implemented_in_pim) {
+      if (
+        modelStatus === model_status.implemented_in_pim || 
+        modelStatus === model_status.validated_in_pim
+      ) {
         return status.validation;
       }
       break;
