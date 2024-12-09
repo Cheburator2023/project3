@@ -1,5 +1,13 @@
 # Semantic Versioning Changelog
 
+# [1.5.0](https://git.sfera.inno.local/SUMD/backend/compare/v1.4.0...v1.5.0) (2024-12-09)
+
+
+### Features
+
+* determine lifecycle stages ([0530544](https://git.sfera.inno.local/SUMD/backend/commit/0530544fdf90eba95cd9864e196377880f89b089))
+* determine lifecycle stages ([505c98d](https://git.sfera.inno.local/SUMD/backend/commit/505c98d9f55509a5507e0d8b40ca2d6301b00973))
+
 # [1.4.0](https://git.sfera.inno.local/SUMD/backend/compare/v1.3.19...v1.4.0) (2024-12-04)
 
 
