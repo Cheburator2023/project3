@@ -55,6 +55,9 @@ SELECT model_id,
                 WHEN artefact_id = 818
                     AND (artefact_value_id IN (632))
                     THEN 'Архив'
+                WHEN (artefact_id = 789)
+                    AND (artefact_string_value IS NOT NULL)
+                    THEN 'Архив'
 
                 WHEN artefact_id = 323
                     AND (artefact_value_id IN (427))
