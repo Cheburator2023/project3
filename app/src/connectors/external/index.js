@@ -49,6 +49,7 @@ module.exports = (db, integration, bpmn, common) => {
     client.subscribe('endEvent', system.endEvent)
     client.subscribe('bpmnStart', system.bpmnStart)
     client.subscribe('bpmnFinish', system.bpmnFinish)
+    client.subscribe('bpmnStatus', system.bpmnStatus)
     client.subscribe('putJobDue', system.putJobDue)
 
     // AutoML Handler

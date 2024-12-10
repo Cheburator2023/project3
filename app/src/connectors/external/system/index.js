@@ -60,6 +60,9 @@ class System{
                 modelId: variables.model,
                 modelStage: variables.model_stage,
             })
+            if ('model_status' in variables) {
+                await this.db.card.changeStatus({ modelId: variables.model, modelStatus: variables.model_status ? variables.model_status : null })
+            }
         }
         catch(e){console.sys(e)}
 
@@ -85,6 +88,18 @@ class System{
         }
         catch(e){console.sys(e)}
 
+    }
+
+    bpmnStatus = async ({ task, taskService }) => {
+        const variables = task.variables.getAll();
+        console.sys('Смена статуса модели')
+        try{
+            if ('model_status' in variables) {
+                await this.db.card.changeStatus({ modelId: variables.model, modelStatus: variables.model_status ? variables.model_status : null })
+            }
+            await taskService.complete(task)
+        }
+        catch(e){console.sys(e)}
     }
 
     putJobDue = async ({ task, taskService }) => {
