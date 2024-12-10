@@ -86,6 +86,9 @@ SELECT model_id,
                 WHEN (artefact_id = 853)
                     AND (artefact_value_id IN (659))
                     THEN 'Разработана, внедрена вне ПИМ'
+                WHEN (artefact_id = 896)
+                    AND (artefact_value_id IN (684))
+                    THEN 'Разработана, внедрена вне ПИМ'
 
                 WHEN (artefact_id = 825)
                     AND (artefact_string_value = 'true')
