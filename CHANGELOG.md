@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.6.0](https://git.sfera.inno.local/SUMD/backend/compare/v1.5.0...v1.6.0) (2024-12-10)
+
+
+### Features
+
+* доработка получения статуса, и промежуточных статусов из external task ([eefa8ce](https://git.sfera.inno.local/SUMD/backend/commit/eefa8ce26d6cf87457b0caed6b54ccf1b235a5d8))
+
 ## [1.5.1](https://git.sfera.inno.local/SUMD/backend/compare/v1.5.0...v1.5.1) (2024-12-09)
 
 # [1.5.0](https://git.sfera.inno.local/SUMD/backend/compare/v1.4.0...v1.5.0) (2024-12-09)
