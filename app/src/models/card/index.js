@@ -92,7 +92,7 @@ class Card {
     const args = {
       type,
       active: active ? "1" : "0",
-      groups: groupsAfterMapping,
+      groups: user.groups.includes("ds") ? groupsAfterMapping : user.groups,
       is_ds_flg: user.groups.includes("ds") ? "1" : "0",
       is_bc_flg: user.groups.includes("business_customer") ? "1" : "0",
     };
