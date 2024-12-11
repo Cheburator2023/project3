@@ -85,25 +85,21 @@ class Card {
 
   // Получить все карточки по типу
   all = ({ type = [], active }, user) => {
-    const userDepartments = user.groups.map(
-      (group) => DEPARTMENT_TO_STREAM_MAPPING[group]
+    const groupsAfterMapping = user.groups.map(
+      (group) => DEPARTMENT_TO_STREAM_MAPPING[group] || group
     );
 
     const args = {
       type,
       active: active ? "1" : "0",
-      groups: user.groups,
+      groups: groupsAfterMapping,
       is_ds_flg: user.groups.includes("ds") ? "1" : "0",
       is_bc_flg: user.groups.includes("business_customer") ? "1" : "0",
-      departments: userDepartments,
     };
 
     return this.db
       .execute({ sql: sql.all, args })
       .then((data) => data.rows)
-      .then((data) =>
-        data.filter((model) => userDepartments.includes(model.DEPARTMENT_VALUE))
-      )
       .then((data) =>
         data.reduce((prev, curr) => {
           const index = prev.findIndex((d) => d.MODEL_ID === curr.MODEL_ID);

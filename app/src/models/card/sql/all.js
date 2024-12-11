@@ -55,7 +55,6 @@ const sql = `
   WHERE
       t1.MODELS_IS_ACTIVE_FLG = :active
       AND t3.BPMN_KEY_DESC = ANY (:type::text[])
-      AND MT.DEPARTMENT_VALUE = ANY (:departments::text[])
   ORDER BY
       t1.CREATE_DATE
 `;
