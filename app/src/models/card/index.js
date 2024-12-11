@@ -2,36 +2,19 @@ const sql = require("./sql");
 const cardArtefacts = require("./helpers/artefact");
 const artefactRestrictions = require("./helpers/artefactRestrictions");
 const { getArguments, groupResponse } = require("./helpers/classificator");
-
-const DEPARTMENTS = {
-  KIB_SMB: "Управление моделирования КИБ и СМБ",
-  PARTNERSHIPS_IT: "Управление моделирования партнерств и ИТ процессов",
-  RB: "Управление моделирования РБ",
-  ML_ALGORITHMS: "Управление перспективных алгоритмов машинного обучения",
-  PROCESS_FINANCIAL: "Управление процессных и финансовых моделей",
-};
-
-const STREAMS = {
-  KIB_SMB: "Разработка моделей для КМБ и КСБ",
-  PARTNERSHIPS_IT: "Моделирование RnD",
-  RB: "Моделирование РБ",
-  ML_ALGORITHMS: "Моделирование RnD",
-  PROCESS_FINANCIAL: "Финансовое моделирование",
-};
-
-const DEPARTMENT_TO_STREAM_MAPPING = {
-  [DEPARTMENTS.KIB_SMB]: STREAMS.KIB_SMB,
-  [DEPARTMENTS.PARTNERSHIPS_IT]: STREAMS.PARTNERSHIPS_IT,
-  [DEPARTMENTS.RB]: STREAMS.RB,
-  [DEPARTMENTS.ML_ALGORITHMS]: STREAMS.ML_ALGORITHMS,
-  [DEPARTMENTS.PROCESS_FINANCIAL]: STREAMS.PROCESS_FINANCIAL,
-};
+const { DEPARTMENT_TO_STREAM_MAPPING } = require("../../common/mapping");
 
 class Card {
   constructor(db, bpmn, integration) {
     this.db = db;
     this.bpmn = bpmn;
     this.integration = integration;
+  }
+
+  getGroupsAfterMapping(userGroups) {
+    return userGroups.map(
+      (group) => DEPARTMENT_TO_STREAM_MAPPING[group] || group
+    );
   }
 
   // Новая модель
@@ -85,9 +68,7 @@ class Card {
 
   // Получить все карточки по типу
   all = ({ type = [], active }, user) => {
-    const groupsAfterMapping = user.groups.map(
-      (group) => DEPARTMENT_TO_STREAM_MAPPING[group] || group
-    );
+    const groupsAfterMapping = this.getGroupsAfterMapping(user.groups);
 
     const args = {
       type,
@@ -130,11 +111,13 @@ class Card {
 
   // Get card by id and version
   one = async ({ type, ROOT_MODEL_ID, MODEL_VERSION }, user) => {
+    const groupsAfterMapping = this.getGroupsAfterMapping(user.groups);
+
     const args = {
       type,
       ROOT_MODEL_ID,
       MODEL_VERSION,
-      groups: user.groups,
+      groups: user.groups.includes("ds") ? groupsAfterMapping : user.groups,
       is_ds_flg: user.groups.includes("ds") ? "1" : "0",
       is_bc_flg: user.groups.includes("business_customer") ? "1" : "0",
     };
