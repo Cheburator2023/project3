@@ -19,7 +19,7 @@ const sql = `
       MAX(
           CASE
               WHEN ar.artefact_id = 7
-                  THEN ar.artefact_string_value
+                  THEN av.artefact_value
               ELSE NULL
           END
       ) AS department_value,
