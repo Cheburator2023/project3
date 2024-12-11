@@ -130,11 +130,15 @@ class Card {
 
   // Get card by id and version
   one = async ({ type, ROOT_MODEL_ID, MODEL_VERSION }, user) => {
+    const groupsAfterMapping = user.groups.map(
+      (group) => DEPARTMENT_TO_STREAM_MAPPING[group] || group
+    );
+
     const args = {
       type,
       ROOT_MODEL_ID,
       MODEL_VERSION,
-      groups: user.groups,
+      groups: user.groups.includes("ds") ? groupsAfterMapping : user.groups,
       is_ds_flg: user.groups.includes("ds") ? "1" : "0",
       is_bc_flg: user.groups.includes("business_customer") ? "1" : "0",
     };
