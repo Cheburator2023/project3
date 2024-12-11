@@ -41,7 +41,7 @@ class System{
         console.sys('Инициализация Бизнес процесса')
         try{
             const checlInstance = await this.db.instance
-                .id(variables.instance)
+                .id(task.processInstanceId)
 
             if (checlInstance) {
                 await taskService.complete(task)
@@ -52,7 +52,7 @@ class System{
             await this.db.instance
                 .new({ 
                     model: variables.model, 
-                    instance: variables.instance, 
+                    instance: task.processInstanceId,
                     key: variables.key 
                 })
             await taskService.complete(task)
@@ -74,7 +74,7 @@ class System{
         try{
             await this.db.instance
                 .finish({ model: variables.model, 
-                    instance: variables.instance, 
+                    instance: task.processInstanceId, 
                     key: variables.key 
                 })
             await taskService.complete(task)
