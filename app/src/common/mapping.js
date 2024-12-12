@@ -7,7 +7,7 @@ const DEPARTMENTS = {
 };
 
 const STREAMS = {
-  KIB_SMB: "Разработка моделей для КМБ и КСБ сегмента",
+  KIB_SMB: "Разработка моделей для КМБ и КСБ",
   PARTNERSHIPS_IT_IT: "Моделирование партнерств и ИТ-процессов",
   PARTNERSHIPS_IT_RND: "Моделирование RnD",
   RB: "Моделирование РБ",
