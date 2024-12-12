@@ -39,7 +39,7 @@ class Task {
       .then((data) => data.rows);
 
   getGroupsAfterMapping(userGroups) {
-    return userGroups.map(
+    return userGroups.flatMap(
       (group) => DEPARTMENT_TO_STREAM_MAPPING[group] || group
     );
   }
