@@ -67,9 +67,6 @@ SELECT model_id,
                     AND artefact_string_value = 'true'
                     THEN 'Вывод модели из эксплуатации'
 
-                WHEN (artefact_id = 896)
-                    AND (artefact_value_id IN (684))
-                    THEN 'Разработана, внедрена в ПИМ'
                 WHEN (artefact_id = 853)
                     AND (artefact_value_id IN (657, 658))
                     THEN 'Разработана, внедрена в ПИМ'
