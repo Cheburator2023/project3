@@ -21,8 +21,6 @@ const groupResponse = (response = [], models = []) => {
   return models.map((model) => {
     const group = response.filter((item) => item.MODEL_ID === model.MODEL_ID);
 
-    console.log(group)
-
     // if has artefacts then transofrm fields, otherwise return empty array
     return group.length
       ? cardArtefacts(group)
