@@ -169,6 +169,7 @@ class Keycloak {
         .then(data => data.map(item => {
             item.group = is_ds_flg ? 'ds' : name
             item.group = is_ds_lead_flg ? 'ds_lead' : item.group
+
             return item
         }))
         .catch(e => {

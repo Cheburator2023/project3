@@ -1,4 +1,14 @@
 const getUserName = require("./helpers");
+const { DEPARTMENT_TO_STREAM_MAPPING } = require("../../../../../common/mapping");
+
+const getDepartmentFromStream = (stream) => {
+  for (const [department, streams] of Object.entries(DEPARTMENT_TO_STREAM_MAPPING)) {
+    if (streams.includes(stream)) {
+      return department;
+    }
+  }
+  return null;
+};
 
 module.exports = async (root, args, context) => {
   // New Camunda instance
@@ -32,10 +42,9 @@ module.exports = async (root, args, context) => {
     await context.integration.git.repo(MODEL_ALIAS);
   }
 
-  // Add users
-  const dept = args.ARTEFACTS.find(
-    (i) => i.ARTEFACT_ID === 7
-  ).ARTEFACT_STRING_VALUE;
+  const stream = args.ARTEFACTS.find((i) => i.ARTEFACT_ID === 7).ARTEFACT_STRING_VALUE;
+  const dept = getDepartmentFromStream(stream);
+
   await context.db.user.addLead(
     args.MODEL_ID,
     dept,

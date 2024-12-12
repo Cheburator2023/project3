@@ -60,10 +60,12 @@ class Card {
       };
       return this.db.execute({ sql: sql.copy, args });
     }
+
     return this.db.execute({
       sql: sql.new,
       args: { MODEL_ID, MODEL_NAME, MODEL_DESC, MODEL_CREATOR },
     });
+
   };
 
   // Получить все карточки по типу
