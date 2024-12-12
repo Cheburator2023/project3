@@ -12,7 +12,7 @@ class Card {
   }
 
   getGroupsAfterMapping(userGroups) {
-    return userGroups.map(
+    return userGroups.flatMap(
       (group) => DEPARTMENT_TO_STREAM_MAPPING[group] || group
     );
   }
