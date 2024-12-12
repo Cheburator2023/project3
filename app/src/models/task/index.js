@@ -46,6 +46,7 @@ class Task {
 
   // Задачи для пользователя
   all = async (user, all = false) => {
+    const groupsAfterMapping = this.getGroupsAfterMapping(user.groups);
     const tasks = await this.bpmn.tasks(user.groups);
 
     const { bpmnIds, tasksIds } = tasks.reduce(
