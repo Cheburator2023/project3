@@ -1,5 +1,28 @@
 # Semantic Versioning Changelog
 
+# [1.7.0](https://git.sfera.inno.local/SUMD/backend/compare/v1.6.0...v1.7.0) (2024-12-12)
+
+
+### Bug Fixes
+
+* этапы ЖЦ модели в bpmnStart и bpmnFinish ([20ffd13](https://git.sfera.inno.local/SUMD/backend/commit/20ffd13e983fe734a5f11d4208b8effa5ce9eb0d))
+
+
+### Features
+
+* mapping departments ([c8da1bc](https://git.sfera.inno.local/SUMD/backend/commit/c8da1bc9d2f205dc7c8f7ed3e820d55c3dddf288))
+* mapping departments ([bbbfd1c](https://git.sfera.inno.local/SUMD/backend/commit/bbbfd1c54463e5131e60b7d3cad4face7edf3f0f))
+* mapping departments ([6a671d4](https://git.sfera.inno.local/SUMD/backend/commit/6a671d4388c1888058e7c4f8881dc2d238d217eb))
+* mapping departments ([9db5688](https://git.sfera.inno.local/SUMD/backend/commit/9db568841c926fe89b9ab7292c1178bd809693a6))
+* mapping departments ([2774986](https://git.sfera.inno.local/SUMD/backend/commit/2774986b46cdfa0c72219aaf956b2eb764966c61))
+* mapping departments ([229350c](https://git.sfera.inno.local/SUMD/backend/commit/229350cadb4ec76df795efd57bb23191cac67884))
+* mapping departments ([39ac871](https://git.sfera.inno.local/SUMD/backend/commit/39ac8713320c862bc142bd74162f4c609f43fd80))
+* mapping departments ([4a53c3e](https://git.sfera.inno.local/SUMD/backend/commit/4a53c3ed4c74433f1f724aab891f3be3429bc38f))
+* mapping departments ([b2e1d79](https://git.sfera.inno.local/SUMD/backend/commit/b2e1d79560cdbca178acc5d2b763c3f172686523))
+* mapping departments ([1acfa11](https://git.sfera.inno.local/SUMD/backend/commit/1acfa11dbcf2def9e666acf75b0ea55790ebf0fd))
+* mapping departments ([c47cc9e](https://git.sfera.inno.local/SUMD/backend/commit/c47cc9ea7d7d6f6c563872d706ca101389f7162f))
+* mapping departments ([a01a641](https://git.sfera.inno.local/SUMD/backend/commit/a01a6411cc9f4a3d5fcb4bf0998088d9f46c7d54))
+
 # [1.6.0](https://git.sfera.inno.local/SUMD/backend/compare/v1.5.0...v1.6.0) (2024-12-10)
 
 
