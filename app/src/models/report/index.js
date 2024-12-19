@@ -8,6 +8,7 @@ const {
 } = require("./helpers/formatModelsResult");
 
 const { formatUserTasks } = require("./helpers/formatCamundaUserTasks");
+const { DEPARTMENT_TO_STREAM_MAPPING } = require("../../common/mapping");
 
 const { user_roles } = require("./constants");
 
@@ -435,7 +436,14 @@ class Report {
         .split(', ')
         .map((username) => {
           if (username in users) {
-            users[username].map(stream => streams.add(stream))
+            users[username].map(department => {
+              const streamsAfterMapping = DEPARTMENT_TO_STREAM_MAPPING[department]
+              if (Array.isArray(streamsAfterMapping)) {
+                streamsAfterMapping.forEach((stream) => streams.add(stream))
+              } else if (streamsAfterMapping) {
+                streams.add(streamsAfterMapping)
+              }
+            })
           }
         })
 
