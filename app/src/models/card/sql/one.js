@@ -21,7 +21,9 @@ const sql = `
         bpmn_instance_id,
         parent_model_id,
         models_is_active_flg,
-        deployment_id
+        deployment_id,
+        model_status,
+        model_stage
     FROM
         models
     WHERE
@@ -44,7 +46,7 @@ const sql = `
       ON automl.automl_model_id = model.model_id
   LEFT JOIN
       (${status}) st
-      ON st.model_id = model.model_id
+      ON model.model_status IS NULL AND st.model_id = model.model_id
   LEFT JOIN
       (${activeBpmnInstance}) activeBpmnInstance
       ON activeBpmnInstance.model_id = model.model_id
