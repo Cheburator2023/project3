@@ -120,8 +120,9 @@ from
         ' > ' ORDER BY
           ar_.artefact_value_id
       ) AS COMPANY_GROUP,
-      MAX(
-        CASE WHEN ar_.ARTEFACT_ID = 6 THEN ARTEFACT_VALUE ELSE NULL END
+      STRING_AGG(
+        (case when ar_.ARTEFACT_ID = 6 then ARTEFACT_VALUE else null end)::varchar,
+        ';'
       ) AS CUSTOMER_DEPT,
       MAX(
         CASE WHEN ar_.ARTEFACT_ID = 781 THEN ARTEFACT_VALUE ELSE NULL END

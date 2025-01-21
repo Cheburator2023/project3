@@ -1,6 +1,9 @@
 const sql = require("./sql");
 const cardArtefacts = require("./helpers/artefact");
 const artefactRestrictions = require("./helpers/artefactRestrictions");
+const {
+  mapBusinessCustomerDepartments,
+} = require("./helpers/businessCustomerDepartamentMapping");
 const { getArguments, groupResponse } = require("./helpers/classificator");
 const { DEPARTMENT_TO_STREAM_MAPPING } = require("../../common/mapping");
 
@@ -65,7 +68,6 @@ class Card {
       sql: sql.new,
       args: { MODEL_ID, MODEL_NAME, MODEL_DESC, MODEL_CREATOR },
     });
-
   };
 
   // Получить все карточки по типу
@@ -134,6 +136,9 @@ class Card {
 
     return {
       ...model,
+      BUSINESS_CUSTOMER_DEPARTAMENT: mapBusinessCustomerDepartments(
+        model.BUSINESS_CUSTOMER_DEPARTAMENT
+      ),
       TYPE: type.join(","),
     };
   };

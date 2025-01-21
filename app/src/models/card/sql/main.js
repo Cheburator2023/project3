@@ -9,13 +9,13 @@ const sql = `
       m_upd_date.update_date AS update_date,
       m.update_author,
       m.parent_model_id,
-      MAX(
+      STRING_AGG(
           CASE
               WHEN ar.artefact_id = 6
                   THEN av.artefact_value
               ELSE NULL
           END
-      ) AS business_customer_departament,
+      , ';') AS business_customer_departament,
       MAX(
           CASE
               WHEN ar.artefact_id = 7

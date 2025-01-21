@@ -1,5 +1,9 @@
 const { model_status, status } = require("../constants");
 
+const {
+  mapBusinessCustomerDepartments,
+} = require("../../card/helpers/businessCustomerDepartamentMapping");
+
 const getModelArtefactsLink = ({ ROOT_MODEL_ID, MODEL_VERSION }) => {
   const interface_url = process.env.INTERFACE_URL || "";
 
@@ -99,6 +103,9 @@ const formatModelsResult = ({ rows }) =>
       row.MODEL_STATUS_IMPLEMENTATION
     ),
     MODEL_ARTEFACTS_LINK: getModelArtefactsLink(row),
+    MODEL_CUSTOMER_DEPT_INFO: mapBusinessCustomerDepartments(
+      row.MODEL_CUSTOMER_DEPT_INFO
+    ),
   }));
 
 const formatModelsDepartmentsResult = ({ rows }) => {
