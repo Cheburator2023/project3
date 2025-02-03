@@ -1,5 +1,14 @@
 # Semantic Versioning Changelog
 
+# [1.8.0](https://git.sfera.inno.local/SUMD/backend/compare/v1.7.0...v1.8.0) (2025-02-03)
+
+
+### Features
+
+* api сум для nlp платформы ([6c0a209](https://git.sfera.inno.local/SUMD/backend/commit/6c0a2099d450619a54aeba4bbd089985f7cdf3d4))
+* mapping departments ([d29c0e3](https://git.sfera.inno.local/SUMD/backend/commit/d29c0e31f052a2735aad3801eeda6816627fc47c))
+* report departments mapping ([1c31dcd](https://git.sfera.inno.local/SUMD/backend/commit/1c31dcd8349da6dce8d266a71d353d56e54988bf))
+
 # [1.7.0](https://git.sfera.inno.local/SUMD/backend/compare/v1.6.0...v1.7.0) (2024-12-12)
 
 
