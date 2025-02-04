@@ -66,7 +66,7 @@ class Card {
 
     return this.db.execute({
       sql: sql.new,
-      args: { MODEL_ID, MODEL_NAME, MODEL_DESC, MODEL_CREATOR },
+      args: { MODEL_ID, MODEL_NAME, MODEL_DESC, MODEL_CREATOR, GENERAL_MODEL_ID: null },
     });
   };
 
