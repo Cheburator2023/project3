@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.8.1](https://git.sfera.inno.local/SUMD/backend/compare/v1.8.0...v1.8.1) (2025-02-04)
+
+
+### Bug Fixes
+
+* исправление создания новой модели ([19870c5](https://git.sfera.inno.local/SUMD/backend/commit/19870c53c0880e69ad9dfb576012968fe4879c25))
+
 # [1.8.0](https://git.sfera.inno.local/SUMD/backend/compare/v1.7.0...v1.8.0) (2025-02-03)
 
 
