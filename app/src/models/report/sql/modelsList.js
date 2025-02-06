@@ -8,6 +8,8 @@ select
   m_.model_name,
   m_.model_version,
   m_.model_desc,
+  m_.model_stage as new_model_stage,
+  m_.model_status as new_model_status,
   to_char(
     cast(m_.create_date as date),
     'DD.MM.YYYY'

@@ -17,7 +17,8 @@ select
 	update_author,
 	bpmn_instance_id,
 	parent_model_id,
-	models_is_active_flg
+	models_is_active_flg,
+	model_status
 from models 
 where models_is_active_flg = '1'
 	and model_id not in 
@@ -113,7 +114,7 @@ select
 	m_.model_id,
 	m_.model_name,
 	to_char(cast(m_.create_date as date), 'DD.MM.YYYY') as create_date,
-	stat_.status AS model_status
+	coalesce (m_.model_status, stat_.status) AS model_status
 from models_fltr m_
 inner join 
 	(
