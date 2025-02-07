@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.9.0](https://git.sfera.inno.local/SUMD/backend/compare/v1.8.2...v1.9.0) (2025-02-07)
+
+
+### Features
+
+* **helm:** rm secret yaml ([3f20000](https://git.sfera.inno.local/SUMD/backend/commit/3f2000008a031aad9aca89b7df87712882913f74))
+
 ## [1.8.2](https://git.sfera.inno.local/SUMD/backend/compare/v1.8.1...v1.8.2) (2025-02-07)
 
 ## [1.8.1](https://git.sfera.inno.local/SUMD/backend/compare/v1.8.0...v1.8.1) (2025-02-04)
