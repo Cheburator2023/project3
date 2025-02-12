@@ -4,6 +4,9 @@ const artefactRestrictions = require("./helpers/artefactRestrictions");
 const {
   mapBusinessCustomerDepartments,
 } = require("./helpers/businessCustomerDepartamentMapping");
+const {
+  formatCustomerDeptInfo,
+} = require("./helpers/businessCustomerDepartamentFormatter");
 const { getArguments, groupResponse } = require("./helpers/classificator");
 const { DEPARTMENT_TO_STREAM_MAPPING } = require("../../common/mapping");
 
@@ -15,9 +18,21 @@ class Card {
   }
 
   getGroupsAfterMapping(userGroups) {
-    return userGroups.flatMap(
-      (group) => DEPARTMENT_TO_STREAM_MAPPING[group] || group
-    );
+    if (!Array.isArray(userGroups) || userGroups.length === 0) {
+      return [];
+    }
+
+    if (userGroups.includes("ds")) {
+      return userGroups.flatMap(
+        (group) => DEPARTMENT_TO_STREAM_MAPPING[group] || group
+      );
+    }
+
+    if (userGroups.includes("business_customer")) {
+      return mapBusinessCustomerDepartments(userGroups);
+    }
+
+    return userGroups;
   }
 
   // Новая модель
@@ -117,7 +132,7 @@ class Card {
     const args = {
       type,
       active: active ? "1" : "0",
-      groups: user.groups.includes("ds") ? groupsAfterMapping : user.groups,
+      groups: groupsAfterMapping,
       is_ds_flg: user.groups.includes("ds") ? "1" : "0",
       is_bc_flg: user.groups.includes("business_customer") ? "1" : "0",
     };
@@ -161,7 +176,7 @@ class Card {
       type,
       ROOT_MODEL_ID,
       MODEL_VERSION,
-      groups: user.groups.includes("ds") ? groupsAfterMapping : user.groups,
+      groups: groupsAfterMapping,
       is_ds_flg: user.groups.includes("ds") ? "1" : "0",
       is_bc_flg: user.groups.includes("business_customer") ? "1" : "0",
     };
@@ -176,9 +191,7 @@ class Card {
 
     return {
       ...model,
-      BUSINESS_CUSTOMER_DEPARTAMENT: mapBusinessCustomerDepartments(
-        model.BUSINESS_CUSTOMER_DEPARTAMENT
-      ),
+      BUSINESS_CUSTOMER_DEPARTAMENT: formatCustomerDeptInfo(model.BUSINESS_CUSTOMER_DEPARTAMENT),
       TYPE: type.join(","),
     };
   };
