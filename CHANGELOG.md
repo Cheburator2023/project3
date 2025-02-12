@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.9.1](https://git.sfera.inno.local/SUMD/backend/compare/v1.9.0...v1.9.1) (2025-02-12)
+
+
+### Bug Fixes
+
+* update business customer customer department mapping ([3246108](https://git.sfera.inno.local/SUMD/backend/commit/3246108447b552a2f1bb0e6728f159a7ae39913b))
+
 # [1.9.0](https://git.sfera.inno.local/SUMD/backend/compare/v1.8.2...v1.9.0) (2025-02-07)
 
 
