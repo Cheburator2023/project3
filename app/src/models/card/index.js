@@ -75,6 +75,7 @@ class Card {
         MODEL_CREATOR,
         ROOT_MODEL_ID,
         MODEL_VERSION: PARENT_MODEL_VERSION + 1,
+        GENERAL_MODEL_ID: null,
       };
       return this.db.execute({ sql: sql.copy, args });
     }
