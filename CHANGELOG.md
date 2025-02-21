@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.9.2](https://git.sfera.inno.local/SUMD/backend/compare/v1.9.1...v1.9.2) (2025-02-21)
+
+
+### Bug Fixes
+
+* создание модели от родительской ([3a168e3](https://git.sfera.inno.local/SUMD/backend/commit/3a168e397b9525ba402f3917bed500b7434db889))
+
 ## [1.9.1](https://git.sfera.inno.local/SUMD/backend/compare/v1.9.0...v1.9.1) (2025-02-12)
 
 
