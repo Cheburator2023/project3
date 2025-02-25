@@ -95,10 +95,10 @@ const formatModelsResult = ({ rows }) =>
     ...row,
     ROOT_MODEL_ID: +row.ROOT_MODEL_ID,
     MODEL_VERSION: +row.MODEL_VERSION,
-    MODEL_STATUS_IMPLEMENTATION: getLastImplementationStatus(
+    MODEL_STATUS_IMPLEMENTATION: row.NEW_MODEL_STAGE || getLastImplementationStatus(
       row.MODEL_STATUS_IMPLEMENTATION
     ),
-    MODEL_STATUS: getModelStatus(
+    MODEL_STATUS: row.NEW_MODEL_STATUS || getModelStatus(
       row.MODEL_STATUS,
       row.MODEL_STATUS_IMPLEMENTATION
     ),

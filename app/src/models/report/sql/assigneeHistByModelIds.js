@@ -4,7 +4,7 @@ SELECT M.MODEL_ID,
        M.ROOT_MODEL_ID,
        M.MODEL_VERSION,
        TO_CHAR(M_UPD_DATE.UPDATE_DATE, 'DD.MM.YYYY HH24:MI:SS') AS UPDATE_DATE,
-       STATUS.BPMN_KEY_DESC                                     AS STATUS,
+       coalesce(M.MODEL_STAGE, STATUS.BPMN_KEY_DESC)            AS STATUS,
        AH.FUNCTIONAL_ROLE,
        STRING_AGG(AH.ASSIGNEE_NAME, ', ')                          AS ASSIGNEE_NAME
 FROM ASSIGNEE_HIST AH
