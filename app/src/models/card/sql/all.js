@@ -21,6 +21,8 @@ const sql = `
       t1.PARENT_MODEL_ID,
       t1.MIPM,
       t1.MODELS_IS_ACTIVE_FLG,
+      t1.MODEL_STATUS,
+      t1.MODEL_STAGE,
       ST.status,
       activeBpmnInstance.bpmn_instance_name,
       MT.UPDATE_DATE,

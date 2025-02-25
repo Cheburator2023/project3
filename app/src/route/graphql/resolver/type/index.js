@@ -64,12 +64,16 @@ const determineLifecycleStageToImplemented = (businessStatus, modelStatus) => {
 
 // Особенности маппинга статусов:
 // Ести статус модели Разработана не внедрена, Этап ЖЦМ тоже должен быть Разработана не внедрена
-
+// После переработки функционала статусов и этапов ЖЦ моделей в приоритете берётся значение из таблицы в БД. Если данных нет (у старых моделей) работает прежняя логика
 module.exports = {
   Card: {
     MODEL_ALIAS: (root) => `model${root.ROOT_MODEL_ID}-v${root.MODEL_VERSION}`,
-    STATUS: ({ STATUS }) => getLastActiveStatus(STATUS),
-    BUSINESS_STATUS: ({ STATUS, BPMN_INSTANCE_NAME }) => {
+    STATUS: ({ STATUS, MODEL_STATUS}) => MODEL_STATUS ? MODEL_STATUS : getLastActiveStatus(STATUS),
+    BUSINESS_STATUS: ({ STATUS, BPMN_INSTANCE_NAME, MODEL_STATUS, MODEL_STAGE }) => {
+      if (MODEL_STATUS || MODEL_STAGE) {
+        return MODEL_STAGE;
+      }
+
       const lastActiveStatus = getLastActiveStatus(STATUS);
       let currentBusinessStatus = status?.[BPMN_INSTANCE_NAME.trim()]
 
