@@ -1,5 +1,13 @@
 # Semantic Versioning Changelog
 
+# [1.10.0](https://git.sfera.inno.local/SUMD/backend/compare/v1.9.2...v1.10.0) (2025-02-27)
+
+
+### Features
+
+* Доработка отчётов СУМ для новых статусов ([fe10a64](https://git.sfera.inno.local/SUMD/backend/commit/fe10a64a63a57970cd4d40191e1df01f449a4e06))
+* новые статусы и этапы ЖЦ в карточке и реестре моделей ([654d392](https://git.sfera.inno.local/SUMD/backend/commit/654d392654b9bf9d9ea9c83c22485fe4841caf7c))
+
 ## [1.9.2](https://git.sfera.inno.local/SUMD/backend/compare/v1.9.1...v1.9.2) (2025-02-21)
 
 
