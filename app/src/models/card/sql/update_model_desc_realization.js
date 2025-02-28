@@ -1,0 +1,9 @@
+const sql = `
+    UPDATE ARTEFACT_REALIZATIONS
+    SET EFFECTIVE_TO = current_timestamp(0)
+    WHERE MODEL_ID = :MODEL_ID
+    AND ARTEFACT_ID = 905
+    AND EFFECTIVE_TO = TO_TIMESTAMP('9999-12-31 23:59:59', 'YYYY-MM-DD HH24:MI:SS');
+`;
+
+module.exports = sql;

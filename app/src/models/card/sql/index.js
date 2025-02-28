@@ -17,7 +17,9 @@ module.exports = {
   autoMLRootModel: require('./autoMLRootModel'),
   rootModelByGeneralModelId: require('./rootModelByGeneralModelId'),
   edit_name: require('./edit_name'),
-  edit_desc: require('./edit_desc'),
+  insert_model_desc_realization: require('./insert_model_desc_realization'),
+  update_model_desc_realization: require('./update_model_desc_realization'),
   edit_status: require('./edit_status'),
   edit_stage: require('./edit_stage'),
+  edit_desc: require('./edit_desc'),
 }
