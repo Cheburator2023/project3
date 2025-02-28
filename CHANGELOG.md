@@ -1,5 +1,17 @@
 # Semantic Versioning Changelog
 
+# [1.11.0](https://git.sfera.inno.local/SUMD/backend/compare/v1.10.0...v1.11.0) (2025-02-28)
+
+
+### Bug Fixes
+
+* исправление новых этапов и статусов ([febaf48](https://git.sfera.inno.local/SUMD/backend/commit/febaf484806e73ecabefe8cbf1b48933a81536b9))
+
+
+### Features
+
+* artefact model desc ([34462a0](https://git.sfera.inno.local/SUMD/backend/commit/34462a0cf4821e388fde21c12259a0f6173abe32))
+
 # [1.10.0](https://git.sfera.inno.local/SUMD/backend/compare/v1.9.2...v1.10.0) (2025-02-27)
 
 
