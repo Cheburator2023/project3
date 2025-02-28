@@ -336,7 +336,7 @@ class Card {
         throw Error(`Model with id: ${modelId} not found`);
       });
 
-    let stages = model.model_stage ? model.model_stage.split(";") : [];
+    let stages = model.MODEL_STAGE ? model.MODEL_STAGE.split(";") : [];
     stages.push(modelStage);
 
     this.db.execute({
@@ -360,11 +360,11 @@ class Card {
         throw Error(`Model with id: ${modelId} not found`);
       });
 
-    if (!model.model_stage) {
+    if (!model.MODEL_STAGE) {
       return;
     }
 
-    let stages = model.model_stage.split(";");
+    let stages = model.MODEL_STAGE.split(";");
     const deleteIndex = stages.indexOf(modelStage);
     if (deleteIndex > -1) {
       stages.splice(deleteIndex, 1);
