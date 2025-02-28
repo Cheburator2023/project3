@@ -52,17 +52,15 @@ class Card {
     PARENT_MODEL_ID,
     ARTEFACTS,
   }) => {
+    // 1. Вставляем запись в MODELS (без описания, так как поле будет удалено)
+    let result;
     if (PARENT_MODEL_ID) {
       const parentModel = await this.db
         .execute({ sql: sql.parent, args: { PARENT_MODEL_ID } })
         .then((data) => data.rows);
-
       const { ROOT_MODEL_ID, PARENT_MODEL_VERSION } = parentModel.reduce(
         (prev, curr) => {
-          if (
-            !prev.PARENT_MODEL_VERSION ||
-            prev.PARENT_MODEL_VERSION < curr.PARENT_MODEL_VERSION
-          )
+          if (!prev.PARENT_MODEL_VERSION || prev.PARENT_MODEL_VERSION < curr.PARENT_MODEL_VERSION)
             return curr;
           return prev;
         },
@@ -77,14 +75,22 @@ class Card {
         MODEL_VERSION: PARENT_MODEL_VERSION + 1,
         GENERAL_MODEL_ID: null,
       };
-      return this.db.execute({ sql: sql.copy, args });
+      result = await this.db.execute({ sql: sql.copy, args });
+    } else {
+      result = await this.db.execute({
+        sql: sql.new,
+        args: { MODEL_ID, MODEL_NAME, MODEL_DESC, MODEL_CREATOR, GENERAL_MODEL_ID: null },
+      });
     }
-
-    return this.db.execute({
-      sql: sql.new,
-      args: { MODEL_ID, MODEL_NAME, MODEL_DESC, MODEL_CREATOR, GENERAL_MODEL_ID: null },
+  
+    await this.db.execute({
+      sql: sql.insert_model_desc_realization,
+      args: { MODEL_ID, MODEL_DESC },
     });
+  
+    return result;
   };
+    
 
   createNewByGeneralModelId = async ({
     MODEL_ID,
@@ -93,38 +99,49 @@ class Card {
     generalModelId,
     MODEL_CREATOR,
   }) => {
-
+    let result;
+  
     const rootModel = await this.db.execute({
       sql: sql.rootModelByGeneralModelId,
       args: { general_model_id: generalModelId },
-    }).then((data) => data.rowCount > 0 ? data.rows[0] : null);
-
+    }).then((data) => (data.rowCount > 0 ? data.rows[0] : null));
+  
     if (rootModel) {
-      return this.db.execute({
+      result = await this.db.execute({
         sql: sql.copy,
         args: { 
           MODEL_ID, 
           MODEL_NAME, 
-          MODEL_DESC, 
+          MODEL_DESC,
           MODEL_CREATOR, 
           ROOT_MODEL_ID: rootModel.ROOT_MODEL_ID,
           MODEL_VERSION: rootModel.MODEL_VERSION + 1,
           GENERAL_MODEL_ID: generalModelId,
         },
       });
+    } else {
+      result = await this.db.execute({
+        sql: sql.new,
+        args: { 
+          MODEL_ID, 
+          MODEL_NAME, 
+          MODEL_DESC,
+          MODEL_CREATOR, 
+          GENERAL_MODEL_ID: generalModelId,
+        },
+      });
     }
-
-    return this.db.execute({
-      sql: sql.new,
-      args: { 
-        MODEL_ID, 
-        MODEL_NAME, 
-        MODEL_DESC, 
-        MODEL_CREATOR, 
-        GENERAL_MODEL_ID: generalModelId,
-      },
-    });
+  
+    if (MODEL_DESC) {
+      await this.db.execute({
+        sql: sql.insert_model_desc_realization,
+        args: { MODEL_ID, MODEL_DESC },
+      });
+    }
+  
+    return result;
   };
+  
 
   // Получить все карточки по типу
   all = ({ type = [], active }, user) => {
@@ -309,11 +326,23 @@ class Card {
       args: { MODEL_ID, MODEL_NAME },
     });
 
-  editDesc = ({ MODEL_ID, MODEL_DESC }) =>
-    this.db.execute({
+  editDesc = async ({ MODEL_ID, MODEL_DESC }) => {
+    await this.db.execute({
       sql: sql.edit_desc,
       args: { MODEL_ID, MODEL_DESC },
     });
+  
+    await this.db.execute({
+      sql: sql.update_model_desc_realization,
+      args: { MODEL_ID },
+    });
+  
+    await this.db.execute({
+      sql: sql.insert_model_desc_realization,
+      args: { MODEL_ID, MODEL_DESC },
+    });
+  };
+    
 
   changeStatus = ({ modelId, modelStatus }) =>
     this.db.execute({
