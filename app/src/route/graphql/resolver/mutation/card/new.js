@@ -1,8 +1,12 @@
 const getUserName = require("./helpers");
-const { DEPARTMENT_TO_STREAM_MAPPING } = require("../../../../../common/mapping");
+const {
+  DEPARTMENT_TO_STREAM_MAPPING,
+} = require("../../../../../common/mapping");
 
 const getDepartmentFromStream = (stream) => {
-  for (const [department, streams] of Object.entries(DEPARTMENT_TO_STREAM_MAPPING)) {
+  for (const [department, streams] of Object.entries(
+    DEPARTMENT_TO_STREAM_MAPPING
+  )) {
     if (streams.includes(stream)) {
       return department;
     }
@@ -20,7 +24,7 @@ module.exports = async (root, args, context) => {
   await context.db.card.new(args);
   // Create git
   const dbNewModel = await context.db.card.info(args);
-  const MODEL_ALIAS = `model${dbNewModel.ROOT_MODEL_ID}-v${dbNewModel.MODEL_VERSION}`;
+  const MODEL_ALIAS = `SUMCORmodel${dbNewModel.ROOT_MODEL_ID}-v${dbNewModel.MODEL_VERSION}`;
 
   if (args.PARENT_MODEL_ID) {
     const parentModelInfo = await context.db.card.info({
@@ -42,7 +46,9 @@ module.exports = async (root, args, context) => {
     await context.integration.git.repo(MODEL_ALIAS);
   }
 
-  const stream = args.ARTEFACTS.find((i) => i.ARTEFACT_ID === 7).ARTEFACT_STRING_VALUE;
+  const stream = args.ARTEFACTS.find(
+    (i) => i.ARTEFACT_ID === 7
+  ).ARTEFACT_STRING_VALUE;
   const dept = getDepartmentFromStream(stream);
 
   await context.db.user.addLead(

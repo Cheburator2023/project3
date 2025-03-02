@@ -1,5 +1,5 @@
-const connector = require('./connector');
-const querystring = require('querystring');
+const connector = require("./connector");
+const querystring = require("querystring");
 
 class Bpmn {
   constructor(db) {
@@ -7,9 +7,9 @@ class Bpmn {
   }
 
   // Initialization main
-  start = (key = 'main', body) =>
+  start = (key = "main", body) =>
     this.connector({
-      method: 'POST',
+      method: "POST",
       path: `/process-definition/key/${key}/start`,
       body,
     });
@@ -17,33 +17,35 @@ class Bpmn {
   // Start process by Definition Version.
   startByVersion = (key, versionTag, body) =>
     this.connector({
-      path: `/process-definition/?key=${key}&versionTag=${versionTag}`
+      path: `/process-definition/?key=${key}&versionTag=${versionTag}`,
     })
-      .then(d => {
+      .then((d) => {
         if (d.length == 0) {
-          throw new Error(`Process definition is not found with key ${key} and version tag ${versionTag}`)
+          throw new Error(
+            `Process definition is not found with key ${key} and version tag ${versionTag}`
+          );
         }
-        return d[0].id
+        return d[0].id;
       }) // Example ID: initialization:2:7b9e3fab-4b50-11ef-a145-b6cb02d3563b (key:version:deploymentId)
-      .then(id => {
+      .then((id) => {
         return this.connector({
-          method: 'POST',
+          method: "POST",
           path: `/process-definition/${id}/start`,
-          body
-        })
-      })
+          body,
+        });
+      });
 
   message = (body) =>
     this.connector({
-      method: 'POST',
-      path: '/message',
+      method: "POST",
+      path: "/message",
       body,
     });
 
-  msg = (model, messageName = 'Message_340hg50', owner = 'admin') =>
+  msg = (model, messageName = "Message_340hg50", owner = "admin") =>
     this.connector({
-      method: 'POST',
-      path: '/message',
+      method: "POST",
+      path: "/message",
       body: JSON.stringify({
         messageName,
         processInstanceId: model,
@@ -71,12 +73,21 @@ class Bpmn {
     });
 
   // Get Process Definition Diagram
-  diagram = (id) => this.connector({ path: `/process-definition/${id}/xml` }).then((data) => data.bpmn20Xml);
+  diagram = (id) =>
+    this.connector({ path: `/process-definition/${id}/xml` }).then(
+      (data) => data.bpmn20Xml
+    );
 
   // Get Instance Activity
-  fullActivity = (id) => this.connector({ path: `/history/activity-instance?processInstanceId=${id}` });
+  fullActivity = (id) =>
+    this.connector({
+      path: `/history/activity-instance?processInstanceId=${id}`,
+    });
 
-  activity = (id) => this.connector({ path: `/history/activity-instance?processInstanceId=${id}` });
+  activity = (id) =>
+    this.connector({
+      path: `/history/activity-instance?processInstanceId=${id}`,
+    });
 
   // Job
   getJobByProcessInstanceId = async (id) =>
@@ -87,7 +98,7 @@ class Bpmn {
   putJobDue = async (id, due) =>
     this.connector({
       path: `/job/${id}/duedate`,
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify({
         duedate: due,
         cascade: false,
@@ -98,7 +109,7 @@ class Bpmn {
   update = (id, lead) =>
     this.connector({
       path: `task/${id}/`,
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify({
         priority: lead ? 0 : 1000,
       }),
@@ -107,7 +118,7 @@ class Bpmn {
   check = (id, groups) =>
     this.connector({
       path: `/task?${querystring.stringify({
-        candidateGroups: groups.join(','),
+        candidateGroups: groups.join(","),
       })}&executionId=${id}&includeAssignedTasks=true`,
     });
 
@@ -121,9 +132,11 @@ class Bpmn {
       path: `/task?unassigned=true`,
     });
 
-  tasks = (groups = ['mipm']) =>
+  tasks = (groups = ["mipm"]) =>
     this.connector({
-      path: `/task?${querystring.stringify({ candidateGroups: groups.join(',') })}&includeAssignedTasks=true`,
+      path: `/task?${querystring.stringify({
+        candidateGroups: groups.join(","),
+      })}&includeAssignedTasks=true`,
     });
 
   task = (id) =>
@@ -134,7 +147,7 @@ class Bpmn {
   assignee = (id, username) =>
     this.connector({
       path: `/task/${id}/assignee`,
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify({ userId: username }),
     });
   // .then(this.update(id, true))
@@ -144,7 +157,7 @@ class Bpmn {
     this.connector({
       path: `/task/${id}/complete`,
       body,
-      method: 'POST',
+      method: "POST",
     });
 
   // Tree modification
@@ -159,7 +172,9 @@ class Bpmn {
     // First modification
     if (index === 0) {
       const activityData = await this.fullActivity(processInstanceId);
-      const chouseActivity = activityData.filter((d) => d.activityId === activityId)[0];
+      const chouseActivity = activityData.filter(
+        (d) => d.activityId === activityId
+      )[0];
       const b = new Date(chouseActivity.endTime).getTime();
       const cancelActivity = activityData.filter((d) => {
         const a = new Date(d.startTime).getTime();
@@ -173,7 +188,9 @@ class Bpmn {
     // Get new Instance
     const prevTreeEl = data[index - 1];
     const newPrevActivity = await this.activity(prevTreeEl.processInstanceId);
-    const newInstance = newPrevActivity.filter((a) => a.activityId === prevTreeEl.activityId && !a.endTime)[0];
+    const newInstance = newPrevActivity.filter(
+      (a) => a.activityId === prevTreeEl.activityId && !a.endTime
+    )[0];
     const oldVars = await this.getVars(prevTreeEl.calledProcessInstanceId);
 
     (data[index].processInstanceId = newInstance.calledProcessInstanceId),
@@ -184,7 +201,11 @@ class Bpmn {
     await this.modification(
       data[index].processInstanceId,
       activityData.filter(
-        (item) => !['Инициализация бизнес-процесса', 'Инициализация бизнес процесса'].includes(item.activityName)
+        (item) =>
+          ![
+            "Инициализация бизнес-процесса",
+            "Инициализация бизнес процесса",
+          ].includes(item.activityName)
       ),
       activityId
     );
@@ -195,7 +216,7 @@ class Bpmn {
   getVars = (id) =>
     this.connector({
       path: `/history/variable-instance?processInstanceId=${id}`,
-      method: 'GET',
+      method: "GET",
     }).then((data) =>
       data.reduce(
         (p, c) => ({
@@ -209,7 +230,7 @@ class Bpmn {
   setVars = (id, vars) =>
     this.connector({
       path: `/process-instance/${id}/variables`,
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify({
         modifications: vars,
       }),
@@ -218,18 +239,18 @@ class Bpmn {
   modification = (id, cancelActivity, activityId) =>
     this.connector({
       path: `/process-instance/${id}/modification`,
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify({
         skipIoMappings: true,
         skipCustomListeners: true,
         instructions: cancelActivity
           .map((item) => ({
-            type: 'cancel',
+            type: "cancel",
             activityId: item.activityId,
           }))
           .concat([
             {
-              type: 'startBeforeActivity',
+              type: "startBeforeActivity",
               activityId,
             },
           ]),
@@ -244,18 +265,23 @@ class Bpmn {
   deleteProcess = (id) =>
     this.connector({
       path: `/process-instance/${id}?skipIoMappings=true`,
-      method: 'DELETE',
+      method: "DELETE",
     }).catch((e) => null);
 
   forwardMVP = async (model, vars) => {
     /* SET ADDITIONAL VARIABLES */
-    await this.setVars(model, Object.keys(vars).reduce(
-      (prev, key) => ({
-        ...prev,
-        [key.split('::').length > 1 ? key.split('::')[1] : key]: { value: vars[key] },
-      }),
-      {}
-    ));
+    await this.setVars(
+      model,
+      Object.keys(vars).reduce(
+        (prev, key) => ({
+          ...prev,
+          [key.split("::").length > 1 ? key.split("::")[1] : key]: {
+            value: vars[key],
+          },
+        }),
+        {}
+      )
+    );
 
     /* CONTINUE MAIN PROCESS */
     await this.msg(model);
@@ -264,9 +290,124 @@ class Bpmn {
   getTaskVar = (taskId, varName) =>
     this.connector({
       path: `/task/${taskId}/variables/${varName}`,
-      method: 'GET',
-    }).then((data) => data.value)
-    .catch((e) => console.log(e));
+      method: "GET",
+    })
+      .then((data) => data.value)
+      .catch((e) => console.log(e));
+
+  /* ***** SUSPEND MODEL FEATURE ***** */
+
+  /**
+   * Retrieves the subprocess instances of the given process instance.
+   *
+   * @param {{superProcessInstanceId: string, active?: boolean}} params - The parameters for retrieving subprocess instances.
+   * @param {string} params.superProcessInstanceId - The ID of the super process instance.
+   * @param {boolean} [params.active] - The active state filter for subprocess instances.
+   * @returns {Promise<Array<any>>} - A promise that resolves with an array of the subprocess instances.
+   */
+  getSubProcessInstances = ({ superProcessInstanceId, active }) =>
+    this.connector({
+      path: `/process-instance?superProcessInstance=${superProcessInstanceId}${
+        active ? `&active=${active}` : ""
+      }`,
+      method: "GET",
+    }).then((data) => data || []);
+
+  /**
+   * Retrieves all subprocess instances of the given process instance,
+   * including its subprocesses, sub-subprocesses, etc.
+   *
+   * @param {Object} params - The parameters for retrieving subprocess instances.
+   * @param {string} params.superProcessInstanceId - The ID of the super process instance.
+   * @param {boolean} [params.active] - The active state filter for subprocess instances.
+   * @returns {Promise<Array<any>>} - A promise that resolves with an array of the subprocess instances.
+   */
+  getAllSubProcessInstances = async ({ superProcessInstanceId, active }) => {
+    const immediateSubprocesses = await this.getSubProcessInstances({
+      superProcessInstanceId,
+      active,
+    });
+    const subProcessPromises = immediateSubprocesses.map((sub) =>
+      this.getAllSubProcessInstances({ superProcessInstanceId: sub.id, active })
+    );
+    const subProcessResults = await Promise.all(subProcessPromises);
+
+    return [
+      ...immediateSubprocesses,
+      ...subProcessResults.flatMap((result) => result),
+    ];
+  };
+
+  /**
+   * Retrieves a process instance by its ID.
+   *
+   * @param {string} id - The id of the process instance.
+   * @returns {Promise<any>} - A promise that resolves with the process instance.
+   */
+  getProcessInstance = (id) =>
+    this.connector({
+      path: `/process-instance/${id}`,
+      method: "GET",
+    });
+
+  /**
+   * Toggles the suspension state of specified process instances.
+   *
+   * @param {Array<string>} processInstanceIds - The IDs of the process instances to suspend or activate.
+   * @param {boolean} suspended - The desired suspension state; true to suspend, false to activate.
+   * @returns {Promise<any>} - A promise that resolves when the operation is complete.
+   */
+  toggleProcessInstancesSuspension = async (processInstanceIds, suspended) =>
+    this.connector({
+      path: `/process-instance/suspended`,
+      method: "PUT",
+      body: JSON.stringify({
+        processInstanceIds,
+        suspended,
+      }),
+    });
+
+  /**
+   * Toggles the suspension state of a model and all its subprocesses in Camunda.
+   *
+   * This method:
+   * 1. Retrieves all subprocess instance IDs associated with the model.
+   * 2. Combines the main process instance ID with the subprocess instance IDs.
+   * 3. Updates the suspension state of all instances (main process + subprocesses).
+   *
+   * @param {string} modelId - The unique identifier of the model (corresponding to the super process instance ID).
+   * @param {boolean} suspended - The desired suspension state; `true` to suspend, `false` to activate.
+   * @returns {Promise<void>} - A promise that resolves when the suspension state is successfully updated.
+   * @throws {Error} - Throws an error if the operation fails, including detailed error messages.
+   */
+  toggleModelSuspension = async ({ modelId, suspended }) => {
+    try {
+      // 1. Get all subprocess instance IDs
+      const camundaInstanceIds = (
+        await this.getAllSubProcessInstances({
+          superProcessInstanceId: modelId,
+        })
+      ).map(({ id }) => id);
+
+      // 2. Combine with the main process instance ID
+      const camundaInstanceIdsWithMainProcess = [
+        modelId,
+        ...camundaInstanceIds,
+      ];
+
+      // 3. Toggle the suspension state for all instances
+      await this.toggleProcessInstancesSuspension(
+        camundaInstanceIdsWithMainProcess,
+        suspended
+      );
+    } catch (error) {
+      throw new Error(
+        `Failed to toggle suspension for model ${modelId}: ${
+          error.response?.data || error.message
+        }`
+      );
+    }
+  };
 }
 
 module.exports = Bpmn;
