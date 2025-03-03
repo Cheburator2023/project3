@@ -46,7 +46,7 @@ const sql = `
       ON automl.automl_model_id = model.model_id
   LEFT JOIN
       (${status}) st
-      ON model.model_status IS NULL AND st.model_id = model.model_id
+      ON st.model_id = model.model_id
   LEFT JOIN
       (${activeBpmnInstance}) activeBpmnInstance
       ON activeBpmnInstance.model_id = model.model_id
