@@ -145,6 +145,43 @@ class PostgresDatabase {
         }
     }
 
+    // Метод возвращает соединение, с которым необходимо далее работать через метод executeWithConnection, так как транзакция работает только в рамках одного соединения
+    // см. https://node-postgres.com/features/transactions
+    // После выполнения бизнес-логики необходимо выполнить commitTransaction или rollbackTransaction
+    async beginTransation() {
+        const connection = await this.getConnection();
+        await connection.query('BEGIN');
+
+        return connection;
+    }
+
+    async commitTransaction(connection) {
+        await connection.query('COMMIT');
+        await connection.release();
+    }
+
+    async rollbackTransaction(connection) {
+        await connection.query('ROLLBACK');
+        await connection.release();
+    }
+
+    async executeWithConnection({ connection, sql, args= {} }) {
+        try {
+            return await retry((_, attempt) => {
+                if (attempt && attempt > 1) {
+                    console.warn(`Attempting to process "query" command again`)
+                }
+
+                return connection.query(queryConvert(sql, args))
+            }, this.options.retryConfig)
+        } catch (err) {
+            console.error(err)
+            console.log(`Unable to process SQL query:`, sql)
+            console.log('With query arguments:', args)
+            throw err
+        }
+    }
+
     /**
      * Execute many queries.
      *
