@@ -1,19 +1,8 @@
 const availableGroups = ["ds", "ds_lead", "mipm"];
-const removalInstanceKey = "removal";
+const removalInstanceKey = "model_state_transition";
 
 const checkRoleModel = (userGroups) =>
   availableGroups.some((groupName) => userGroups.includes(groupName));
-
-const getUserRole = (userGroups) => {
-  if (userGroups.includes("mipm")) {
-    return "mipm";
-  }
-  if (userGroups.includes("ds_lead")) {
-    return "ds_lead";
-  }
-
-  return null;
-};
 
 module.exports = async (root, args, context) => {
   const modelId = args.MODEL_ID;
@@ -36,26 +25,17 @@ module.exports = async (root, args, context) => {
     return checkRemovalInstance[0].BPMN_INSTANCE_ID;
   }
 
-  /* Create removal model instance */
-  const userRole = getUserRole(groups);
-
   const instance = await context.bpmn
     .start(
       removalInstanceKey,
       JSON.stringify({
         variables: {
           model: { value: modelId },
-          remove_role: { value: userRole },
+          transition_reason: { value: "archive" },
         },
       })
     )
     .then((d) => d.id);
-
-  await context.db.instance.new({
-    model: modelId,
-    instance,
-    key: removalInstanceKey,
-  });
 
   return instance;
 };

@@ -275,7 +275,6 @@ class Task {
       JSON.stringify(camundaVar(ARTEFACTS))
     );
 
-    console.log("TEST ***");
     await this.addOperationLog({
       MODEL_ID,
       TASK_ID,
