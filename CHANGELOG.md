@@ -1,5 +1,19 @@
 # Semantic Versioning Changelog
 
+# [1.12.0](https://git.sfera.inno.local/SUMD/backend/compare/v1.11.0...v1.12.0) (2025-03-14)
+
+
+### Bug Fixes
+
+* enable editing previous quarter in previous year ([ef5904f](https://git.sfera.inno.local/SUMD/backend/commit/ef5904fd2e0afbde3d38edc9dd7075aef7162cf2))
+* метод смены статуса NLP API ([424b78f](https://git.sfera.inno.local/SUMD/backend/commit/424b78fc6297c0d846af1ffd7824e18cd04ccc2c))
+* отображение статуса в карточке модели ([de96054](https://git.sfera.inno.local/SUMD/backend/commit/de960542c89218b1847127296b973671196279eb))
+
+
+### Features
+
+* Сохранение подразделения БЗ или владельца модели ([d6e9e43](https://git.sfera.inno.local/SUMD/backend/commit/d6e9e43e69d0fbb0bc97c8cca3e805d071ce6214))
+
 # [1.11.0](https://git.sfera.inno.local/SUMD/backend/compare/v1.10.0...v1.11.0) (2025-02-28)
 
 
