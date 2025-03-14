@@ -1,5 +1,5 @@
 const availableGroups = ["ds", "ds_lead", "mipm"];
-const removalInstanceKey = "suspend";
+const removalInstanceKey = "removal";
 
 const checkRoleModel = (userGroups) =>
   availableGroups.some((groupName) => userGroups.includes(groupName));
@@ -46,12 +46,10 @@ module.exports = async (root, args, context) => {
         variables: {
           model: { value: modelId },
           remove_role: { value: userRole },
-          suspend_reason: { value: "archive" },
         },
       })
     )
-    .then((d) => d.id)
-    .catch((e) => console.error(e));
+    .then((d) => d.id);
 
   await context.db.instance.new({
     model: modelId,

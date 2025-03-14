@@ -23,4 +23,5 @@ module.exports = {
   edit_stage: require("./edit_stage"),
   edit_desc: require("./edit_desc"),
   edit_active_status: require("./edit_active_status"),
+  selectModelForUpdate: require("./selectModelForUpdate"),
 };

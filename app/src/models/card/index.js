@@ -368,14 +368,22 @@ class Card {
       args: { model_id: modelId, model_status: modelStatus },
     });
 
+  // Обновление этапа происходит в транзакции.
+  // Запрос selectModelForUpdate блокирует строку на чтение и изменение (FOR UPDATE), чтобы параллельные таски не перетёрли изменения (см. lost update)
+  // Блокировка будет действовать пока не завершится транзакция, любые параллельные запросы на чтение for update или изменение будут ждать снятия блокировки и получат обновлённые данные
   addStage = async ({ modelId, modelStage }) => {
     if (!modelStage) {
       return;
     }
 
-    const model = await this.db
-      .execute({ sql: sql.info, args: { MODEL_ID: modelId } })
-      .then((data) => {
+    const connection = await this.db.beginTransation();
+
+    try {
+      const model = await this.db.executeWithConnection({ 
+        connection, 
+        sql: sql.selectModelForUpdate, 
+        args: { model_id: modelId } 
+      }).then((data) => {
         if (data.rows.length) {
           return data.rows[0];
         }
@@ -383,47 +391,74 @@ class Card {
         throw Error(`Model with id: ${modelId} not found`);
       });
 
-    let stages = model.MODEL_STAGE ? model.MODEL_STAGE.split(";") : [];
-    stages.push(modelStage);
+      let stages = model.MODEL_STAGE ? model.MODEL_STAGE.split(";") : [];
+      stages.push(modelStage);
 
-    this.db.execute({
-      sql: sql.edit_stage,
-      args: { model_id: modelId, model_stage: stages.join(";") },
-    });
+      await this.db.executeWithConnection({
+        connection,
+        sql: sql.edit_stage,
+        args: { 
+          model_id: modelId, 
+          model_stage: stages.join(";") 
+        },
+      });
+
+      await this.db.commitTransaction(connection);
+    } catch (err) {
+      console.error(`Unable to add stage ${modelStage} for model ${modelId}`);
+      await this.db.rollbackTransaction(connection);
+      throw err;
+    }
   };
 
+  // Обновление этапа происходит в транзакции. 
+  // Запрос selectModelForUpdate блокирует строку на чтение и изменение (FOR UPDATE), чтобы параллельные таски не перетёрли изменения (см. lost update)
+  // Блокировка будет действовать пока не завершится транзакция, любые параллельные запросы на чтение for update или изменение будут ждать снятия блокировки и получат обновлённые данные
   removeStage = async ({ modelId, modelStage }) => {
     if (!modelStage) {
       return;
     }
 
-    const model = await this.db
-      .execute({ sql: sql.info, args: { MODEL_ID: modelId } })
-      .then((data) => {
-        if (data.rows.length) {
-          return data.rows[0];
-        }
+    const connection = await this.db.beginTransation();
 
-        throw Error(`Model with id: ${modelId} not found`);
+    try {
+      const model = await this.db.executeWithConnection({ 
+          connection, 
+          sql: sql.selectModelForUpdate, 
+          args: { model_id: modelId } 
+        }).then((data) => {
+          if (data.rows.length) {
+            return data.rows[0];
+          }
+
+          throw Error(`Model with id: ${modelId} not found`);
+        });
+
+      if (!model.MODEL_STAGE) {
+        return;
+      }
+
+      let stages = model.MODEL_STAGE.split(";");
+      const deleteIndex = stages.indexOf(modelStage);
+      if (deleteIndex > -1) {
+        stages.splice(deleteIndex, 1);
+      }
+
+      this.db.executeWithConnection({
+        connection,
+        sql: sql.edit_stage,
+        args: {
+          model_id: modelId,
+          model_stage: stages.length ? stages.join(";") : null,
+        },
       });
 
-    if (!model.MODEL_STAGE) {
-      return;
+      await this.db.commitTransaction(connection);
+    } catch (err) {
+      console.error(`Unable to remove stage ${modelStage} from model ${modelId}`);
+      await this.db.rollbackTransaction(connection);
+      throw err;
     }
-
-    let stages = model.MODEL_STAGE.split(";");
-    const deleteIndex = stages.indexOf(modelStage);
-    if (deleteIndex > -1) {
-      stages.splice(deleteIndex, 1);
-    }
-
-    this.db.execute({
-      sql: sql.edit_stage,
-      args: {
-        model_id: modelId,
-        model_stage: stages.length ? stages.join(";") : null,
-      },
-    });
   };
 
   /**

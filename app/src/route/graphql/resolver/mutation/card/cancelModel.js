@@ -1,6 +1,6 @@
 const availableGroups = ["ds", "ds_lead", "mipm"];
 const initializationInstanceKey = "initialization";
-const cancelInstanceKey = "suspend";
+const cancelInstanceKey = "cancel";
 
 module.exports = async (root, args, context) => {
   try {
@@ -47,7 +47,6 @@ module.exports = async (root, args, context) => {
           variables: {
             model: { value: model },
             cancel_role: { value: cancel_role },
-            suspend_reason: { value: "mistake" }, // archive
           },
         })
       )

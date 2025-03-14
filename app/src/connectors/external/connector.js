@@ -12,7 +12,8 @@ const basicAuthentication = new BasicAuthInterceptor({
 const clientConfig = {
     baseUrl: process.env.BPMN_API || 'http://localhost:8085/engine-rest', 
     interceptors: basicAuthentication,
-    use: logger 
+    use: logger,
+
 }
 
 

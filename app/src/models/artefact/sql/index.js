@@ -16,4 +16,5 @@ module.exports = {
   list: require("./list"),
   artefactById: require("./artefactById"),
   artefactRealizationById: require("./artefactRealizationById"),
+  getArtefactValueIdByValue: require("./getArtefactValueIdByValue"),
 };
