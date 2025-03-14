@@ -417,6 +417,8 @@ class Card {
         });
 
       if (!model.MODEL_STAGE) {
+        console.error(`Tried to remove stage ${modelStage} from model ${modelId} but model.MODEL_STAGE is empty`);
+        await this.db.rollbackTransaction(connection);
         return;
       }
 
