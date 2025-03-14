@@ -23,7 +23,7 @@ ON CONFLICT (model_id, quarter, confirmation_year)
                                           ELSE model_usage_confirm.artifact_link
     END,
                   confirmation_date = COALESCE(EXCLUDED.confirmation_date, model_usage_confirm.confirmation_date)
-RETURNING model_id, quarter, artifact_link, confirmed;
+RETURNING model_id, confirmation_year, quarter, artifact_link, confirmed;
 `
 
 module.exports = sql
