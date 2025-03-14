@@ -24,7 +24,7 @@ module.exports = async (root, args, context) => {
   await context.db.card.new(args);
   // Create git
   const dbNewModel = await context.db.card.info(args);
-  const MODEL_ALIAS = `SUMCORmodel${dbNewModel.ROOT_MODEL_ID}-v${dbNewModel.MODEL_VERSION}`;
+  const MODEL_ALIAS = `model${dbNewModel.ROOT_MODEL_ID}-v${dbNewModel.MODEL_VERSION}`;
 
   if (args.PARENT_MODEL_ID) {
     const parentModelInfo = await context.db.card.info({
