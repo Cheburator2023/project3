@@ -123,6 +123,11 @@ class Artefact {
     this.db
       .execute({ sql: sql.possibleValues, args: { ARTEFACT_ID } })
       .then((d) => d.rows);
+
+  getArtefactValueIdByValue = ({ artefactId, value }) =>
+    this.db
+      .execute({ sql: sql.getArtefactValueIdByValue, args: { artefact_id: artefactId, value }})
+      .then((d) => d.rows[0] ? d.rows[0] : null);
 }
 
 module.exports = Artefact;

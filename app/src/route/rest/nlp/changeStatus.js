@@ -45,8 +45,8 @@ module.exports = async (req, res, next) => {
         }
 
         await db.card.changeStatus({
-            MODEL_ID: versionId,
-            MODEL_STATUS: nlpModelStatusMap[String(modelStatusCode)],
+            modelId: versionId,
+            modelStatus: nlpModelStatusMap[String(modelStatusCode)],
         });
 
         res.status(200).json({

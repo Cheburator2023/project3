@@ -43,6 +43,16 @@ module.exports = async (req, res, next) => {
             });
             return;
         }
+
+        // Сопоставляем ds_department со справочником значений, записываем artefact_value_id
+        const dsDepartmentArtefactValue = await db.artefact.getArtefactValueIdByValue({artefactId: 6, value: ds_department});
+        if (dsDepartmentArtefactValue === null) {
+            res.status(400).json({
+                error: 'Bad request',
+                details: 'given ds_department does not exist',
+            });
+            return;
+        }
     
         // Создаём карточку модели
         await db.card.createNewByGeneralModelId({
@@ -62,9 +72,9 @@ module.exports = async (req, res, next) => {
             MODEL_ID: version_id, 
             ARTEFACTS: [{
                 MODEL_ID: version_id,
-                ARTEFACT_ID: 7, // Departament
-                ARTEFACT_VALUE_ID: null,
-                ARTEFACT_STRING_VALUE: ds_department,
+                ARTEFACT_ID: 6, // business_customer_departament
+                ARTEFACT_VALUE_ID: dsDepartmentArtefactValue.ARTEFACT_VALUE_ID,
+                ARTEFACT_STRING_VALUE: null,
             }, {
                 MODEL_ID: version_id,
                 ARTEFACT_ID: 67, // significance_validity
