@@ -1,6 +1,5 @@
 const availableGroups = ["ds", "ds_lead", "mipm"];
-const initializationInstanceKey = "initialization";
-const cancelInstanceKey = "cancel";
+const cancelInstanceKey = "model_state_transition";
 
 module.exports = async (root, args, context) => {
   try {
@@ -22,23 +21,6 @@ module.exports = async (root, args, context) => {
       return checkCancelInstance[0].BPMN_INSTANCE_ID;
     }
 
-    /* Create cancel model instance */
-    let cancel_role = null;
-    if (groups.includes("ds")) cancel_role = "ds";
-    if (groups.includes("ds_lead")) cancel_role = "ds_lead";
-    if (groups.includes("mipm")) cancel_role = "mipm";
-
-    /* Get initialization instance by model_id */
-    const [initializationInstance] =
-      await context.db.instance.getInstancesByModelIdAndKey({
-        model,
-        key: initializationInstanceKey,
-      });
-
-    if (!initializationInstance) {
-      throw new Error("Initialization instance not found.");
-    }
-
     /* Start cancel BPMN-instance on newest deployed schema */
     const instance = await context.bpmn
       .start(
@@ -46,7 +28,7 @@ module.exports = async (root, args, context) => {
         JSON.stringify({
           variables: {
             model: { value: model },
-            cancel_role: { value: cancel_role },
+            transition_reason: { value: "mistake" }, // archive
           },
         })
       )
@@ -54,10 +36,7 @@ module.exports = async (root, args, context) => {
 
     return instance;
   } catch (error) {
-    console.error(
-      "Error occurred while processing cancel model instance:",
-      error
-    );
+    console.error(error);
     throw new Error(
       "An error occurred while processing the cancel instance. Please try again."
     );

@@ -114,6 +114,12 @@ module.exports = async (root, { activity }, context) => {
         });
       }
 
+      // Reset model status
+      await context.db.card.changeStatus({
+        modelId: MODEL_ID,
+        modelStatus: null,
+      });
+
       if (taskRolledbackFrom) {
         // Add "roll back" log to tasks operations
         await context.db.task.addOperationLog({

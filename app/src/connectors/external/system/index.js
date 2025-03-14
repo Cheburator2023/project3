@@ -1,4 +1,5 @@
 const moment = require("moment");
+const { Variables } = require("camunda-external-task-client-js");
 
 class System {
   constructor(db, bpmn) {
@@ -25,44 +26,56 @@ class System {
     await taskService.complete(task);
   };
 
+  // Update model data in DB
+  updateModelInfo = async ({ task, taskService }) => {
+    console.log("Updating model info...");
+
+    const { model } = task.variables.getAll();
+
+    // Set model_is_active_flg to 0 in models table
+    await this.db.card.cancel({ model });
+
+    await taskService.complete(task);
+  };
+
+  // Validates the consistency of a model's state between the database and Camunda. Add result to process variables
+  healthCheck = async ({ task, taskService }) => {
+    console.log("Starting health check model...");
+
+    const { model } = task.variables.getAll();
+
+    const modelValidationResult =
+      await this.db.card.validateModelStateConsistency(model);
+
+    const processVariables = new Variables();
+
+    if (modelValidationResult.error) {
+      processVariables.setAll({
+        is_healthy: false,
+        healthy_error: modelValidationResult.errorMessage,
+      });
+    } else {
+      processVariables.setAll({
+        is_healthy: true,
+        healthy_error: "",
+      });
+    }
+
+    await taskService.complete(task, processVariables);
+  };
+
+  // Suspend all active process instances
   suspend = async ({ task, taskService }) => {
     try {
       console.log("Starting suspending model...");
 
-      const { model, key, ...variables } = task.variables.getAll();
+      const { model } = task.variables.getAll();
 
-      // 1. Validate the consistency of a model's state between the database and Camunda.
-      const modelValidationResult =
-        await this.db.card.validateModelStateConsistency(model);
-
-      if (modelValidationResult.error) {
-        throw new Error(modelValidationResult.errorMessage);
-      }
-
-      // 2. Suspend all active process instances
       await this.bpmn.toggleModelSuspension({
         modelId: model,
         suspended: true,
       });
 
-      // 3. Update model data in DB
-      // Set model_is_active_flg to 0 in models table
-      await this.db.card.cancel({ model });
-
-      // 4. Update cancel process instance in bpmn_instances table (set effective_to to current timestamp)
-      await this.db.instance.finish({
-        model,
-        instance: task.processInstanceId,
-        key,
-      });
-
-      // 5. Update model_status
-      await this.db.card.changeStatus({
-        modelId: model,
-        modelStatus: variables.model_status ? variables.model_status : null,
-      });
-
-      // 6. Finish task and full process in camunda
       await taskService.complete(task);
     } catch (e) {
       console.error(e);
@@ -72,10 +85,11 @@ class System {
   bpmnStart = async ({ task, taskService }) => {
     const variables = task.variables.getAll();
     console.sys("Инициализация Бизнес процесса");
-    try {
-      const checlInstance = await this.db.instance.id(task.processInstanceId);
 
-      if (checlInstance) {
+    try {
+      const checkInstance = await this.db.instance.id(task.processInstanceId);
+
+      if (checkInstance) {
         await taskService.complete(task);
         return;
       }

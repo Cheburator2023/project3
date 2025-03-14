@@ -23,6 +23,10 @@ type Mutation {
   removeUser(MODEL_ID: String!, user: DbUserInput!): Boolean
   cancelModel(MODEL_ID: String!): String
   removeModel(MODEL_ID: String!): String
+  transitModelState(
+    modelId: String!
+    transitionReason: TransitionReason!
+  ): String
   updateArtefactsHistory(MODEL_ID: String!, ARTEFACT: InputArtefact): Boolean
   updateMetaInfo(
     MODEL_ID: String!
@@ -123,4 +127,9 @@ input InputActivity {
   startTime: String
   endTime: String
   durationInMillis: BigInt
+}
+
+enum TransitionReason {
+  mistake
+  archive
 }

@@ -379,17 +379,19 @@ class Card {
     const connection = await this.db.beginTransation();
 
     try {
-      const model = await this.db.executeWithConnection({ 
-        connection, 
-        sql: sql.selectModelForUpdate, 
-        args: { model_id: modelId } 
-      }).then((data) => {
-        if (data.rows.length) {
-          return data.rows[0];
-        }
+      const model = await this.db
+        .executeWithConnection({
+          connection,
+          sql: sql.selectModelForUpdate,
+          args: { model_id: modelId },
+        })
+        .then((data) => {
+          if (data.rows.length) {
+            return data.rows[0];
+          }
 
-        throw Error(`Model with id: ${modelId} not found`);
-      });
+          throw Error(`Model with id: ${modelId} not found`);
+        });
 
       let stages = model.MODEL_STAGE ? model.MODEL_STAGE.split(";") : [];
       stages.push(modelStage);
@@ -397,9 +399,9 @@ class Card {
       await this.db.executeWithConnection({
         connection,
         sql: sql.edit_stage,
-        args: { 
-          model_id: modelId, 
-          model_stage: stages.join(";") 
+        args: {
+          model_id: modelId,
+          model_stage: stages.join(";"),
         },
       });
 
@@ -411,7 +413,7 @@ class Card {
     }
   };
 
-  // Обновление этапа происходит в транзакции. 
+  // Обновление этапа происходит в транзакции.
   // Запрос selectModelForUpdate блокирует строку на чтение и изменение (FOR UPDATE), чтобы параллельные таски не перетёрли изменения (см. lost update)
   // Блокировка будет действовать пока не завершится транзакция, любые параллельные запросы на чтение for update или изменение будут ждать снятия блокировки и получат обновлённые данные
   removeStage = async ({ modelId, modelStage }) => {
@@ -422,11 +424,13 @@ class Card {
     const connection = await this.db.beginTransation();
 
     try {
-      const model = await this.db.executeWithConnection({ 
-          connection, 
-          sql: sql.selectModelForUpdate, 
-          args: { model_id: modelId } 
-        }).then((data) => {
+      const model = await this.db
+        .executeWithConnection({
+          connection,
+          sql: sql.selectModelForUpdate,
+          args: { model_id: modelId },
+        })
+        .then((data) => {
           if (data.rows.length) {
             return data.rows[0];
           }
@@ -455,7 +459,9 @@ class Card {
 
       await this.db.commitTransaction(connection);
     } catch (err) {
-      console.error(`Unable to remove stage ${modelStage} from model ${modelId}`);
+      console.error(
+        `Unable to remove stage ${modelStage} from model ${modelId}`
+      );
       await this.db.rollbackTransaction(connection);
       throw err;
     }
@@ -493,9 +499,11 @@ class Card {
       console.log("1/5. Pass. Main process instance exists in Camunda");
 
       // 2. Verify if the main process instance status in the DB matches the status in Camunda
-      const isModelActive = await this.info({ MODEL_ID: modelId })
-        .MODELS_IS_ACTIVE_FLG;
-      if (mainProcessInstance.suspended === isModelActive) {
+      const { MODELS_IS_ACTIVE_FLG: isModelActive } = await this.info({
+        MODEL_ID: modelId,
+      });
+
+      if (mainProcessInstance.suspended === !!isModelActive) {
         const errorMessage = `Mismatch statuses. Model: ${modelId} is ${
           isModelActive ? "active" : "not active"
         } in DB, but ${
@@ -537,7 +545,7 @@ class Card {
 
       // 4. Check that process instances in Camunda have correct status of activity
       if (
-        camundaInstances.some(({ suspended }) => suspended === isModelActive)
+        camundaInstances.some(({ suspended }) => suspended === !!isModelActive)
       ) {
         return {
           error: true,

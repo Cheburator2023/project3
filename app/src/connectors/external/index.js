@@ -46,6 +46,8 @@ module.exports = (db, integration, bpmn, common) => {
   // System Handler
   const system = new System(db, bpmn);
   client.subscribe("suspend", system.suspend);
+  client.subscribe("healthCheck", system.healthCheck);
+  client.subscribe("updateModelInfo", system.updateModelInfo);
   client.subscribe("endEvent", system.endEvent);
   client.subscribe("bpmnStart", system.bpmnStart);
   client.subscribe("bpmnFinish", system.bpmnFinish);
