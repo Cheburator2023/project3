@@ -413,7 +413,7 @@ class Card {
     }
   };
 
-  // Обновление этапа происходит в транзакции. 
+  // Обновление этапа происходит в транзакции.
   // Запрос selectModelForUpdate блокирует строку на чтение и изменение (FOR UPDATE), чтобы параллельные таски не перетёрли изменения (см. lost update)
   // Блокировка будет действовать пока не завершится транзакция, любые параллельные запросы на чтение for update или изменение будут ждать снятия блокировки и получат обновлённые данные
   removeStage = async ({ modelId, modelStage }) => {
@@ -424,11 +424,13 @@ class Card {
     const connection = await this.db.beginTransation();
 
     try {
-      const model = await this.db.executeWithConnection({ 
-          connection, 
-          sql: sql.selectModelForUpdate, 
-          args: { model_id: modelId } 
-        }).then((data) => {
+      const model = await this.db
+        .executeWithConnection({
+          connection,
+          sql: sql.selectModelForUpdate,
+          args: { model_id: modelId },
+        })
+        .then((data) => {
           if (data.rows.length) {
             return data.rows[0];
           }
@@ -437,7 +439,9 @@ class Card {
         });
 
       if (!model.MODEL_STAGE) {
-        console.error(`Tried to remove stage ${modelStage} from model ${modelId} but model.MODEL_STAGE is empty`);
+        console.error(
+          `Tried to remove stage ${modelStage} from model ${modelId} but model.MODEL_STAGE is empty`
+        );
         await this.db.rollbackTransaction(connection);
         return;
       }
@@ -499,11 +503,12 @@ class Card {
       console.log("1/5. Pass. Main process instance exists in Camunda");
 
       // 2. Verify if the main process instance status in the DB matches the status in Camunda
-      const { MODELS_IS_ACTIVE_FLG: isModelActive } = await this.info({
+      const { MODELS_IS_ACTIVE_FLG } = await this.info({
         MODEL_ID: modelId,
       });
+      const isModelActive = MODELS_IS_ACTIVE_FLG === "1" ? true : false;
 
-      if (mainProcessInstance.suspended === !!isModelActive) {
+      if (mainProcessInstance.suspended === isModelActive) {
         const errorMessage = `Mismatch statuses. Model: ${modelId} is ${
           isModelActive ? "active" : "not active"
         } in DB, but ${
@@ -545,7 +550,7 @@ class Card {
 
       // 4. Check that process instances in Camunda have correct status of activity
       if (
-        camundaInstances.some(({ suspended }) => suspended === !!isModelActive)
+        camundaInstances.some(({ suspended }) => suspended === isModelActive)
       ) {
         return {
           error: true,
