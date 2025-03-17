@@ -413,7 +413,7 @@ class Card {
     }
   };
 
-  // Обновление этапа происходит в транзакции.
+  // Обновление этапа происходит в транзакции. 
   // Запрос selectModelForUpdate блокирует строку на чтение и изменение (FOR UPDATE), чтобы параллельные таски не перетёрли изменения (см. lost update)
   // Блокировка будет действовать пока не завершится транзакция, любые параллельные запросы на чтение for update или изменение будут ждать снятия блокировки и получат обновлённые данные
   removeStage = async ({ modelId, modelStage }) => {
@@ -424,13 +424,11 @@ class Card {
     const connection = await this.db.beginTransation();
 
     try {
-      const model = await this.db
-        .executeWithConnection({
-          connection,
-          sql: sql.selectModelForUpdate,
-          args: { model_id: modelId },
-        })
-        .then((data) => {
+      const model = await this.db.executeWithConnection({ 
+          connection, 
+          sql: sql.selectModelForUpdate, 
+          args: { model_id: modelId } 
+        }).then((data) => {
           if (data.rows.length) {
             return data.rows[0];
           }
@@ -439,6 +437,8 @@ class Card {
         });
 
       if (!model.MODEL_STAGE) {
+        console.error(`Tried to remove stage ${modelStage} from model ${modelId} but model.MODEL_STAGE is empty`);
+        await this.db.rollbackTransaction(connection);
         return;
       }
 
