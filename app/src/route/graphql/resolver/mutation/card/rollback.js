@@ -184,16 +184,29 @@ const updateModelState = async (task, prevModelStages = "", context) => {
 
 module.exports = async (root, { activity }, context) => {
   try {
-    const { MODEL_ID, MODEL_STAGE: prevModelStages } = await getModelInfo(
-      activity,
-      context
-    );
+    const {
+      MODEL_ID,
+      MODEL_STAGE: prevModelStages,
+      MODELS_IS_ACTIVE_FLG,
+    } = await getModelInfo(activity, context);
 
     const modelStateValidationResult =
       await context.db.card.validateModelStateConsistency(MODEL_ID);
 
     if (modelStateValidationResult.error) {
       throw new Error(modelStateValidationResult.errorMessage);
+    }
+
+    if (MODELS_IS_ACTIVE_FLG === "0") {
+      await context.bpmn.toggleModelSuspension({
+        modelId: MODEL_ID,
+        suspended: false,
+      });
+
+      await context.db.card.editActiveStatus({
+        MODEL_ID,
+        MODELS_IS_ACTIVE_FLG: 1,
+      });
     }
 
     const activeTaskBeforeRollback = await getActiveTask(MODEL_ID, context);
