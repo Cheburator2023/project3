@@ -226,10 +226,14 @@ class Task {
           inst.BPMN_INSTANCE_ID === task.processInstanceId &&
           inst.TASK_ID === task.taskDefinitionKey
       );
-      return {
-        ...taskBpmn,
-        ...inst,
-      };
+
+      if (taskBpmn) {
+        return {
+          ...taskBpmn,
+          ...inst,
+        };
+      }
+      return inst;
     });
   };
 
