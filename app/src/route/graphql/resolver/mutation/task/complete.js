@@ -23,7 +23,9 @@ module.exports = async (root, args, context) => {
 
     console.sys(addNewArtefactStatus)
 
-    const modelStatus = await context.bpmn.getTaskVar(args.id, 'model_status')
+    const modelStatus = await context.bpmn.getTaskVar(args.id, 'model_status');
+    const modelStage = await context.bpmn.getTaskVar(args.id, 'model_stage');
+
     console.log(`Получен новый статус модели model${taskInfo.MODEL.ROOT_MODEL_ID}-v${taskInfo.MODEL.MODEL_VERSION}: ${modelStatus}`)
 
     // Camunda close task
@@ -39,6 +41,12 @@ module.exports = async (root, args, context) => {
                 context.db.card.changeStatus({ modelId: args.MODEL_ID, modelStatus })
                     .then()
                     .catch((err) => console.log(`Ошибка при смене статуса модели model${taskInfo.MODEL.ROOT_MODEL_ID}-v${taskInfo.MODEL.MODEL_VERSION}: ${err}`))
+            }
+
+            if (modelStage) {
+                context.db.card.addStage({ modelId: args.MODEL_ID, modelStage })
+                    .then()
+                    .catch((err) => console.log(`Ошибка при смене этапа модели model${taskInfo.MODEL.ROOT_MODEL_ID}-v${taskInfo.MODEL.MODEL_VERSION}: ${err}`))
             }
            
             return data

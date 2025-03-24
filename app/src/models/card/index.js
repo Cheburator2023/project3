@@ -400,6 +400,12 @@ class Card {
         });
 
       let stages = model.MODEL_STAGE ? model.MODEL_STAGE.split(";") : [];
+      const currentStageIndex = stages.indexOf(modelStage);
+      if (currentStageIndex > -1) {
+        // Добавляем этап только если он не был ранее добавлен
+        await this.db.rollbackTransaction(connection);
+        return;
+      }
       stages.push(modelStage);
 
       await this.db.executeWithConnection({
