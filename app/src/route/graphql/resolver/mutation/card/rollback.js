@@ -156,27 +156,10 @@ const updateModelState = async (task, prevModelStages = "", context) => {
       modelId: task.MODEL_ID,
       modelStatus: newModelStatus || null,
     });
-
-    if (newModelStage) {
-      // Clear all previous stages except stages from transition process
-      for (const modelStageToRemove of prevModelStages.split(";")) {
-        const isModelStageFromTransitionProcess =
-          MODEL_STAGES_FROM_TRANSITION_PROCESS.includes(modelStageToRemove);
-
-        if (!isModelStageFromTransitionProcess) {
-          await context.db.card.removeStage({
-            modelId: task.MODEL_ID,
-            modelStage: modelStageToRemove,
-          });
-        }
-      }
-
-      // Add new stage to model in DB
-      await context.db.card.addStage({
-        modelId: task.MODEL_ID,
-        modelStage: newModelStage,
-      });
-    }
+    await context.db.card.changeStage({
+      modelId: task.MODEL_ID,
+      modelStage: newModelStage || null,
+    });
   } catch (e) {
     throw new Error(`UpdateModelState error: ${e.message}`);
   }
@@ -221,7 +204,7 @@ module.exports = async (root, { activity }, context) => {
     return context.bpmn.modify(activity).then(async (data) => {
       const activeTaskAfterRollback = await getActiveTask(MODEL_ID, context);
 
-      if (!(activeTaskBeforeRollback && activeTaskAfterRollback)) {
+      if (!activeTaskAfterRollback) {
         throw new Error(
           `After a rollback, updates cannot be executed because the variables "activeTaskBeforeRollback" or "activeTaskAfterRollback" are not defined.`
         );

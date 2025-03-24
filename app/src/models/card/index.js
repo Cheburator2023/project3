@@ -368,6 +368,12 @@ class Card {
       args: { model_id: modelId, model_status: modelStatus },
     });
 
+  changeStage = ({ modelId, modelStage }) =>
+    this.db.execute({
+      sql: sql.edit_stage,
+      args: { model_id: modelId, model_stage: modelStage },
+    });
+
   // Обновление этапа происходит в транзакции.
   // Запрос selectModelForUpdate блокирует строку на чтение и изменение (FOR UPDATE), чтобы параллельные таски не перетёрли изменения (см. lost update)
   // Блокировка будет действовать пока не завершится транзакция, любые параллельные запросы на чтение for update или изменение будут ждать снятия блокировки и получат обновлённые данные
