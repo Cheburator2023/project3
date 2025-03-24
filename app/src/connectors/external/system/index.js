@@ -133,7 +133,7 @@ class System {
         modelId: variables.model,
         modelStage: variables.model_stage,
       });
-      if ("model_status" in variables && variables.model_status !== "") {
+      if ("model_status" in variables && variables.model_status) {
         await this.db.card.changeStatus({
           modelId: variables.model,
           modelStatus: variables.model_status ? variables.model_status : null,
