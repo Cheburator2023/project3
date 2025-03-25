@@ -139,6 +139,13 @@ class Bpmn {
       })}&includeAssignedTasks=true`,
     });
 
+  tasksByModel = (modelId) => 
+    this.connector({
+      path: `/task?${querystring.stringify({
+        processVariables: 'model_eq_' + modelId,
+      })}`,
+    });
+
   task = (id) =>
     this.connector({ path: `/task/${id}` })
       .catch(() => this.connector({ path: `/history/task?taskId=${id}` }))

@@ -203,6 +203,41 @@ class Task {
     return { ...camundaTask, ...dbInfo };
   };
 
+  // Получает из камунды таски вне зависимости от группы пользователя и объединяет с данными из базы СУМа
+  getByModel = async ({ MODEL_ID }, groups) => {
+    const groupsAfterMapping = this.getGroupsAfterMapping(groups);
+    const tasks = await this.bpmn.tasksByModel(MODEL_ID);
+
+    const instances = await this.db
+      .execute({
+        sql: sql.model,
+        args: {
+          MODEL_ID,
+          idxbpmn: tasks.map(({ processInstanceId }) => processInstanceId),
+          tasks: tasks.map(({ taskDefinitionKey }) => taskDefinitionKey),
+          groups: groups.includes("ds") ? groupsAfterMapping : groups,
+          is_ds_flg: groups.includes("ds") ? "1" : "0",
+        },
+      })
+      .then((data) => data.rows);
+
+    return instances.map((inst) => {
+      const taskBpmn = tasks.find(
+        (task) =>
+          inst.BPMN_INSTANCE_ID === task.processInstanceId &&
+          inst.TASK_ID === task.taskDefinitionKey
+      );
+
+      if (taskBpmn) {
+        return {
+          ...taskBpmn,
+          ...inst,
+        };
+      }
+      return inst;
+    });
+  };
+
   model = async ({ MODEL_ID }, user) => {
     const groupsAfterMapping = this.getGroupsAfterMapping(user.groups);
     const tasks = await this.bpmn.tasks(user.groups);
