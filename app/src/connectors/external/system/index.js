@@ -28,14 +28,22 @@ class System {
 
   // Update model data in DB
   updateModelInfo = async ({ task, taskService }) => {
-    console.log("Updating model info...");
+    try {
+      const { model, model_stage } = task.variables.getAll();
 
-    const { model } = task.variables.getAll();
+      // Set model_is_active_flg to 0 in models table
+      await this.db.card.cancel({ model });
 
-    // Set model_is_active_flg to 0 in models table
-    await this.db.card.cancel({ model });
+      // Replace all stages, including parallel ones, with the current stage
+      await this.db.card.changeStage({
+        modelId: model,
+        modelStage: model_stage ? model_stage : null,
+      });
 
-    await taskService.complete(task);
+      await taskService.complete(task);
+    } catch (e) {
+      throw e;
+    }
   };
 
   // Validates the consistency of a model's state between the database and Camunda. Add result to process variables

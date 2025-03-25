@@ -205,37 +205,52 @@ class Task {
 
   // Получает из камунды таски вне зависимости от группы пользователя и объединяет с данными из базы СУМа
   getByModel = async ({ MODEL_ID }, groups) => {
-    const groupsAfterMapping = this.getGroupsAfterMapping(groups);
-    const tasks = await this.bpmn.tasksByModel(MODEL_ID);
+    try {
+      const groupsAfterMapping = this.getGroupsAfterMapping(groups);
+      const tasks = await this.bpmn.tasksByModel(MODEL_ID);
 
-    const instances = await this.db
-      .execute({
-        sql: sql.model,
-        args: {
-          MODEL_ID,
-          idxbpmn: tasks.map(({ processInstanceId }) => processInstanceId),
-          tasks: tasks.map(({ taskDefinitionKey }) => taskDefinitionKey),
-          groups: groups.includes("ds") ? groupsAfterMapping : groups,
-          is_ds_flg: groups.includes("ds") ? "1" : "0",
-        },
-      })
-      .then((data) => data.rows);
+      const instances = await this.db
+        .execute({
+          sql: sql.model,
+          args: {
+            MODEL_ID,
+            idxbpmn: tasks.map(({ processInstanceId }) => processInstanceId),
+            tasks: tasks.map(({ taskDefinitionKey }) => taskDefinitionKey),
+            groups: groups.includes("ds") ? groupsAfterMapping : groups,
+            is_ds_flg: groups.includes("ds") ? "1" : "0",
+          },
+        })
+        .then((data) => data.rows);
 
-    return instances.map((inst) => {
-      const taskBpmn = tasks.find(
-        (task) =>
-          inst.BPMN_INSTANCE_ID === task.processInstanceId &&
-          inst.TASK_ID === task.taskDefinitionKey
+      console.log(`Camunda tasks: ${tasks}`, `DB tasks: ${instances}`);
+
+      const instancesWithCamundaTaskInfo = instances.map((inst) => {
+        const taskBpmn = tasks.find(
+          (task) =>
+            inst.BPMN_INSTANCE_ID === task.processInstanceId &&
+            inst.TASK_ID === task.taskDefinitionKey
+        );
+
+        if (taskBpmn) {
+          return {
+            ...taskBpmn,
+            ...inst,
+          };
+        }
+        return inst;
+      });
+
+      console.log(
+        "instancesWithCamundaTaskInfo: ",
+        instancesWithCamundaTaskInfo
       );
 
-      if (taskBpmn) {
-        return {
-          ...taskBpmn,
-          ...inst,
-        };
-      }
-      return inst;
-    });
+      return instancesWithCamundaTaskInfo;
+    } catch (e) {
+      console.error(`Error on getByModel: ${e.message}`);
+
+      throw e;
+    }
   };
 
   model = async ({ MODEL_ID }, user) => {
