@@ -5,6 +5,7 @@ module.exports = {
   addUser: require("./addUser"),
   cancelModel: require("./cancelModel"),
   removeModel: require("./removeModel"),
+  transitModelState: require("./transitModelState"),
   updateArtefactsHistory: require("./updateArtefactsHistory"),
   updateMetaInfo: require("./updateMetaInfo"),
 };
