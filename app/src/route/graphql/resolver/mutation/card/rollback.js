@@ -28,7 +28,7 @@ const MODEL_STAGES_FROM_TRANSITION_PROCESS = [
 const getActiveTask = async (MODEL_ID, context) => {
   try {
     const activeTasks = (
-      await context.db.task.model({ MODEL_ID }, context.user)
+      await context.db.task.getByModel({ MODEL_ID }, context.user.groups)
     ).filter(({ TASK_ID }) => !TASK_IDS_NOT_TO_COUNT.includes(TASK_ID));
 
     if (!activeTasks.length) {
