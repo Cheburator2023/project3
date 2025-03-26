@@ -17,6 +17,8 @@ const MODEL_STAGES_FROM_TRANSITION_PROCESS = [
   "Вывод из эксплуатации",
 ];
 
+const BPMN_INTERMEDIATE_TIMER_ACTIVITY_TYPE_NAME = "intermediateTimer";
+
 /**
  * Retrieves the first active task for a given model, excluding tasks with specific IDs.
  *
@@ -122,7 +124,6 @@ const getModelInfo = async (activity, context) => {
     const modelInfo = await context.db.instance.info({
       processInstanceId: processInstanceRollbackTo,
     });
-
     if (!modelInfo || !modelInfo[0]) {
       throw new Error("Model not found of roll back activity");
     }
@@ -134,23 +135,25 @@ const getModelInfo = async (activity, context) => {
 };
 
 /**
- * Updates the model state by retrieving the current model status and stage
- * from the BPMN context and updating the database accordingly. It changes
- * the model status and manages the model stages by removing previous stages
- * not involved in the transition process and adding the new stage.
+ * Updates the model state and stage in the database based on the task variables.
  *
  * @param {Object} task - The task object containing the model ID.
- * @param {string} [prevModelStages=""] - A semicolon-separated string of previous model stages.
  * @param {Object} context - The context object providing access to BPMN and database operations.
- * @throws {Error} Throws an error if the update process fails.
+ * @throws {Error} Throws an error if updating the model state or stage fails.
  */
-const updateModelState = async (task, prevModelStages = "", context) => {
+const updateModelState = async (task, context) => {
   try {
     const newModelStatus = await context.bpmn.getTaskVar(
       task.id,
       "model_status"
     );
     const newModelStage = await context.bpmn.getTaskVar(task.id, "model_stage");
+
+    console.log(
+      "Update model status and stage:",
+      newModelStatus,
+      newModelStage
+    );
 
     await context.db.card.changeStatus({
       modelId: task.MODEL_ID,
@@ -165,13 +168,43 @@ const updateModelState = async (task, prevModelStages = "", context) => {
   }
 };
 
+/**
+ * Checks if the model's final status is an intermediate timer activity.
+ *
+ * @param {string} modelId - The ID of the model to check.
+ * @param {object} context - The context containing the BPMN activity method.
+ * @returns {Promise<boolean>} - A promise that resolves to true if the model's
+ * final activity is an intermediate timer, otherwise false.
+ * @throws Will throw an error if the operation fails.
+ */
+const checkModelFinalStatus = async (modelId, context) => {
+  try {
+    const BPMN_INTERMEDIATE_TIMER_ACTIVITY_TYPE_NAME = "intermediateTimer";
+
+    const activitiesOnMainProcess = await context.bpmn.activity(modelId, false);
+
+    if (activitiesOnMainProcess.length === 1) {
+      const isActivityFinalTimer =
+        activitiesOnMainProcess[0].activityType ===
+        BPMN_INTERMEDIATE_TIMER_ACTIVITY_TYPE_NAME;
+
+      return isActivityFinalTimer;
+    }
+
+    return false;
+  } catch (e) {
+    console.error("Error on checkModelFinalStatus:", e.message);
+
+    return false;
+  }
+};
+
 module.exports = async (root, { activity }, context) => {
   try {
-    const {
-      MODEL_ID,
-      MODEL_STAGE: prevModelStages,
-      MODELS_IS_ACTIVE_FLG,
-    } = await getModelInfo(activity, context);
+    const { MODEL_ID, MODELS_IS_ACTIVE_FLG } = await getModelInfo(
+      activity,
+      context
+    );
 
     const modelStateValidationResult =
       await context.db.card.validateModelStateConsistency(MODEL_ID);
@@ -195,9 +228,16 @@ module.exports = async (root, { activity }, context) => {
     const activeTaskBeforeRollback = await getActiveTask(MODEL_ID, context);
 
     if (!activeTaskBeforeRollback) {
-      throw new Error(
-        "activeTaskBeforeRollback is not defined. Cannot modify the process until this issue is resolved."
+      const isModelOnFinalStatus = await checkModelFinalStatus(
+        MODEL_ID,
+        context
       );
+
+      if (!isModelOnFinalStatus) {
+        throw new Error(
+          "activeTaskBeforeRollback is not defined. Cannot modify the process until this issue is resolved."
+        );
+      }
     }
 
     // 0. Modify process instance to rollback
@@ -206,12 +246,12 @@ module.exports = async (root, { activity }, context) => {
 
       if (!activeTaskAfterRollback) {
         throw new Error(
-          `After a rollback, updates cannot be executed because the variables "activeTaskBeforeRollback" or "activeTaskAfterRollback" are not defined.`
+          `After a rollback, updates cannot be executed because the variable "activeTaskAfterRollback" is not defined.`
         );
       }
 
       // 1. Update model stage and status
-      await updateModelState(activeTaskAfterRollback, prevModelStages, context);
+      await updateModelState(activeTaskAfterRollback, context);
 
       // 2. Delete rolled back process instances
       await deleteRolledBackProcessInstances({
@@ -229,7 +269,8 @@ module.exports = async (root, { activity }, context) => {
         TASK_ID: activeTaskAfterRollback.taskDefinitionKey,
         OPERATION: "rollback",
         USER_NAME: getUserName(context.user),
-        TASK_ID_ROLLED_BACK_FROM: activeTaskBeforeRollback.taskDefinitionKey,
+        TASK_ID_ROLLED_BACK_FROM:
+          activeTaskBeforeRollback?.taskDefinitionKey || "",
       });
 
       return data;
