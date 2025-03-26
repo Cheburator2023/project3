@@ -78,16 +78,24 @@ class Bpmn {
       (data) => data.bpmn20Xml
     );
 
-  // Get Instance Activity
-  fullActivity = (id) =>
-    this.connector({
-      path: `/history/activity-instance?processInstanceId=${id}`,
-    });
+  /**
+   * Fetches the activity instance history for a given process instance ID.
+   *
+   * @param {string} id - The ID of the process instance.
+   * @param {boolean} [finished] - Optional parameter to filter activities by their finished status.
+   * @returns {Promise} - A promise that resolves with the activity instance history.
+   */
+  activity = (id, finished) => {
+    const queryParams = new URLSearchParams({ processInstanceId: id });
 
-  activity = (id) =>
-    this.connector({
-      path: `/history/activity-instance?processInstanceId=${id}`,
+    if (finished !== undefined) {
+      queryParams.append(finished ? "finished" : "unfinished", "true");
+    }
+
+    return this.connector({
+      path: `/history/activity-instance?${queryParams.toString()}`,
     });
+  };
 
   // Job
   getJobByProcessInstanceId = async (id) =>
@@ -139,10 +147,10 @@ class Bpmn {
       })}&includeAssignedTasks=true`,
     });
 
-  tasksByModel = (modelId) => 
+  tasksByModel = (modelId) =>
     this.connector({
       path: `/task?${querystring.stringify({
-        processVariables: 'model_eq_' + modelId,
+        processVariables: "model_eq_" + modelId,
       })}`,
     });
 
@@ -178,7 +186,7 @@ class Bpmn {
     if (!endTime) return this.modify(data, index + 1);
     // First modification
     if (index === 0) {
-      const activityData = await this.fullActivity(processInstanceId);
+      const activityData = await this.activity(processInstanceId);
       const chouseActivity = activityData.filter(
         (d) => d.activityId === activityId
       )[0];

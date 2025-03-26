@@ -222,7 +222,7 @@ class Task {
         })
         .then((data) => data.rows);
 
-      console.log(`Camunda tasks: ${tasks}`, `DB tasks: ${instances}`);
+      console.log("Camunda tasks:", tasks, "DB tasks:", instances);
 
       const instancesWithCamundaTaskInfo = instances.map((inst) => {
         const taskBpmn = tasks.find(
