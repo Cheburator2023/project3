@@ -1,5 +1,32 @@
 # Semantic Versioning Changelog
 
+# [1.13.0](https://git.sfera.inno.local/SUMD/backend/compare/v1.12.0...v1.13.0) (2025-03-26)
+
+
+### Bug Fixes
+
+* fix big with rollback on final status ([1f10850](https://git.sfera.inno.local/SUMD/backend/commit/1f10850108049ffc524dab1d5650be442d1751fa))
+* fix bugs in rollback feature ([bfbf318](https://git.sfera.inno.local/SUMD/backend/commit/bfbf3188c95406addb9644b0601a6e696ed2d176))
+* fix rollback stages and add logs ([5232513](https://git.sfera.inno.local/SUMD/backend/commit/5232513a9d1736a543ac20b440b19a151a53a761))
+* merge conflict with parallel stages final ([bb695b1](https://git.sfera.inno.local/SUMD/backend/commit/bb695b13c0ddd8ed7f79e82b0fc19423b089332f))
+* rollback ([64a5e2c](https://git.sfera.inno.local/SUMD/backend/commit/64a5e2ccddbc55aeb50807ed42bd8d3a41e4fdfb))
+* rollback ([26e3410](https://git.sfera.inno.local/SUMD/backend/commit/26e34108575ff26106116a6fdf600edec5505203))
+* update rollback logic ([16af3e6](https://git.sfera.inno.local/SUMD/backend/commit/16af3e6ea57d525b9dfe12c7c12a28a1e7c65967))
+* update rollback logic ([7a2f115](https://git.sfera.inno.local/SUMD/backend/commit/7a2f11595b132bfc6c52c74f53183b6d16018969))
+* незакрытая транзакция при удалении этапа модели ([023dfa8](https://git.sfera.inno.local/SUMD/backend/commit/023dfa831330cf3b8329109f547acf3af2eeb89d))
+* обработка смены этапа модели в транзакции ([3516fbe](https://git.sfera.inno.local/SUMD/backend/commit/3516fbe310cccd81e50052eb2b06bb6acb6619e2))
+* получение тасок из камунды в рамках отката без привязки к группам пользователя ([87f979a](https://git.sfera.inno.local/SUMD/backend/commit/87f979a61dcfe09bcae399dde418fddcef0ad8ee))
+
+
+### Features
+
+* add suspend ([0ae0b45](https://git.sfera.inno.local/SUMD/backend/commit/0ae0b4582a202f166aeab93e546f18ca621da835))
+* add suspend feature ([99a03c7](https://git.sfera.inno.local/SUMD/backend/commit/99a03c78096653f3d8038e4f1ef0ce7f255203f0))
+* add suspend feature ([bc54049](https://git.sfera.inno.local/SUMD/backend/commit/bc54049e27b6e80ef5d0e33f93a77ba375105fe2))
+* add suspend feature ([d22bbbb](https://git.sfera.inno.local/SUMD/backend/commit/d22bbbb90ec51be5399a2c733db9db8164ea138c))
+* add suspend feature ([2e2389c](https://git.sfera.inno.local/SUMD/backend/commit/2e2389cdbb3f1ae7b684f80473646738371e0168))
+* установка этапа из user task ([7dad742](https://git.sfera.inno.local/SUMD/backend/commit/7dad7428437efd1af49c3f007f29653ca8c444ff))
+
 # [1.12.0](https://git.sfera.inno.local/SUMD/backend/compare/v1.11.0...v1.12.0) (2025-03-14)
 
 
