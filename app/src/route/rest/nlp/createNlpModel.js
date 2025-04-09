@@ -45,8 +45,13 @@ module.exports = async (req, res, next) => {
         }
 
         // Сопоставляем ds_department со справочником значений, записываем artefact_value_id
-        const dsDepartmentArtefactValue = await db.artefact.getArtefactValueIdByValue({artefactId: 6, value: ds_department});
-        if (dsDepartmentArtefactValue === null) {
+        const dsDepartmentPossibleValues = await db.artefact.possibleValues({ ARTEFACT_ID: 6 });
+        const dsDepartmentPattern = ds_department.replaceAll(/["'«»]/g, '.');
+        const dsDepartmentArtefactValue = dsDepartmentPossibleValues.find((item) => {
+            return item.ARTEFACT_VALUE.match(RegExp(`^${dsDepartmentPattern}$`, 'i')) !== null;
+        });
+
+        if (!dsDepartmentArtefactValue) {
             res.status(400).json({
                 error: 'Bad request',
                 details: 'given ds_department does not exist',
