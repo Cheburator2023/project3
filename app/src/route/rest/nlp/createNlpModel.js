@@ -46,7 +46,7 @@ module.exports = async (req, res, next) => {
 
         // Сопоставляем ds_department со справочником значений, записываем artefact_value_id
         const dsDepartmentPossibleValues = await db.artefact.possibleValues({ ARTEFACT_ID: 6 });
-        const dsDepartmentPattern = ds_department.replaceAll(/["'«»]/g, '.');
+        const dsDepartmentPattern = ds_department.replace(/["'«»]/g, '.');
         const dsDepartmentArtefactValue = dsDepartmentPossibleValues.find((item) => {
             return item.ARTEFACT_VALUE.match(RegExp(`^${dsDepartmentPattern}$`, 'i')) !== null;
         });

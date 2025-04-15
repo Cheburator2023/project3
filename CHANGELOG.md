@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.13.1](https://git.sfera.inno.local/SUMD/backend/compare/v1.13.0...v1.13.1) (2025-04-10)
+
+
+### Bug Fixes
+
+* доработка сопоставления параметра ds_department ([6e36a16](https://git.sfera.inno.local/SUMD/backend/commit/6e36a16e6cc93dbae984c2566e86b7465100fe15))
+
 # [1.13.0](https://git.sfera.inno.local/SUMD/backend/compare/v1.12.0...v1.13.0) (2025-03-26)
 
 
