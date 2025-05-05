@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.13.2](https://git.sfera.inno.local/SUMD/backend/compare/v1.13.1...v1.13.2) (2025-04-15)
+
+
+### Bug Fixes
+
+* замена неподдерживаемой функции ([05be67c](https://git.sfera.inno.local/SUMD/backend/commit/05be67cc500a1767760eb2e66e619ee40b6614dd))
+
 ## [1.13.1](https://git.sfera.inno.local/SUMD/backend/compare/v1.13.0...v1.13.1) (2025-04-10)
 
 
