@@ -1,3 +1,5 @@
+const enableSSL = process.env.SSL_ENABLED === "true";
+
 module.exports = {
   poolConfig: {
     user: process.env.PGUSER,
@@ -8,9 +10,11 @@ module.exports = {
     idleTimeoutMillis: parseInt(process.env.POOL_QUEUE_TIMEOUT) || 10000,
     max: parseInt(process.env.POOL_MAX) || 50,
     allowExitOnIdle: false,
-    ssl: {
-      rejectUnauthorized: false,
-    },
+    ssl: enableSSL
+      ? {
+          rejectUnauthorized: false,
+        }
+      : false,
   },
   retryConfig: {
     retries: parseInt(process.env.ATTEMPT) || 3,
