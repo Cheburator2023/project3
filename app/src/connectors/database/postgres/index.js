@@ -73,12 +73,16 @@ class PostgresDatabase {
       const client = await this.pool.connect();
 
       try {
-        // Query to check PostgreSQL version
-        const result = await client.query("SELECT version() AS version;");
+        // Get SSL connection info
+        const sslCheck = await client.query(
+          "SELECT ssl FROM pg_stat_ssl WHERE pid = pg_backend_pid();"
+        );
 
-        // Log success and version info
-        console.sys("Successfully connected to PostgreSQL over SSL.");
-        console.log("PostgreSQL version:", result.rows[0].version); // Access by alias "version"
+        // Determine if SSL is used
+        const sslValue = sslCheck.rows[0]?.["ssl"] || sslCheck.rows[0]?.["SSL"];
+        const isSSLUsed = sslValue === "t" || sslValue === true;
+
+        console.log(`SSL connection in use: ${isSSLUsed ? "✅ Yes" : "❌ No"}`);
       } finally {
         client.release(); // Always release the client back to the pool
       }
