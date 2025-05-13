@@ -1,5 +1,17 @@
 # Semantic Versioning Changelog
 
+# [1.14.0](https://git.sfera.inno.local/SUMD/backend/compare/v1.13.2...v1.14.0) (2025-05-13)
+
+
+### Bug Fixes
+
+* add env variable for SSL connection ([b30406f](https://git.sfera.inno.local/SUMD/backend/commit/b30406fd6b61d4d8db4512c8068ecb01508a477c))
+
+
+### Features
+
+* add required SSL connection to DB ([e6dd5da](https://git.sfera.inno.local/SUMD/backend/commit/e6dd5da736531399f6cf744efaf03c184e1fd911))
+
 ## [1.13.2](https://git.sfera.inno.local/SUMD/backend/compare/v1.13.1...v1.13.2) (2025-04-15)
 
 
