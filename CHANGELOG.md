@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.14.1](https://git.sfera.inno.local/SUMD/backend/compare/v1.14.0...v1.14.1) (2025-05-13)
+
+
+### Bug Fixes
+
+* update logs for SSL connection ([e14ed08](https://git.sfera.inno.local/SUMD/backend/commit/e14ed08405fd3f844a8f3fa5456b747a1d42337e))
+
 # [1.14.0](https://git.sfera.inno.local/SUMD/backend/compare/v1.13.2...v1.14.0) (2025-05-13)
 
 
