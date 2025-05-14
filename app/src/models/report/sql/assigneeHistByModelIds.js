@@ -32,12 +32,18 @@ LEFT JOIN (
   WHERE rn = 1
 ) STATUS ON STATUS.MODEL_ID = M.MODEL_ID
 WHERE AH.MODEL_ID = ANY(:modelIds::text[])
-  AND TO_TIMESTAMP(CAST(M_UPD_DATE.UPDATE_DATE AS TEXT), 'YYYY-MM-DD HH24:MI:SS') 
-      <= TO_DATE(:dateOfDelay, 'YYYY-MM-DD HH24:MI:SS')
+  AND (
+  :dateOfDelay::text IS NULL OR 
+  TO_TIMESTAMP(CAST(M_UPD_DATE.UPDATE_DATE AS TEXT), 'YYYY-MM-DD HH24:MI:SS') 
+      <= TO_DATE(:dateOfDelay::text, 'YYYY-MM-DD HH24:MI:SS')
+  )
   AND BPMN_KEY_DESC IN (
     'main', 'initialization', 'data', 'data_search', 'data_pilot', 'data_build', 'model',
     'model_validation', 'integration', 'integration_datamart', 'integration_env_conf',
-    'integration_test', 'integration_user', 'integration_prod', 'cancel'
+    'integration_test', 'integration_user', 'integration_prod', 'monitoring', 
+    'monitoring_auto_correct', 'validation', 'removal', 'cancel', 'rollback_version', 
+    'rollback', 'jira', 'cancel', 'fast_model_process', 'model_pilot', 'fullvalidation_datamart', 
+    'inegration_model', 'test_preprod_transfer_prod', 'fullvalidation', 'model_state_transition'
   )
 ORDER BY M_UPD_DATE.UPDATE_DATE DESC
 `;

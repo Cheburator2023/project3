@@ -28,11 +28,15 @@ class ActiveTasksService {
     const userTasks = await this.getUserTasks();
     const taskMap = new Map(userTasks.map(task => [task.processInstanceId + task.role, task]))
 
+    debugger
+
     const users = await this.getUsersInGroups();
     const instanceMap = await this.getBpmnInstancesMap(userTasks);
     const assigneeHist = await this.getAssigneeHistory(instanceMap, days_of_delay);
 
     const result = this.aggregateTasks(assigneeHist, instanceMap, taskMap, users);
+
+    debugger
     
     return {
       pagesHeaders: usersActiveTasks,
@@ -47,6 +51,7 @@ class ActiveTasksService {
   async getUserTasks() {
     const userTasksPromises = user_roles.map((role) => this.bpmn.tasks([role]));
     const userTasksResults = await Promise.all(userTasksPromises);
+    debugger
     const formattedTasks = formatUserTasks(userTasksResults);
     return formattedTasks;
   }
@@ -76,9 +81,12 @@ class ActiveTasksService {
       sql: sql.assigneeHistByModelIds,
       args: {
         modelIds: Array.from(instanceMap.keys()),
-        dateOfDelay: moment().subtract(days_of_delay, 'days').format('YYYY-MM-DD HH:MM:ss'),
+        dateOfDelay: days_of_delay > 0 
+        ? moment().subtract(days_of_delay, 'days').format('YYYY-MM-DD HH:mm:ss') 
+        : null,
       },
     });
+
     return assigneeHist?.rows;
   }
 
