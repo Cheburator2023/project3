@@ -28,15 +28,12 @@ class ActiveTasksService {
     const userTasks = await this.getUserTasks();
     const taskMap = new Map(userTasks.map(task => [task.processInstanceId + task.role, task]))
 
-    debugger
-
-    const users = await this.getUsersInGroups();
+    // const users = await this.getUsersInGroups();
     const instanceMap = await this.getBpmnInstancesMap(userTasks);
     const assigneeHist = await this.getAssigneeHistory(instanceMap, days_of_delay);
+    const modelStreamsMap = await this.getModelStreamsFromArtefacts();
 
-    const result = this.aggregateTasks(assigneeHist, instanceMap, taskMap, users);
-
-    debugger
+    const result = this.aggregateTasks(assigneeHist, instanceMap, taskMap, modelStreamsMap);
     
     return {
       pagesHeaders: usersActiveTasks,
@@ -51,7 +48,7 @@ class ActiveTasksService {
   async getUserTasks() {
     const userTasksPromises = user_roles.map((role) => this.bpmn.tasks([role]));
     const userTasksResults = await Promise.all(userTasksPromises);
-    debugger
+
     const formattedTasks = formatUserTasks(userTasksResults);
     return formattedTasks;
   }
@@ -91,37 +88,56 @@ class ActiveTasksService {
   }
 
   /**
-   * Получает пользователей, сгруппированных по отделам.
-   * @returns {Object} Карта пользователей по отделам.
+   * Получает соответствие моделей и стримов на основе значений артефакта.
+   * 
+   * Использует таблицу artefact_realizations, где стримы привязаны к model_id
+   * через artefact_id = 7
+   * Возвращает Map, где ключ — model_id, а значение — название стрима.
+   *
+   * @returns {Map<string, string>} Карта соответствий model_id → stream_name.
    */
-  async getUsersInGroups() {
-    const allGroups = await this.integration.keycloak.getSubGroupsByGroupsName([
-      'departament', 'departament_business_customer'
-    ]);
+  async getModelStreamsFromArtefacts() {
+    const result = await this.db.execute({
+      sql: sql.modelStreams,
+      args: {},
+    });
 
-    const userGroupsMap = {};
-    await Promise.all(allGroups.map(async (group) => {
-      const users = await this.integration.keycloak.getUsersInGroup(group.id);
-      users.forEach(user => {
-        if (!userGroupsMap[user.username]) {
-          userGroupsMap[user.username] = [];
-        }
-        userGroupsMap[user.username].push(group.name);
-      });
-    }));
-
-    return userGroupsMap;
+    return new Map(result.rows.map(({ MODEL_ID, ARTEFACT_STRING_VALUE }) => [MODEL_ID, ARTEFACT_STRING_VALUE]));
   }
+
+
+  // /**
+  //  * Получает пользователей, сгруппированных по отделам.
+  //  * @returns {Object} Карта пользователей по отделам.
+  //  */
+  // async getUsersInGroups() {
+  //   const allGroups = await this.integration.keycloak.getSubGroupsByGroupsName([
+  //     'departament', 'departament_business_customer'
+  //   ]);
+
+  //   const userGroupsMap = {};
+  //   await Promise.all(allGroups.map(async (group) => {
+  //     const users = await this.integration.keycloak.getUsersInGroup(group.id);
+  //     users.forEach(user => {
+  //       if (!userGroupsMap[user.username]) {
+  //         userGroupsMap[user.username] = [];
+  //       }
+  //       userGroupsMap[user.username].push(group.name);
+  //     });
+  //   }));
+
+  //   return userGroupsMap;
+  // }
 
   /**
    * Агрегирует задачи пользователей на основе истории назначений.
    * @param {Array} assigneeHist - История назначений.
    * @param {Map} instanceMap - Карта инстансов.
    * @param {Map} taskMap - Карта задач.
-   * @param {Object} users - Карта пользователей по отделам.
+   * @param {Object} users - Карта model_id → stream_name.
    * @returns {Array} Агрегированные задачи.
    */
-  aggregateTasks(assigneeHist, instanceMap, taskMap, users) {
+  aggregateTasks(assigneeHist, instanceMap, taskMap, modelStreamsMap) {
     const ROLE_TO_LEAD_ROLE = this.mapRolesToLeads();
 
     const aggregated = assigneeHist.reduce((acc, item) => {
@@ -142,7 +158,7 @@ class ActiveTasksService {
       acc[key].ASSIGNEES.add(task.assignee || '');
 
       this.setRole(acc[key], task, item, ROLE_TO_LEAD_ROLE);
-      this.addStreamsFromUsernames(acc[key], item.ASSIGNEE_NAME, users);
+      this.addStreamsFromArtefacts(acc[key], item.MODEL_ID, modelStreamsMap);
 
       return acc;
     }, {});
@@ -211,21 +227,38 @@ class ActiveTasksService {
     }
   }
 
-
-  addStreamsFromUsernames(taskItem, assigneeNames, users) {
-    assigneeNames.split(', ').forEach(username => {
-      if (users[username]) {
-        users[username].forEach(department => {
-          const streams = DEPARTMENT_TO_STREAM_MAPPING[department];
-          if (Array.isArray(streams)) {
-            streams.forEach(s => taskItem.STREAMS.add(s));
-          } else if (streams) {
-            taskItem.STREAMS.add(streams);
-          }
-        });
-      }
-    });
+  /**
+   * Добавляет стрим модели в задачу на основе заранее полученной карты стримов.
+   * 
+   * Использует Map, полученный из artefact_realizations, где для каждой модели
+   * заранее определён её стрим. Если стрим найден, добавляет его в Set STREAMS.
+   *
+   * @param {Object} taskItem - Объект агрегированной задачи.
+   * @param {string} modelId - Идентификатор модели.
+   * @param {Map<string, string>} streamsMap - Карта model_id → stream_name.
+   */
+  addStreamsFromArtefacts(taskItem, modelId, streamsMap) {
+    const stream = streamsMap.get(modelId);
+    if (stream) {
+      taskItem.STREAMS.add(stream);
+    }
   }
+
+
+  // addStreamsFromUsernames(taskItem, assigneeNames, users) {
+  //   assigneeNames.split(', ').forEach(username => {
+  //     if (users[username]) {
+  //       users[username].forEach(department => {
+  //         const streams = DEPARTMENT_TO_STREAM_MAPPING[department];
+  //         if (Array.isArray(streams)) {
+  //           streams.forEach(s => taskItem.STREAMS.add(s));
+  //         } else if (streams) {
+  //           taskItem.STREAMS.add(streams);
+  //         }
+  //       });
+  //     }
+  //   });
+  // }
 
   formatTaskResult(item) {
     return {
