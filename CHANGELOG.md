@@ -1,5 +1,18 @@
 # Semantic Versioning Changelog
 
+# [1.15.0](https://git.sfera.inno.local/SUMD/backend/compare/v1.14.1...v1.15.0) (2025-05-19)
+
+
+### Bug Fixes
+
+* фикс 0 дней задержки и добавление bpmn key desc в sql ([8adcb25](https://git.sfera.inno.local/SUMD/backend/commit/8adcb25b501a27cfd98945f19319d25ab3c1f188))
+
+
+### Features
+
+* получение активных задач пользователей ([695a450](https://git.sfera.inno.local/SUMD/backend/commit/695a450e9b119953e692f77abae8d5bd6d2af221))
+* получение стримов из artefact realizations ([1e71ed6](https://git.sfera.inno.local/SUMD/backend/commit/1e71ed68b70a1d34741fe1a5373557ff55db9da6))
+
 ## [1.14.1](https://git.sfera.inno.local/SUMD/backend/compare/v1.14.0...v1.14.1) (2025-05-13)
 
 
