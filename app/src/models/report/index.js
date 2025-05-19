@@ -7,10 +7,7 @@ const {
   formatModelsResult,
 } = require("./helpers/formatModelsResult");
 
-const { formatUserTasks } = require("./helpers/formatCamundaUserTasks");
-const { DEPARTMENT_TO_STREAM_MAPPING } = require("../../common/mapping");
-
-const { user_roles } = require("./constants");
+const ActiveTasksService = require("./services/activeServiceTasks");
 
 const {
   models,
@@ -20,7 +17,6 @@ const {
   validation,
   rate_system,
   risk_scale,
-  usersActiveTasks,
 } = require("./headers");
 
 class Report {
@@ -28,6 +24,7 @@ class Report {
     this.db = db;
     this.bpmn = bpmn;
     this.integration = integration;
+    this.activeTasksService = new ActiveTasksService(db, bpmn, integration);
   }
 
   models = async ({
@@ -375,97 +372,7 @@ class Report {
   };
 
   usersActiveTasks = async ({ days_of_delay }) => {
-    const userTasksPromises = user_roles.map((userRole) => this.bpmn.tasks([userRole]))
-    const userTasks = formatUserTasks(await Promise.all(userTasksPromises))
-    const taskMap = new Map(userTasks.map(task => [task.processInstanceId + task.role, task]))
-
-    const bpmnInstances = (
-      await this.db.execute({
-        sql: sql.instancesByIds,
-        args: {
-          bpmnIds: userTasks.map(({ processInstanceId }) => processInstanceId)
-        }
-      })
-    )?.rows
-
-    const instanceMap = new Map(bpmnInstances.map(instance => [instance.MODEL_ID, instance]))
-
-    const assigneeHist = (
-      await this.db.execute({
-        sql: sql.assigneeHistByModelIds,
-        args: {
-          modelIds: Array.from(instanceMap.keys()),
-          dateOfDelay: moment().subtract(days_of_delay * 1, 'days').format('YYYY-MM-DD HH:MM:ss')
-        }
-      })
-    )?.rows
-
-    const allGroups = await this.integration.keycloak.getSubGroupsByGroupsName(['departament', 'departament_business_customer'])
-    const getUsersInGroups = (groups) => {
-      const userGroupsMap = {}
-      const getUsersInGroup = async (groupId, groupName) => {
-        const users = await this.integration.keycloak.getUsersInGroup(groupId)
-        users.forEach(user => {
-          const username = user.username
-          if (!userGroupsMap[username]) {
-            userGroupsMap[username] = []
-          }
-          userGroupsMap[username].push(groupName)
-        })
-      }
-      const groupPromises = groups.map(group => {
-        const groupId = group.id
-        const groupName = group.name
-        return getUsersInGroup(groupId, groupName)
-      })
-      return Promise.all(groupPromises)
-        .then(() => userGroupsMap)
-    }
-    const users = await getUsersInGroups(allGroups)
-
-    const assigneeHistWithTasks = assigneeHist.reduce((acc, assigneeHistItem) => {
-      const instance = instanceMap.get(assigneeHistItem.MODEL_ID)
-      if (!instance) return acc
-
-      const taskKey = instance.BPMN_INSTANCE_ID + assigneeHistItem.FUNCTIONAL_ROLE
-      const task = taskMap.get(taskKey)
-      if (!task || task.role !== assigneeHistItem.FUNCTIONAL_ROLE) return acc
-
-      const streams = new Set()
-      assigneeHistItem.ASSIGNEE_NAME
-        .split(', ')
-        .map((username) => {
-          if (username in users) {
-            users[username].map(department => {
-              const streamsAfterMapping = DEPARTMENT_TO_STREAM_MAPPING[department]
-              if (Array.isArray(streamsAfterMapping)) {
-                streamsAfterMapping.forEach((stream) => streams.add(stream))
-              } else if (streamsAfterMapping) {
-                streams.add(streamsAfterMapping)
-              }
-            })
-          }
-        })
-
-      acc.push({
-        MODEL_ID: assigneeHistItem.MODEL_ID,
-        MODEL_NAME: assigneeHistItem.MODEL_NAME,
-        MODEL_ALIAS: `model${ assigneeHistItem.ROOT_MODEL_ID }-v${ assigneeHistItem.MODEL_VERSION }`,
-        UPDATE_DATE: assigneeHistItem.UPDATE_DATE,
-        STATUS: assigneeHistItem.STATUS,
-        TASK_NAME: task.name,
-        ROLE: task.role,
-        USER_NAME: assigneeHistItem.ASSIGNEE_NAME,
-        STREAMS: Array.from(streams).join(', ')
-      })
-
-      return acc
-    }, [])
-
-    return {
-      pagesHeaders: usersActiveTasks,
-      pagesData: [assigneeHistWithTasks]
-    }
+    return await this.activeTasksService.getUsersActiveTasks(days_of_delay);
   };
 }
 

@@ -501,7 +501,7 @@ const usersActiveTasks = [
       { key: "UPDATE_DATE", title: "Дата последнего обновления" },
       { key: "TASK_NAME", title: "Название задачи" },
       { key: "ROLE", title: "Роль" },
-      { key: "USER_NAME", title: "Исполнитель"},
+      { key: "ASSIGNEE", title: "Исполнитель" },
       { key: "STREAMS", title: "Стрим"}
     ],
   },
