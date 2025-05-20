@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.15.1](https://git.sfera.inno.local/SUMD/backend/compare/v1.15.0...v1.15.1) (2025-05-20)
+
+
+### Bug Fixes
+
+* исправлена логика формирования на основе bmpn_inctance_id ([2657439](https://git.sfera.inno.local/SUMD/backend/commit/2657439a1b38412ebcdc6c141e1ee7df3ee62373))
+
 # [1.15.0](https://git.sfera.inno.local/SUMD/backend/compare/v1.14.1...v1.15.0) (2025-05-19)
 
 
