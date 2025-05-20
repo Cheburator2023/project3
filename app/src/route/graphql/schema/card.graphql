@@ -68,6 +68,7 @@ type Card {
   ASSIGNMENTS: [RootAssignment]
   AUTOML_MODEL_CUSTOMER: String
   AUTOML_FLG: String
+  CALIBRATION_MODEL: Boolean
 }
 
 type Instance {

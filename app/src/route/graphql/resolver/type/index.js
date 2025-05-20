@@ -1,66 +1,12 @@
 const moment = require("moment");
 const activity = require("./bpmnActivity");
-const {status, model_status} = require("./status");
+const { status, model_status } = require("./status");
 
-const getLastActiveStatus = (activeStatuses) => {
-  const activeStatusesList = activeStatuses?.split(";");
-
-  if (activeStatusesList?.includes(model_status.removed_from_operation)) {
-    return model_status.removed_from_operation;
-  }
-
-  if (activeStatusesList?.includes(model_status.developed_not_implemented)) {
-    return model_status.developed_not_implemented;
-  }
-
-  return activeStatusesList?.[0];
-};
-
-const determineLifecycleStageToImplemented = (businessStatus, modelStatus) => {
-  switch (businessStatus) {
-    case status.fast_model_process:
-      if (
-        modelStatus === model_status.implemented_in_pim ||
-        modelStatus === model_status.validated_outside_pim || 
-        modelStatus === model_status.implemented_outside_pim
-      ) {
-        return status.validation;
-      }
-      break;
-
-    case status.model:
-      if (
-        modelStatus === model_status.validated_outside_pim || 
-        modelStatus === model_status.implemented_outside_pim
-      ) {
-        return status.validation;
-      }
-      break;
-
-    case status.inegration_model:
-      if (
-        modelStatus === model_status.validated_outside_pim || 
-        modelStatus === model_status.implemented_outside_pim
-      ) {
-        return status.validation;
-      }
-      break;
-
-    case status.test_preprod_transfer_prod:
-      if (
-        modelStatus === model_status.implemented_in_pim || 
-        modelStatus === model_status.validated_in_pim
-      ) {
-        return status.validation;
-      }
-      break;
-
-    default:
-      return businessStatus;
-  }
-
-  return businessStatus;
-};
+const {
+  getLastActiveStatus,
+  hasSpecificArtefactValue,
+  determineLifecycleStageToImplemented,
+} = require("./helpers");
 
 // Особенности маппинга статусов:
 // Ести статус модели Разработана не внедрена, Этап ЖЦМ тоже должен быть Разработана не внедрена
@@ -68,16 +14,25 @@ const determineLifecycleStageToImplemented = (businessStatus, modelStatus) => {
 module.exports = {
   Card: {
     MODEL_ALIAS: (root) => `model${root.ROOT_MODEL_ID}-v${root.MODEL_VERSION}`,
-    STATUS: ({ STATUS, MODEL_STATUS}) => MODEL_STATUS ? MODEL_STATUS : getLastActiveStatus(STATUS),
-    BUSINESS_STATUS: ({ STATUS, BPMN_INSTANCE_NAME, MODEL_STATUS, MODEL_STAGE }) => {
+    STATUS: ({ STATUS, MODEL_STATUS }) =>
+      MODEL_STATUS ? MODEL_STATUS : getLastActiveStatus(STATUS),
+    BUSINESS_STATUS: ({
+      STATUS,
+      BPMN_INSTANCE_NAME,
+      MODEL_STATUS,
+      MODEL_STAGE,
+    }) => {
       if (MODEL_STATUS || MODEL_STAGE) {
         return MODEL_STAGE;
       }
 
       const lastActiveStatus = getLastActiveStatus(STATUS);
-      let currentBusinessStatus = status?.[BPMN_INSTANCE_NAME.trim()]
+      let currentBusinessStatus = status?.[BPMN_INSTANCE_NAME.trim()];
 
-      currentBusinessStatus = determineLifecycleStageToImplemented(currentBusinessStatus, lastActiveStatus)
+      currentBusinessStatus = determineLifecycleStageToImplemented(
+        currentBusinessStatus,
+        lastActiveStatus
+      );
 
       switch (lastActiveStatus) {
         case model_status.developed_not_implemented:
@@ -100,7 +55,22 @@ module.exports = {
     RISK_SCALE: (root, args, context) => context.db.card.risk(root.MODEL_ID),
     AUTOML_FLG: (root) => (root.AUTOML_FLG == "true" ? "Да" : "Нет"),
     ASSIGNMENTS: (root, args, context) =>
-      context.db.card.assignments(root.MODEL_ID)
+      context.db.card.assignments(root.MODEL_ID),
+    CALIBRATION_MODEL: async ({ MODEL_ID, TYPE }, args, { loaders, user }) => {
+      const modelArtefacts = await loaders.card.artefacts.load(
+        { MODEL_ID, TYPE },
+        user
+      );
+
+      const DEVELOPING_MODEL_REASON_ARTEFACT_ID = 69;
+      const CALIBRATION_MODEL_ARTEFACT_VALUE_ID = 143;
+
+      return hasSpecificArtefactValue(
+        modelArtefacts,
+        DEVELOPING_MODEL_REASON_ARTEFACT_ID,
+        CALIBRATION_MODEL_ARTEFACT_VALUE_ID
+      );
+    },
   },
   Task: {
     USER_GROUPS: (root, args, context) =>
@@ -240,5 +210,5 @@ module.exports = {
   DateItem: {
     dateFormatted: (root) => moment(root).format("DD.MM.YYYY HH:mm"),
     timestampt: (root) => root,
-  }
+  },
 };
