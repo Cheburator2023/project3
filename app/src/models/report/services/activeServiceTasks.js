@@ -64,7 +64,7 @@ class ActiveTasksService {
       sql: sql.instancesByIds,
       args: { bpmnIds: processInstanceIds },
     });
-    return new Map(bpmnInstances?.rows.map(instance => [instance.MODEL_ID, instance]));
+    return new Map(bpmnInstances?.rows.map(instance => [instance.BPMN_INSTANCE_ID, instance]));
   }
 
   /**
@@ -74,13 +74,18 @@ class ActiveTasksService {
    * @returns {Array} Массив истории назначений.
    */
   async getAssigneeHistory(instanceMap, days_of_delay) {
+    // Получаем уникальные MODEL_ID из instanceMap
+    const modelIds = Array.from(
+      new Set(Array.from(instanceMap.values()).map(i => i.MODEL_ID))
+    );
+
     const assigneeHist = await this.db.execute({
       sql: sql.assigneeHistByModelIds,
       args: {
-        modelIds: Array.from(instanceMap.keys()),
+        modelIds,
         dateOfDelay: days_of_delay > 0 
-        ? moment().subtract(days_of_delay, 'days').format('YYYY-MM-DD HH:mm:ss') 
-        : null,
+          ? moment().subtract(days_of_delay, 'days').format('YYYY-MM-DD HH:mm:ss') 
+          : null,
       },
     });
 
@@ -141,14 +146,14 @@ class ActiveTasksService {
     const ROLE_TO_LEAD_ROLE = this.mapRolesToLeads();
 
     const aggregated = assigneeHist.reduce((acc, item) => {
-      const instance = instanceMap.get(item.MODEL_ID);
+      const instance = instanceMap.get(item.BPMN_INSTANCE_ID);
       if (!instance) return acc;
 
       const taskKey = instance.BPMN_INSTANCE_ID + item.FUNCTIONAL_ROLE;
       const task = taskMap.get(taskKey);
       if (!task) return acc;
 
-      const key = item.MODEL_ID;
+      const key = instance.BPMN_INSTANCE_ID;
       if (!acc[key]) {
         acc[key] = this.initializeTaskItem(item);
       }
