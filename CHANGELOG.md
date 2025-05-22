@@ -1,5 +1,17 @@
 # Semantic Versioning Changelog
 
+# [1.16.0](https://git.sfera.inno.local/SUMD/backend/compare/v1.15.1...v1.16.0) (2025-05-22)
+
+
+### Bug Fixes
+
+* update parent model link ([61d6e40](https://git.sfera.inno.local/SUMD/backend/commit/61d6e40e1d1cad7dd51a21a6c26a366b5217c342))
+
+
+### Features
+
+* add calibration flag to card schema ([9b182b7](https://git.sfera.inno.local/SUMD/backend/commit/9b182b7107dbfad0c93fd2b1dc9538c3d061c7c1))
+
 ## [1.15.1](https://git.sfera.inno.local/SUMD/backend/compare/v1.15.0...v1.15.1) (2025-05-20)
 
 
