@@ -9,5 +9,6 @@ module.exports = {
   model_risk: require("./model_risk"),
   instancesByIds: require("./instancesByIds"),
   assigneeHistByModelIds: require("./assigneeHistByModelIds"),
-  modelStreams: require('./modelStreams')
+  modelStreams: require('./modelStreams'),
+  modelsMetadataByIds: require('./modelsMetadataByIds')
 };
