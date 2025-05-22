@@ -35,7 +35,7 @@ module.exports = async (root, args, context) => {
     args.ARTEFACTS.push({
       ARTEFACT_ID: 46,
       ARTEFACT_VALUE_ID: null,
-      ARTEFACT_STRING_VALUE: `${process.env.INTERFACE_URL}mode/${parentModelInfo.ROOT_MODEL_ID}/${parentModelInfo.MODEL_VERSION}/main`,
+      ARTEFACT_STRING_VALUE: `${process.env.INTERFACE_URL}sum/model/${parentModelInfo.ROOT_MODEL_ID}/${parentModelInfo.MODEL_VERSION}/main`,
     });
     /* Copy artefacts from parent to new model */
     const PARENT_MODEL_ALIAS = `model${parentModelInfo.ROOT_MODEL_ID}-v${parentModelInfo.MODEL_VERSION}`;
@@ -51,16 +51,29 @@ module.exports = async (root, args, context) => {
   ).ARTEFACT_STRING_VALUE;
   const dept = getDepartmentFromStream(stream);
 
-  context.integration.repo.create(dbNewModel.GENERAL_MODEL_ID, dbNewModel.MODEL_NAME, dbNewModel.MODEL_ID, dbNewModel.MODEL_DESC, stream)
+  context.integration.repo
+    .create(
+      dbNewModel.GENERAL_MODEL_ID,
+      dbNewModel.MODEL_NAME,
+      dbNewModel.MODEL_ID,
+      dbNewModel.MODEL_DESC,
+      stream
+    )
     .then((data) => {
-      if (typeof data?.model_repo_is_created === 'boolean') {
+      if (typeof data?.model_repo_is_created === "boolean") {
         context.db.card.editRepoStatus(MODEL_ID, data.model_repo_is_created);
       } else {
-        console.error(`Failed to get repo status while creating model ${MODEL_ID}`, data);
+        console.error(
+          `Failed to get repo status while creating model ${MODEL_ID}`,
+          data
+        );
       }
     })
     .catch((e) => {
-      console.error(`Failed to create repo while creating new model ${MODEL_ID}`, e);
+      console.error(
+        `Failed to create repo while creating new model ${MODEL_ID}`,
+        e
+      );
     });
 
   await context.db.user.addLead(
