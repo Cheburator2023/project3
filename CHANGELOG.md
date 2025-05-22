@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.16.1](https://git.sfera.inno.local/SUMD/backend/compare/v1.16.0...v1.16.1) (2025-05-22)
+
+
+### Bug Fixes
+
+* полная переработка логики расчета активных задач пользователей ([680e784](https://git.sfera.inno.local/SUMD/backend/commit/680e784bbae903514fb12e64d08cdeb28a908040))
+
 # [1.16.0](https://git.sfera.inno.local/SUMD/backend/compare/v1.15.1...v1.16.0) (2025-05-22)
 
 
