@@ -24,7 +24,7 @@ module.exports = async (root, args, context) => {
   await context.db.card.new(args);
   // Create git
   const dbNewModel = await context.db.card.info(args);
-  const MODEL_ALIAS = `SUMCORmodel${dbNewModel.ROOT_MODEL_ID}-v${dbNewModel.MODEL_VERSION}`;
+  const MODEL_ALIAS = `model${dbNewModel.ROOT_MODEL_ID}-v${dbNewModel.MODEL_VERSION}`;
 
   if (args.PARENT_MODEL_ID) {
     const parentModelInfo = await context.db.card.info({
@@ -35,7 +35,7 @@ module.exports = async (root, args, context) => {
     args.ARTEFACTS.push({
       ARTEFACT_ID: 46,
       ARTEFACT_VALUE_ID: null,
-      ARTEFACT_STRING_VALUE: `${process.env.INTERFACE_URL}mode/${parentModelInfo.ROOT_MODEL_ID}/${parentModelInfo.MODEL_VERSION}/main`,
+      ARTEFACT_STRING_VALUE: `${process.env.INTERFACE_URL}sum/model/${parentModelInfo.ROOT_MODEL_ID}/${parentModelInfo.MODEL_VERSION}/main`,
     });
     /* Copy artefacts from parent to new model */
     const PARENT_MODEL_ALIAS = `model${parentModelInfo.ROOT_MODEL_ID}-v${parentModelInfo.MODEL_VERSION}`;
