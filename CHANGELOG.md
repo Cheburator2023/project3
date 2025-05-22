@@ -1,5 +1,56 @@
 # Semantic Versioning Changelog
 
+# [1.16.0](https://git.sfera.inno.local/SUMD/backend/compare/v1.15.1...v1.16.0) (2025-05-22)
+
+
+### Bug Fixes
+
+* update parent model link ([61d6e40](https://git.sfera.inno.local/SUMD/backend/commit/61d6e40e1d1cad7dd51a21a6c26a366b5217c342))
+
+
+### Features
+
+* add calibration flag to card schema ([9b182b7](https://git.sfera.inno.local/SUMD/backend/commit/9b182b7107dbfad0c93fd2b1dc9538c3d061c7c1))
+
+## [1.15.1](https://git.sfera.inno.local/SUMD/backend/compare/v1.15.0...v1.15.1) (2025-05-20)
+
+
+### Bug Fixes
+
+* исправлена логика формирования на основе bmpn_inctance_id ([2657439](https://git.sfera.inno.local/SUMD/backend/commit/2657439a1b38412ebcdc6c141e1ee7df3ee62373))
+
+# [1.15.0](https://git.sfera.inno.local/SUMD/backend/compare/v1.14.1...v1.15.0) (2025-05-19)
+
+
+### Bug Fixes
+
+* фикс 0 дней задержки и добавление bpmn key desc в sql ([8adcb25](https://git.sfera.inno.local/SUMD/backend/commit/8adcb25b501a27cfd98945f19319d25ab3c1f188))
+
+
+### Features
+
+* получение активных задач пользователей ([695a450](https://git.sfera.inno.local/SUMD/backend/commit/695a450e9b119953e692f77abae8d5bd6d2af221))
+* получение стримов из artefact realizations ([1e71ed6](https://git.sfera.inno.local/SUMD/backend/commit/1e71ed68b70a1d34741fe1a5373557ff55db9da6))
+
+## [1.14.1](https://git.sfera.inno.local/SUMD/backend/compare/v1.14.0...v1.14.1) (2025-05-13)
+
+
+### Bug Fixes
+
+* update logs for SSL connection ([e14ed08](https://git.sfera.inno.local/SUMD/backend/commit/e14ed08405fd3f844a8f3fa5456b747a1d42337e))
+
+# [1.14.0](https://git.sfera.inno.local/SUMD/backend/compare/v1.13.2...v1.14.0) (2025-05-13)
+
+
+### Bug Fixes
+
+* add env variable for SSL connection ([b30406f](https://git.sfera.inno.local/SUMD/backend/commit/b30406fd6b61d4d8db4512c8068ecb01508a477c))
+
+
+### Features
+
+* add required SSL connection to DB ([e6dd5da](https://git.sfera.inno.local/SUMD/backend/commit/e6dd5da736531399f6cf744efaf03c184e1fd911))
+
 ## [1.13.2](https://git.sfera.inno.local/SUMD/backend/compare/v1.13.1...v1.13.2) (2025-04-15)
 
 
