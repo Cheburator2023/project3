@@ -31,7 +31,7 @@ WHERE M.MODEL_ID = ANY(:modelIds::text[])
   AND (
     :dateOfDelay::text IS NULL OR 
     TO_TIMESTAMP(CAST(M_UPD.UPDATE_DATE AS TEXT), 'YYYY-MM-DD HH24:MI:SS') 
-      <= TO_DATE(:dateOfDelay::text, 'YYYY-MM-DD HH24:MI:SS')
+      <= TO_TIMESTAMP(:dateOfDelay::text, 'YYYY-MM-DD HH24:MI:SS')
   )
 `
 
