@@ -27,25 +27,34 @@ LEFT JOIN (
     FROM BPMN_INSTANCES BI
     LEFT JOIN BPMN_PROCESSES BP 
       ON BI.BPMN_KEY_ID = BP.BPMN_KEY_ID
-      AND effective_to = TO_TIMESTAMP('9999-12-31 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+      AND bi.effective_to = TO_TIMESTAMP('9999-12-31 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
   ) dummy
   WHERE rn = 1
 ) STATUS ON STATUS.MODEL_ID = M.MODEL_ID
 WHERE AH.MODEL_ID = ANY(:modelIds::text[])
   AND (
-  :dateOfDelay::text IS NULL OR 
-  TO_TIMESTAMP(CAST(M_UPD_DATE.UPDATE_DATE AS TEXT), 'YYYY-MM-DD HH24:MI:SS') 
+    :dateOfDelay::text IS NULL OR 
+    TO_TIMESTAMP(CAST(M_UPD_DATE.UPDATE_DATE AS TEXT), 'YYYY-MM-DD HH24:MI:SS') 
       <= TO_DATE(:dateOfDelay::text, 'YYYY-MM-DD HH24:MI:SS')
   )
-  AND BPMN_KEY_DESC IN (
+  AND STATUS.BPMN_KEY_DESC IN (
     'main', 'initialization', 'data', 'data_search', 'data_pilot', 'data_build', 'model',
     'model_validation', 'integration', 'integration_datamart', 'integration_env_conf',
     'integration_test', 'integration_user', 'integration_prod', 'monitoring', 
     'monitoring_auto_correct', 'validation', 'removal', 'cancel', 'rollback_version', 
-    'rollback', 'jira', 'cancel', 'fast_model_process', 'model_pilot', 'fullvalidation_datamart', 
+    'rollback', 'jira', 'fast_model_process', 'model_pilot', 'fullvalidation_datamart', 
     'inegration_model', 'test_preprod_transfer_prod', 'fullvalidation', 'model_state_transition'
   )
-ORDER BY M_UPD_DATE.UPDATE_DATE DESC
+GROUP BY 
+  M.MODEL_ID,
+  M.ROOT_MODEL_ID,
+  M.MODEL_VERSION,
+  M.MODEL_NAME,
+  STATUS.BPMN_KEY_DESC,
+  M_UPD_DATE.UPDATE_DATE,
+  AH.FUNCTIONAL_ROLE,
+  AH.ASSIGNEE_NAME
+ORDER BY M_UPD_DATE.UPDATE_DATE DESC;
 `;
 
 module.exports = sql;
