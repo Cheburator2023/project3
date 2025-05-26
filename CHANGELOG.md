@@ -1,5 +1,13 @@
 # Semantic Versioning Changelog
 
+## [1.16.2](https://git.sfera.inno.local/SUMD/backend/compare/v1.16.1...v1.16.2) (2025-05-26)
+
+
+### Bug Fixes
+
+* исправлен date of delay ([40673c4](https://git.sfera.inno.local/SUMD/backend/commit/40673c43451fd6cee6e6aa081bc9212b8dd65eac))
+* исправлен sql assigne hist ([cdbfe73](https://git.sfera.inno.local/SUMD/backend/commit/cdbfe73336552fbea4b7920fd1ade636fb5356e8))
+
 ## [1.16.1](https://git.sfera.inno.local/SUMD/backend/compare/v1.16.0...v1.16.1) (2025-05-22)
 
 
