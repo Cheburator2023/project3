@@ -144,7 +144,7 @@ class Bpmn {
     this.connector({
       path: `/task?${querystring.stringify({
         candidateGroups: groups.join(","),
-      })}&includeAssignedTasks=true`,
+      })}&includeAssignedTasks=true&active=true`,
     });
 
   tasksByModel = (modelId) =>
