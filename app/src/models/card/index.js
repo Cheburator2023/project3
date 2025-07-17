@@ -363,24 +363,111 @@ class Card {
   };
 
   changeStatus = ({ modelId, modelStatus }) =>
+    this.changeStaticModelStatus({ modelId, modelStatus })
+      .then(() => this.changeHistoricalModelStatus({ modelId, modelStatus }))
+
+  changeStaticModelStatus = ({ modelId, modelStatus }) =>
     this.db.execute({
       sql: sql.edit_status,
       args: { model_id: modelId, model_status: modelStatus },
     });
 
+  changeHistoricalModelStatus = async ({ modelId, modelStatus }) => {
+    const statusName = modelStatus?.trim()
+    if (!statusName) {
+      return
+    }
+
+    const { rows: activeStatuses = [] } = await this.db.execute({
+      sql: `
+      SELECT id, status
+      FROM model_status
+      WHERE model_id = :model_id
+        AND effective_to = TO_TIMESTAMP('9999-12-31 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+    `,
+      args: { model_id: modelId },
+    });
+
+    if (
+      activeStatuses.length &&
+      activeStatuses.every(({ STATUS }) => STATUS === modelStatus)
+    ) return;
+
+    const trx = await this.db.beginTransation();
+
+    try {
+      // Завершаем активные статусы
+      for (const { ID } of activeStatuses) {
+        await this.db.executeWithConnection({
+          connection: trx,
+          sql: `UPDATE model_status SET effective_to = current_timestamp(0) WHERE id = :id`,
+          args: { id: ID },
+        });
+      }
+
+      // Вставляем новый статус
+      await this.db.executeWithConnection({
+        connection: trx,
+        sql: `
+        INSERT INTO model_status (model_id, status, effective_from, effective_to)
+        VALUES (:model_id, :status, current_timestamp(0), TO_TIMESTAMP('9999-12-31 23:59:59', 'YYYY-MM-DD HH24:MI:SS'))
+      `,
+        args: { model_id: modelId, status: modelStatus },
+      });
+
+      await this.db.commitTransaction(trx);
+    } catch (err) {
+      await this.db.rollbackTransaction(trx);
+      throw err;
+    }
+  };
+
   changeStage = ({ modelId, modelStage }) =>
-    this.db.execute({
+    this.changeStaticModelStage({ modelId, modelStage })
+      .then(() => this.changeHistoricalModelStage({
+          modelId,
+          modelStage,
+          action: 'change'
+        })
+      );
+
+  addStage = ({ modelId, modelStage }) =>
+    this.addStaticModelStage({ modelId, modelStage })
+      .then(() => this.changeHistoricalModelStage({
+          modelId,
+          modelStage,
+          action: 'add'
+        })
+      );
+
+  removeStage = ({ modelId, modelStage }) =>
+    this.removeStaticModelStage({ modelId, modelStage })
+      .then(() => this.changeHistoricalModelStage({
+          modelId,
+          modelStage,
+          action: 'remove'
+        })
+      );
+
+  changeStaticModelStage = ({ modelId, modelStage }) => {
+    console.log('changeStaticModelStage.modelId', modelId)
+    console.log('changeStaticModelStage.modelStage', modelStage)
+    return this.db.execute({
       sql: sql.edit_stage,
       args: { model_id: modelId, model_stage: modelStage },
-    });
+    })
+  }
 
   // Обновление этапа происходит в транзакции.
   // Запрос selectModelForUpdate блокирует строку на чтение и изменение (FOR UPDATE), чтобы параллельные таски не перетёрли изменения (см. lost update)
   // Блокировка будет действовать пока не завершится транзакция, любые параллельные запросы на чтение for update или изменение будут ждать снятия блокировки и получат обновлённые данные
-  addStage = async ({ modelId, modelStage }) => {
+  addStaticModelStage = async ({ modelId, modelStage }) => {
     if (!modelStage) {
       return;
     }
+
+    console.log('addStaticModelStage.modelId', modelId)
+    console.log('addStaticModelStage.modelStage', modelStage)
 
     const connection = await this.db.beginTransation();
 
@@ -428,10 +515,13 @@ class Card {
   // Обновление этапа происходит в транзакции.
   // Запрос selectModelForUpdate блокирует строку на чтение и изменение (FOR UPDATE), чтобы параллельные таски не перетёрли изменения (см. lost update)
   // Блокировка будет действовать пока не завершится транзакция, любые параллельные запросы на чтение for update или изменение будут ждать снятия блокировки и получат обновлённые данные
-  removeStage = async ({ modelId, modelStage }) => {
+  removeStaticModelStage = async ({ modelId, modelStage }) => {
     if (!modelStage) {
       return;
     }
+
+    console.log('removeStaticModelStage.modelId', modelId)
+    console.log('removeStaticModelStage.modelStage', modelStage)
 
     const connection = await this.db.beginTransation();
 
@@ -479,6 +569,104 @@ class Card {
         `Unable to remove stage ${modelStage} from model ${modelId}`
       );
       await this.db.rollbackTransaction(connection);
+      throw err;
+    }
+  };
+
+  changeHistoricalModelStage = async ({ modelId, modelStage, action }) => {
+    const stageName = modelStage?.trim();
+    if (!stageName || !action) {
+      return;
+    }
+
+    console.log('changeHistoricalModelStage.modelId', modelId)
+    console.log('changeHistoricalModelStage.modelStage', modelStage)
+    console.log('changeHistoricalModelStage.action', action)
+
+    const { rows: activeStages = [] } = await this.db.execute({
+      sql: `
+      SELECT id, stage
+      FROM model_stage
+      WHERE model_id = :model_id
+        AND effective_to = TO_TIMESTAMP('9999-12-31 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+    `,
+      args: { model_id: modelId },
+    });
+
+    const trx = await this.db.beginTransation();
+
+    try {
+      if (action === 'add') {
+        const exists = activeStages.some(({ STAGE }) => STAGE === stageName);
+        if (exists) {
+          await this.db.rollbackTransaction(trx);
+          return;
+        }
+
+        await this.db.executeWithConnection({
+          connection: trx,
+          sql: `
+          INSERT INTO model_stage (model_id, stage, effective_from, effective_to)
+          VALUES (:model_id, :stage, current_timestamp(0), TO_TIMESTAMP('9999-12-31 23:59:59', 'YYYY-MM-DD HH24:MI:SS'))
+        `,
+          args: { model_id: modelId, stage: stageName },
+        });
+
+        await this.db.commitTransaction(trx);
+        return;
+      }
+
+      if (action === 'remove') {
+        const toClose = activeStages.filter(({ STAGE }) => STAGE === stageName);
+        if (!toClose.length) {
+          await this.db.rollbackTransaction(trx);
+          return;
+        }
+
+        for (const { ID } of toClose) {
+          await this.db.executeWithConnection({
+            connection: trx,
+            sql: `UPDATE model_stage SET effective_to = current_timestamp(0) WHERE id = :id`,
+            args: { id: ID },
+          });
+        }
+
+        await this.db.commitTransaction(trx);
+        return;
+      }
+
+      if (action === 'change') {
+        const keepStage = activeStages.find(({ STAGE }) => STAGE === stageName);
+        const stagesToClose = activeStages.filter(({ STAGE }) => STAGE !== stageName);
+
+        for (const { ID } of stagesToClose) {
+          await this.db.executeWithConnection({
+            connection: trx,
+            sql: `UPDATE model_stage SET effective_to = current_timestamp(0) WHERE id = :id`,
+            args: { id: ID },
+          });
+        }
+
+        if (!keepStage) {
+          await this.db.executeWithConnection({
+            connection: trx,
+            sql: `
+            INSERT INTO model_stage (model_id, stage, effective_from, effective_to)
+            VALUES (:model_id, :stage, current_timestamp(0), TO_TIMESTAMP('9999-12-31 23:59:59', 'YYYY-MM-DD HH24:MI:SS'))
+          `,
+            args: { model_id: modelId, stage: stageName },
+          });
+        }
+
+        await this.db.commitTransaction(trx);
+        return;
+      }
+
+      // Неподдерживаемое действие
+      await this.db.rollbackTransaction(trx);
+      throw new Error(`Unsupported action: ${action}`);
+    } catch (err) {
+      await this.db.rollbackTransaction(trx);
       throw err;
     }
   };
