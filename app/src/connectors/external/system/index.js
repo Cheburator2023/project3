@@ -146,6 +146,16 @@ class System {
           modelId: variables.model,
           modelStatus: variables.model_status ? variables.model_status : null,
         });
+        // проставляем флаг активности если модель перешла в архив (для моделей со статусом из камунды)
+        if (variables.model_status === 'Архив') {
+          await this.db.card.editActiveStatus({MODEL_ID: variables.model, MODELS_IS_ACTIVE_FLG: 0});
+        }
+      } else {
+        const model = await this.db.card.getCurrentModelStatus(model);
+        // проставляем флаг активности если модель перешла в архив (для моделей со статусом по артефактам)
+        if (model.artefacts_model_status && model.artefacts_model_status.split(';').includes('Архив')) {
+          await this.db.card.editActiveStatus({MODEL_ID: variables.model, MODELS_IS_ACTIVE_FLG: 0});
+        }
       }
     } catch (e) {
       console.sys(e);

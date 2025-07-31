@@ -792,6 +792,15 @@ class Card {
       };
     }
   };
+
+  // Возвращает два статуса модели: по артефактам и по схеме камунды
+  getCurrentModelStatus = (modelId) =>
+    this.db
+      .execute({
+        sql: sql.currentModelStatus,
+        args: { model_id: modelId },
+      })
+      .then((data) => data.rows[0]);
 }
 
 module.exports = Card;
