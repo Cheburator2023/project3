@@ -51,6 +51,31 @@ module.exports = async (root, args, context) => {
   ).ARTEFACT_STRING_VALUE;
   const dept = getDepartmentFromStream(stream);
 
+  context.integration.repo
+    .create(
+      dbNewModel.GENERAL_MODEL_ID,
+      dbNewModel.MODEL_NAME,
+      dbNewModel.MODEL_ID,
+      dbNewModel.MODEL_DESC,
+      stream
+    )
+    .then((data) => {
+      if (typeof data?.model_repo_is_created === "boolean") {
+        context.db.card.editRepoStatus(MODEL_ID, data.model_repo_is_created);
+      } else {
+        console.error(
+          `Failed to get repo status while creating model ${MODEL_ID}`,
+          data
+        );
+      }
+    })
+    .catch((e) => {
+      console.error(
+        `Failed to create repo while creating new model ${MODEL_ID}`,
+        e
+      );
+    });
+
   await context.db.user.addLead(
     args.MODEL_ID,
     dept,

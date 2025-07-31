@@ -85,6 +85,14 @@ class Instance {
       })
       .then(d => d.rows)
   }
+
+  getAllBpmnProcesses = () => {
+    return this.db
+      .execute({
+        sql: sql.bpmnProcesses,
+      })
+      .then(d => d.rows);
+  }
 }
 
 module.exports = Instance

@@ -43,6 +43,49 @@ const getActiveTask = async (MODEL_ID, context) => {
     return null;
   }
 };
+
+/**
+ * Retrieves the first active task for a given model from Camunda, excluding tasks with specific IDs.
+ *
+ * @param {string} MODEL_ID - The ID of the model to retrieve tasks for.
+ * @param {object} context - The context containing the database and user information.
+ * @returns {object|null} The first active task object or null if no active tasks are found.
+ * @throws Will log an error message if an exception occurs during the retrieval process.
+ */
+const getActiveTaskAfterRollback = async (MODEL_ID, context) => {
+  try {
+    const tasks = await context.bpmn.tasksByModel(MODEL_ID);
+    const bpmnProcessKeys = await context.db.instance.getAllBpmnProcesses();
+    let tasksWithKeys = [];
+
+    for (const task of tasks) {
+      let keyVar = await context.bpmn.getTaskVar(task.id, 'key');
+      if (!keyVar) {
+        console.error(`Can not get key var from task ${task.id}`);
+        keyVar = null;
+      }
+      const bpmnProcessKey = bpmnProcessKeys.find((key) => key.BPMN_KEY_DESC === keyVar);
+      if (!bpmnProcessKey) {
+        console.error(`Can not get bpmn process key ${keyVar} from db`);
+        tasksWithKeys.push({...task});
+      } else {
+        tasksWithKeys.push({...task, ...bpmnProcessKey});
+      }
+    }
+
+    tasksWithKeys = tasksWithKeys.filter(({ taskDefinitionKey }) => !TASK_IDS_NOT_TO_COUNT.includes(taskDefinitionKey));
+
+    if (!tasksWithKeys.length) {
+      return null;
+    }
+
+    return tasksWithKeys[0];
+  } catch (e) {
+    console.error("Error on getActiveTaskAfterRollback", e);
+    return null;
+  }
+};
+
 // TODO: refactor this function
 const deleteRolledBackProcessInstances = async ({
   taskRolledBackTo,
@@ -141,7 +184,7 @@ const getModelInfo = async (activity, context) => {
  * @param {Object} context - The context object providing access to BPMN and database operations.
  * @throws {Error} Throws an error if updating the model state or stage fails.
  */
-const updateModelState = async (task, context) => {
+const updateModelState = async (task, modelId, context) => {
   try {
     const newModelStatus = await context.bpmn.getTaskVar(
       task.id,
@@ -156,11 +199,11 @@ const updateModelState = async (task, context) => {
     );
 
     await context.db.card.changeStatus({
-      modelId: task.MODEL_ID,
+      modelId: modelId,
       modelStatus: newModelStatus || null,
     });
     await context.db.card.changeStage({
-      modelId: task.MODEL_ID,
+      modelId: modelId,
       modelStage: newModelStage || null,
     });
   } catch (e) {
@@ -242,7 +285,7 @@ module.exports = async (root, { activity }, context) => {
 
     // 0. Modify process instance to rollback
     return context.bpmn.modify(activity).then(async (data) => {
-      const activeTaskAfterRollback = await getActiveTask(MODEL_ID, context);
+      const activeTaskAfterRollback = await getActiveTaskAfterRollback(MODEL_ID, context);
 
       if (!activeTaskAfterRollback) {
         throw new Error(
@@ -251,7 +294,7 @@ module.exports = async (root, { activity }, context) => {
       }
 
       // 1. Update model stage and status
-      await updateModelState(activeTaskAfterRollback, context);
+      await updateModelState(activeTaskAfterRollback, MODEL_ID, context);
 
       // 2. Delete rolled back process instances
       await deleteRolledBackProcessInstances({

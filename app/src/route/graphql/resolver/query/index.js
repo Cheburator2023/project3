@@ -22,12 +22,21 @@ module.exports = {
   card: (root, args, context) =>
     context.db.card
       .one(args, context.user)
-      .then((data) => {
+      .then(async (data) => {
         context.log({
           msg: `Карточка ${ args.type.join(",") } для модели model${
             args.ROOT_MODEL_ID
           }-v${ args.MODEL_VERSION }`,
         });
+        if (!data.MODEL_REPO_IS_CREATED) {
+          try {
+            const modelRepoIsCreated = await context.db.card.getRepoStatus(data.GENERAL_MODEL_ID, data.MODEL_ID);
+            await context.db.card.editRepoStatus(data.MODEL_ID, modelRepoIsCreated);
+            return {...data, MODEL_REPO_IS_CREATED: modelRepoIsCreated};
+          } catch(e) {
+            console.warn(`Unable to get repo status for model ${data.MODEL_ID}`, e);
+          }
+        }
         return data;
       })
       .catch((e) => {

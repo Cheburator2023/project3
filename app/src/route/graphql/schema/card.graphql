@@ -45,6 +45,8 @@ type Card {
   MODEL_CREATOR: String
   MODEL_DESC: String
   MODEL_VERSION: Int
+  GENERAL_MODEL_ID: String
+  MODEL_REPO_IS_CREATED: Boolean
   CREATE_DATE: DateItem
   UPDATE_DATE: Date
   UPDATE_AUTHOR: String
