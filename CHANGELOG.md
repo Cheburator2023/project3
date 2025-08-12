@@ -1,5 +1,18 @@
 # Semantic Versioning Changelog
 
+# [1.17.0](https://git.sfera.inno.local/sumd/backend/compare/v1.16.2...v1.17.0) (2025-08-12)
+
+
+### Bug Fixes
+
+* добавления фильтрации в отчет актвиные пользователи ([1d98786](https://git.sfera.inno.local/sumd/backend/commit/1d98786eefa623537cdced119ed65254393685fa))
+
+
+### Features
+
+* add history tracking for model stages and statuses ([fd79b89](https://git.sfera.inno.local/sumd/backend/commit/fd79b89eeb6d4a9c16dce47302552854f8bded8e))
+* установка флага активности при переходе модели в архив ([0617087](https://git.sfera.inno.local/sumd/backend/commit/0617087f052dd7927f5b291de546c47e708e51a2))
+
 ## [1.16.2](https://git.sfera.inno.local/SUMD/backend/compare/v1.16.1...v1.16.2) (2025-05-26)
 
 
