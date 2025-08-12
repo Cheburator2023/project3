@@ -1,5 +1,6 @@
 FROM docker.repo-ci.sfera.inno.local/sumd-docker-lib/ubi8-base-backend:v1.0.0
 
+###build steps
 #ARG NPM_REGISTRY
 #ARG NPM_EMAIL
 #ARG NPM_AUTH
