@@ -1,4 +1,5 @@
 const getUserName = require("./helpers");
+const { applyCreationDefaults } = require("../../../../../models/artefact/helpers/defaults");
 const {
   DEPARTMENT_TO_STREAM_MAPPING,
 } = require("../../../../../common/mapping");
@@ -57,12 +58,18 @@ module.exports = async (root, args, context) => {
     args.MIPM,
     args.business_customer
   );
-  // Insert artefacts
+  // Insert artefacts with defaults
+  const artefactsWithDefaults = await applyCreationDefaults({
+    db: context.db,
+    modelId: dbNewModel.MODEL_ID,
+    artefacts: args.ARTEFACTS,
+  });
+
   await context.db.artefact.update({
     MODEL_ID: dbNewModel.MODEL_ID,
-    ARTEFACT_IDS: args.ARTEFACTS.map((a) => a.ARTEFACT_ID),
+    ARTEFACT_IDS: artefactsWithDefaults.map((a) => a.ARTEFACT_ID),
   });
-  await context.db.artefact.add(args);
+  await context.db.artefact.add({ MODEL_ID: dbNewModel.MODEL_ID, ARTEFACTS: artefactsWithDefaults });
   await context.bpmn.msg(args.MODEL_ID);
 
   return dbNewModel;
