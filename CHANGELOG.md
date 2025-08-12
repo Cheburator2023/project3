@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.17.1](https://git.sfera.inno.local/sumd/backend/compare/v1.17.0...v1.17.1) (2025-08-12)
+
+
+### Bug Fixes
+
+* **Dockerfile:** commit to up version ([96cbed4](https://git.sfera.inno.local/sumd/backend/commit/96cbed478ca4c90bce109c915cb98837d2adfaab))
+
 # [1.17.0](https://git.sfera.inno.local/sumd/backend/compare/v1.16.2...v1.17.0) (2025-08-12)
 
 
