@@ -4,7 +4,6 @@ const Smtp = require('./smtp')
 const Jira = require('./jira')
 const Teamcity = require('./teamcity')
 const Kafka = require('./kafka')
-const Repo = require('./repo')
 
 module.exports = {
     keycloak: new Keycloak(),
@@ -12,6 +11,5 @@ module.exports = {
     smtp: new Smtp(),
     jira: new Jira(),
     teamcity: new Teamcity(),
-    kafka: new Kafka(),
-    repo: new Repo(),
+    kafka: new Kafka()
 }

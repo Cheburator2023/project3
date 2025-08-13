@@ -23,9 +23,7 @@ const sql = `
         models_is_active_flg,
         deployment_id,
         model_status,
-        model_stage,
-        general_model_id,
-        model_repo_is_created
+        model_stage
     FROM
         models
     WHERE

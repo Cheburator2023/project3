@@ -9,6 +9,5 @@ module.exports = {
   key: require('./key'),
   instancesByModelId: require('./instancesByModelId'),
   instancesByModelIdAndKey: require('./instancesByModelIdAndKey'),
-  deleteBpmnInstance: require('./deleteBpmnInstance'),
-  bpmnProcesses: require('./bpmnProcesses'),
+  deleteBpmnInstance: require('./deleteBpmnInstance')
 }

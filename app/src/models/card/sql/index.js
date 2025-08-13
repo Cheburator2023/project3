@@ -25,5 +25,4 @@ module.exports = {
   edit_active_status: require("./edit_active_status"),
   selectModelForUpdate: require("./selectModelForUpdate"),
   currentModelStatus: require("./currentModelStatus"),
-  updateModelRepoStatus: require("./updateModelRepoStatus"),
 };
