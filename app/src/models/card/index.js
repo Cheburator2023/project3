@@ -9,6 +9,7 @@ const {
 } = require("./helpers/businessCustomerDepartamentFormatter");
 const { getArguments, groupResponse } = require("./helpers/classificator");
 const { DEPARTMENT_TO_STREAM_MAPPING } = require("../../common/mapping");
+const { v4: uuidv4 } = require('uuid');
 
 const InstanceService = require("../instance");
 
@@ -60,7 +61,7 @@ class Card {
       const parentModel = await this.db
         .execute({ sql: sql.parent, args: { PARENT_MODEL_ID } })
         .then((data) => data.rows);
-      const { ROOT_MODEL_ID, PARENT_MODEL_VERSION } = parentModel.reduce(
+      const { ROOT_MODEL_ID, PARENT_MODEL_VERSION, GENERAL_MODEL_ID } = parentModel.reduce(
         (prev, curr) => {
           if (
             !prev.PARENT_MODEL_VERSION ||
@@ -78,7 +79,7 @@ class Card {
         MODEL_CREATOR,
         ROOT_MODEL_ID,
         MODEL_VERSION: PARENT_MODEL_VERSION + 1,
-        GENERAL_MODEL_ID: null,
+        GENERAL_MODEL_ID,
       };
       result = await this.db.execute({ sql: sql.copy, args });
     } else {
@@ -89,7 +90,7 @@ class Card {
           MODEL_NAME,
           MODEL_DESC,
           MODEL_CREATOR,
-          GENERAL_MODEL_ID: null,
+          GENERAL_MODEL_ID: uuidv4(),
         },
       });
     }
@@ -801,6 +802,24 @@ class Card {
         args: { model_id: modelId },
       })
       .then((data) => data.rows[0]);
+
+  editRepoStatus = (modelId, modelRepoIsCreated) => {
+    this.db.execute({
+      sql: sql.updateModelRepoStatus,
+      args: { model_id: modelId, model_repo_is_created: modelRepoIsCreated },
+    });
+  };
+
+  getRepoStatus = async (generalModelId, modelId) => {
+    var status = await this.integration.repo.status(generalModelId, modelId);
+
+    if (typeof status?.model_repo_is_created === 'boolean') {
+      return status.model_repo_is_created;
+    } else {
+      console.debug('Got response from repo: ', status);
+      throw new Error(`Failed to get repo status by model ${modelId}. Boolean value expected, got ${status?.model_repo_is_created}`);
+    }
+  };
 }
 
 module.exports = Card;

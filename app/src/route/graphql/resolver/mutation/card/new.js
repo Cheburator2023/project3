@@ -1,4 +1,5 @@
 const getUserName = require("./helpers");
+const { applyCreationDefaults } = require("../../../../../models/artefact/helpers/defaults");
 const {
   DEPARTMENT_TO_STREAM_MAPPING,
 } = require("../../../../../common/mapping");
@@ -51,18 +52,49 @@ module.exports = async (root, args, context) => {
   ).ARTEFACT_STRING_VALUE;
   const dept = getDepartmentFromStream(stream);
 
+  context.integration.repo
+    .create(
+      dbNewModel.GENERAL_MODEL_ID,
+      dbNewModel.MODEL_NAME,
+      dbNewModel.MODEL_ID,
+      dbNewModel.MODEL_DESC,
+      stream
+    )
+    .then((data) => {
+      if (typeof data?.model_repo_is_created === "boolean") {
+        context.db.card.editRepoStatus(MODEL_ID, data.model_repo_is_created);
+      } else {
+        console.error(
+          `Failed to get repo status while creating model ${MODEL_ID}`,
+          data
+        );
+      }
+    })
+    .catch((e) => {
+      console.error(
+        `Failed to create repo while creating new model ${MODEL_ID}`,
+        e
+      );
+    });
+
   await context.db.user.addLead(
     args.MODEL_ID,
     dept,
     args.MIPM,
     args.business_customer
   );
-  // Insert artefacts
+  // Insert artefacts with defaults
+  const artefactsWithDefaults = await applyCreationDefaults({
+    db: context.db,
+    modelId: dbNewModel.MODEL_ID,
+    artefacts: args.ARTEFACTS,
+  });
+
   await context.db.artefact.update({
     MODEL_ID: dbNewModel.MODEL_ID,
-    ARTEFACT_IDS: args.ARTEFACTS.map((a) => a.ARTEFACT_ID),
+    ARTEFACT_IDS: artefactsWithDefaults.map((a) => a.ARTEFACT_ID),
   });
-  await context.db.artefact.add(args);
+  await context.db.artefact.add({ MODEL_ID: dbNewModel.MODEL_ID, ARTEFACTS: artefactsWithDefaults });
   await context.bpmn.msg(args.MODEL_ID);
 
   return dbNewModel;
