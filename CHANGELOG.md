@@ -1,5 +1,26 @@
 # Semantic Versioning Changelog
 
+# [1.18.0](https://git.sfera.inno.local/sumd/backend/compare/v1.17.1...v1.18.0) (2025-08-14)
+
+
+### Bug Fixes
+
+* add env variable for SSL connection ([a100a8b](https://git.sfera.inno.local/sumd/backend/commit/a100a8bd787e306725c5ddab44fef8a886f402b8))
+* update logs for SSL connection ([1581026](https://git.sfera.inno.local/sumd/backend/commit/158102633a60b4c4d412121c416c5836da4c1edb))
+* update parent model link ([e41ae94](https://git.sfera.inno.local/sumd/backend/commit/e41ae9440b3595bb4ac080d417bf1c02d0662d2d))
+* получение таски после отката модели ([94fe03b](https://git.sfera.inno.local/sumd/backend/commit/94fe03b12b1649f59ba4394a4109d1464bffb1b6))
+
+
+### Features
+
+* add calibration flag to card schema ([cf1d9cf](https://git.sfera.inno.local/sumd/backend/commit/cf1d9cfd459906e19f2e1b40484746c2cee5650d))
+* add default values for artefacts on creation ([9acdace](https://git.sfera.inno.local/sumd/backend/commit/9acdace205e78c318bec2c1e04f26dcbdd8e5afd))
+* add default values for artefacts on creation ([b7b6c86](https://git.sfera.inno.local/sumd/backend/commit/b7b6c8653b53b602f2548ba8e38b7043fe631070))
+* add history tracking for model stages and statuses (corrects message of d2cb19f7) ([14a3944](https://git.sfera.inno.local/sumd/backend/commit/14a394475abf9aaaf2b3d7ae729c44b79abbe435))
+* add required SSL connection to DB ([5b0327d](https://git.sfera.inno.local/sumd/backend/commit/5b0327dd40251f87b724f812217d4940859fcec3))
+* Интеграция с Репо ([8defb26](https://git.sfera.inno.local/sumd/backend/commit/8defb265d59411cbfdf96966081aac53b2c633bf))
+* установка флага активности при переходе модели в архив ([805ce6a](https://git.sfera.inno.local/sumd/backend/commit/805ce6ad0fbfb6fbec341cbcdb68e6b87e58d47b))
+
 ## [1.17.1](https://git.sfera.inno.local/sumd/backend/compare/v1.17.0...v1.17.1) (2025-08-12)
 
 
