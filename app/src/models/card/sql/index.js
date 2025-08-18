@@ -13,6 +13,7 @@ module.exports = {
   risk: require("./risk"),
   assignments: require("./assignments"),
   artefacts: require("./artefacts"),
+  syncArtefacts: require("./syncArtefacts"),
   modelsByBpmnIds: require("./modelsByBpmnIds"),
   autoMLRootModel: require("./autoMLRootModel"),
   rootModelByGeneralModelId: require("./rootModelByGeneralModelId"),

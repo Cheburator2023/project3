@@ -5,6 +5,7 @@ const Jira = require('./jira')
 const Teamcity = require('./teamcity')
 const Kafka = require('./kafka')
 const Repo = require('./repo')
+const SumRM = require('./sumrm')
 
 module.exports = {
     keycloak: new Keycloak(),
@@ -14,4 +15,5 @@ module.exports = {
     teamcity: new Teamcity(),
     kafka: new Kafka(),
     repo: new Repo(),
+    sumrm: new SumRM()
 }

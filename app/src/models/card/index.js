@@ -10,6 +10,8 @@ const {
 const { getArguments, groupResponse } = require("./helpers/classificator");
 const { DEPARTMENT_TO_STREAM_MAPPING } = require("../../common/mapping");
 const { v4: uuidv4 } = require('uuid');
+const { SYNC_CONFIG } = require("../../common/sumrmConfig");
+const { mergeArtefacts } = require("./helpers/artefactMerger");
 
 const InstanceService = require("../instance");
 
@@ -219,13 +221,45 @@ class Card {
       throw Error(`Model with root id: ${ROOT_MODEL_ID} not found`);
     });
 
-    return {
+    // SumRM synchronization - only fetch and merge if enabled
+    let mergedArtefacts = [];
+    if (SYNC_CONFIG.enabled && this.integration && this.integration.sumrm) {
+      try {
+        // Fetch only the specific artefacts that need to be synchronized with SumRM
+        const localArtefacts = await this.syncArtefacts(model.MODEL_ID);
+        
+        console.log(`Fetching SumRM artefacts for model ${model.MODEL_ID}`);
+        const sumrmArtefacts = await this.integration.sumrm.getArtefactRealizations(
+          model.MODEL_ID,
+          SYNC_CONFIG.artefactIds
+        );
+        console.log(`Retrieved ${sumrmArtefacts.length} SumRM artefacts for model ${model.MODEL_ID}`);
+
+        // Merge local and SumRM artefacts
+        if (sumrmArtefacts.length > 0 || localArtefacts.length > 0) {
+          mergedArtefacts = mergeArtefacts(localArtefacts, sumrmArtefacts);
+          console.log(`Merged ${localArtefacts.length} local and ${sumrmArtefacts.length} SumRM artefacts for model ${model.MODEL_ID}`);
+        }
+      } catch (error) {
+        console.error(`Error in SumRM synchronization for model ${model.MODEL_ID}:`, error);
+        // Continue without SumRM artefacts if there's an error
+      }
+    }
+
+    const result = {
       ...model,
       BUSINESS_CUSTOMER_DEPARTAMENT: formatCustomerDeptInfo(
         model.BUSINESS_CUSTOMER_DEPARTAMENT
       ),
       TYPE: type.join(","),
     };
+
+    // Only add ARTEFACTS field if we have synchronized artefacts
+    if (mergedArtefacts.length > 0) {
+      result.ARTEFACTS = mergedArtefacts;
+    }
+
+    return result;
   };
 
   // Get instances for card with id and version
@@ -280,6 +314,24 @@ class Card {
       })
       .then((data) => data.rows)
       .then(cardArtefacts);
+
+  // Fetch only the specific artefacts that need to be synchronized with SumRM
+  syncArtefacts = (MODEL_ID) => {
+    if (!SYNC_CONFIG.enabled || SYNC_CONFIG.artefactIds.length === 0) {
+      return Promise.resolve([]);
+    }
+
+    return this.db
+      .execute({
+        sql: sql.syncArtefacts,
+        args: { 
+          model_id: MODEL_ID, 
+          artefact_ids: SYNC_CONFIG.artefactIds.map(id => parseInt(id))
+        },
+      })
+      .then((data) => data.rows)
+      .then(cardArtefacts);
+  };
 
   status = () =>
     this.db
