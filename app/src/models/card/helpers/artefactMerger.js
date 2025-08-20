@@ -129,6 +129,20 @@ const transformSumrmArtefact = (sumrmArtefact) => {
  * @returns {Array} - Merged artefacts with latest values
  */
 const mergeArtefacts = (localArtefacts, sumrmArtefacts) => {
+    console.sys('ARTEFACT_MERGER', `[DEBUG] === SYNC INVESTIGATION ===`)
+    console.sys('ARTEFACT_MERGER', `[DEBUG] Local artefacts count: ${localArtefacts.length}`)
+    console.sys('ARTEFACT_MERGER', `[DEBUG] SumRM artefacts count: ${sumrmArtefacts.length}`)
+    console.sys('ARTEFACT_MERGER', `[DEBUG] Sync config mapping:`, SYNC_CONFIG.artefactIdMapping)
+    console.sys('ARTEFACT_MERGER', `[DEBUG] Raw SumRM API response:`, JSON.stringify(sumrmArtefacts, null, 2))
+    
+    // Check for the specific SumRM artefact mentioned
+    const targetSumrmArtefact = sumrmArtefacts.find(artefact => artefact.artefact_id === '2073')
+    if (targetSumrmArtefact) {
+        console.sys('ARTEFACT_MERGER', `[DEBUG] Found SumRM artefact 2073:`, JSON.stringify(targetSumrmArtefact, null, 2))
+    } else {
+        console.sys('ARTEFACT_MERGER', `[DEBUG] SumRM artefact 2073 NOT found in API response`)
+    }
+    
     const localArtefactsMap = new Map()
     const sumrmArtefactsMap = new Map()
 
@@ -141,20 +155,29 @@ const mergeArtefacts = (localArtefacts, sumrmArtefacts) => {
         sumrmArtefactsMap.set(artefact.artefact_id, artefact)
     })
 
+    console.sys('ARTEFACT_MERGER', `[DEBUG] Local artefact IDs:`, Array.from(localArtefactsMap.keys()))
+    console.sys('ARTEFACT_MERGER', `[DEBUG] SumRM artefact IDs:`, Array.from(sumrmArtefactsMap.keys()))
+
     const mergedArtefacts = []
 
     // Process all local artefacts
     localArtefacts.forEach(localArtefact => {
         const artefactId = localArtefact.ARTEFACT_ID.toString()
+        console.sys('ARTEFACT_MERGER', `[DEBUG] Processing local artefact ID: ${artefactId}`)
         
         const shouldSync = SYNC_CONFIG.artefactIdMapping.hasOwnProperty(artefactId)
+        console.sys('ARTEFACT_MERGER', `[DEBUG] Should sync artefact ${artefactId}: ${shouldSync}`)
         
         if (shouldSync) {
             const sumrmArtefactId = SYNC_CONFIG.artefactIdMapping[artefactId]
+            console.sys('ARTEFACT_MERGER', `[DEBUG] Mapped SumRM artefact ID: ${sumrmArtefactId}`)
+            
             const sumrmArtefact = sumrmArtefactsMap.get(sumrmArtefactId)
+            console.sys('ARTEFACT_MERGER', `[DEBUG] Found SumRM artefact: ${!!sumrmArtefact}`)
             
             if (sumrmArtefact) {
                 const mergedArtefact = compareArtefactValues(localArtefact, sumrmArtefact)
+                console.sys('ARTEFACT_MERGER', `[DEBUG] Comparison result for ${artefactId}: ${mergedArtefact?.source}`)
                 
                 if (mergedArtefact && mergedArtefact.source === 'sumrm') {
                     // Replace local artefact with SumRM artefact
@@ -169,12 +192,14 @@ const mergeArtefacts = (localArtefacts, sumrmArtefacts) => {
                         transformedSumrmArtefact.ARTEFACT_NAME = localArtefact.ARTEFACT_NAME
                     }
                     mergedArtefacts.push(transformedSumrmArtefact)
+                    console.sys('ARTEFACT_MERGER', `[DEBUG] ✅ Using SumRM artefact for ID ${artefactId}`)
                 } else {
                     // Keep local artefact
                     mergedArtefacts.push({
                         ...localArtefact,
                         source: 'local'
                     })
+                    console.sys('ARTEFACT_MERGER', `[DEBUG] ✅ Using local artefact for ID ${artefactId}`)
                 }
             } else {
                 // No SumRM artefact found, keep local value
@@ -182,6 +207,7 @@ const mergeArtefacts = (localArtefacts, sumrmArtefacts) => {
                     ...localArtefact,
                     source: 'local'
                 })
+                console.sys('ARTEFACT_MERGER', `[DEBUG] ⚠️ No SumRM artefact found for ID ${artefactId}, keeping local`)
             }
         } else {
             // This artefact doesn't need synchronization
@@ -189,23 +215,37 @@ const mergeArtefacts = (localArtefacts, sumrmArtefacts) => {
                 ...localArtefact,
                 source: 'local'
             })
+            console.sys('ARTEFACT_MERGER', `[DEBUG] ℹ️ Artefact ${artefactId} not in sync mapping, keeping local`)
         }
     })
 
     // Add SumRM artefacts that don't exist locally
+    console.sys('ARTEFACT_MERGER', `[DEBUG] === CHECKING FOR NEW SUMRM ARTEFACTS ===`)
     sumrmArtefacts.forEach(sumrmArtefact => {
         const sumrmArtefactId = sumrmArtefact.artefact_id
+        console.sys('ARTEFACT_MERGER', `[DEBUG] Checking SumRM artefact ID: ${sumrmArtefactId}`)
+        
+        // Find the corresponding Sum artefact ID from the mapping
         const sumArtefactId = Object.keys(SYNC_CONFIG.artefactIdMapping).find(
             key => SYNC_CONFIG.artefactIdMapping[key] === sumrmArtefactId
         )
+        console.sys('ARTEFACT_MERGER', `[DEBUG] Mapped Sum artefact ID: ${sumArtefactId}`)
+        console.sys('ARTEFACT_MERGER', `[DEBUG] Local artefact exists: ${localArtefactsMap.has(parseInt(sumArtefactId))}`)
         
         if (sumArtefactId && !localArtefactsMap.has(parseInt(sumArtefactId))) {
+            console.sys('ARTEFACT_MERGER', `[DEBUG] ➕ Adding new SumRM artefact for Sum ID: ${sumArtefactId}`)
             const transformedArtefact = transformSumrmArtefact(sumrmArtefact)
             transformedArtefact.VALUES = []
             transformedArtefact.ARTEFACT_ID = parseInt(sumArtefactId)
             mergedArtefacts.push(transformedArtefact)
+        } else {
+            console.sys('ARTEFACT_MERGER', `[DEBUG] ℹ️ SumRM artefact ${sumrmArtefactId} not added (no mapping or local exists)`)
         }
     })
+    
+    console.sys('ARTEFACT_MERGER', `[DEBUG] Final merged artefacts count: ${mergedArtefacts.length}`)
+    console.sys('ARTEFACT_MERGER', `[DEBUG] Final merged artefact IDs:`, mergedArtefacts.map(a => a.ARTEFACT_ID))
+    console.sys('ARTEFACT_MERGER', `[DEBUG] ================================`)
     
     return mergedArtefacts
 }
