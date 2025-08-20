@@ -223,26 +223,23 @@ class Card {
 
     // SumRM synchronization - only fetch and merge if enabled
     let mergedArtefacts = [];
-    if (SYNC_CONFIG.enabled && this.integration && this.integration.sumrm) {
+    if (SYNC_CONFIG.enabled && this.integration?.sumrm) {
       try {
         // Fetch only the specific artefacts that need to be synchronized with SumRM
         const localArtefacts = await this.syncArtefacts(model.MODEL_ID);
-        
-        console.log(`Fetching SumRM artefacts for model ${model.MODEL_ID}`);
         const sumrmArtefacts = await this.integration.sumrm.getArtefactRealizations(
           model.MODEL_ID,
-          SYNC_CONFIG.artefactIds
+          SYNC_CONFIG.artefactIds,
+          null,
+          user.token
         );
-        console.log(`Retrieved ${sumrmArtefacts.length} SumRM artefacts for model ${model.MODEL_ID}`);
 
         // Merge local and SumRM artefacts
         if (sumrmArtefacts.length > 0 || localArtefacts.length > 0) {
           mergedArtefacts = mergeArtefacts(localArtefacts, sumrmArtefacts);
-          console.log(`Merged ${localArtefacts.length} local and ${sumrmArtefacts.length} SumRM artefacts for model ${model.MODEL_ID}`);
         }
       } catch (error) {
-        console.error(`Error in SumRM synchronization for model ${model.MODEL_ID}:`, error);
-        // Continue without SumRM artefacts if there's an error
+        console.sys('CARD_MODEL', `[SUMRM_SYNC] Error:`, error.message);
       }
     }
 
@@ -291,8 +288,9 @@ class Card {
       .then((data) => data.rows.map((row) => row.MODEL_VERSION));
 
   // Card's artefacts
-  artefacts = (models, user, is_class_flg) =>
-    this.db
+  artefacts = async (models, user, is_class_flg) => {
+    // Get raw artefacts from database
+    const rawArtefacts = await this.db
       .execute({
         sql: sql.artefacts,
         args: {
@@ -301,8 +299,66 @@ class Card {
         },
       })
       .then((data) => data.rows)
-      .then((data) => artefactRestrictions(data, user))
-      .then((data) => groupResponse(data, models));
+      .then((data) => artefactRestrictions(data, user));
+
+    // Apply SumRM synchronization if enabled
+    if (SYNC_CONFIG.enabled && models.length === 1 && this.integration?.sumrm) {
+      await this.applySumRMSync(rawArtefacts, models[0], user);
+    }
+
+    // Process and return artefacts
+    return groupResponse(rawArtefacts, models);
+  };
+
+  /**
+   * Apply SumRM synchronization to raw artefacts
+   * @param {Array} rawArtefacts - Raw artefacts from database
+   * @param {Object} model - Model object
+   * @param {Object} user - User object with token
+   */
+  applySumRMSync = async (rawArtefacts, model, user) => {
+    try {
+      // Fetch local and SumRM artefacts
+      const [localArtefacts, sumrmArtefacts] = await Promise.all([
+        this.syncArtefacts(model.MODEL_ID),
+        this.integration.sumrm.getArtefactRealizations(
+          model.MODEL_ID,
+          SYNC_CONFIG.artefactIds,
+          null,
+          user.token
+        )
+      ]);
+
+      // Merge and apply updates if we have data
+      if (sumrmArtefacts.length > 0 || localArtefacts.length > 0) {
+        const mergedArtefacts = mergeArtefacts(localArtefacts, sumrmArtefacts);
+        this.updateRawArtefactsWithSumRM(rawArtefacts, mergedArtefacts);
+      }
+    } catch (error) {
+      console.sys('CARD_MODEL', `[SUMRM_SYNC] Error:`, error.message);
+    }
+  };
+
+  /**
+   * Update raw artefacts with SumRM values
+   * @param {Array} rawArtefacts - Raw artefacts to update
+   * @param {Array} mergedArtefacts - Merged artefacts from SumRM
+   */
+  updateRawArtefactsWithSumRM = (rawArtefacts, mergedArtefacts) => {
+    const mergedMap = new Map();
+    mergedArtefacts.forEach(artefact => {
+      mergedMap.set(artefact.ARTEFACT_ID, artefact);
+    });
+
+    rawArtefacts.forEach(artefact => {
+      const mergedArtefact = mergedMap.get(artefact.ARTEFACT_ID);
+      if (mergedArtefact) {
+        artefact.ARTEFACT_STRING_VALUE = mergedArtefact.ARTEFACT_STRING_VALUE;
+        artefact.ARTEFACT_VALUE_ID = mergedArtefact.ARTEFACT_VALUE_ID;
+        artefact.ARTEFACT_ORIGINAL_VALUE = mergedArtefact.ARTEFACT_ORIGINAL_VALUE;
+      }
+    });
+  };
 
   // Card's artefacts by type
   // TODO: Check that artefact method is using somewhere
@@ -317,19 +373,30 @@ class Card {
 
   // Fetch only the specific artefacts that need to be synchronized with SumRM
   syncArtefacts = (MODEL_ID) => {
-    if (!SYNC_CONFIG.enabled || SYNC_CONFIG.artefactIds.length === 0) {
+    if (!SYNC_CONFIG.enabled || Object.keys(SYNC_CONFIG.artefactIdMapping).length === 0) {
       return Promise.resolve([]);
     }
 
+    const sumArtefactIds = Object.keys(SYNC_CONFIG.artefactIdMapping);
     return this.db
       .execute({
         sql: sql.syncArtefacts,
         args: { 
           model_id: MODEL_ID, 
-          artefact_ids: SYNC_CONFIG.artefactIds.map(id => parseInt(id))
+          artefact_ids: sumArtefactIds.map(id => parseInt(id))
         },
       })
-      .then((data) => data.rows)
+      .then((data) => {
+        // Get the latest record for each artefact (since we ordered by effective_from DESC)
+        const latestArtefacts = new Map();
+        data.rows.forEach(row => {
+          const artefactId = row.artefact_id;
+                      if (!latestArtefacts.has(artefactId)) {
+              latestArtefacts.set(artefactId, row);
+            }
+        });
+        return Array.from(latestArtefacts.values());
+      })
       .then(cardArtefacts);
   };
 

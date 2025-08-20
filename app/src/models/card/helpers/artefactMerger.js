@@ -33,27 +33,47 @@ const compareArtefactValues = (localArtefact, sumrmArtefact) => {
         }
     }
 
-    // For local artefacts, we need to get the effective date from the current value
-    // Local artefacts are processed by cardArtefacts helper, so we need to check VALUES
-    let localEffectiveDate = null
+    // Convert dates to UTC timestamps for comparison
+    // Local date needs special handling - it's stored as local time but needs to be treated as UTC
+    const localDateString = localArtefact.EFFECTIVE_FROM.toString()
+    const dateTimeMatch = localDateString.match(/(\w{3})\s+(\w{3})\s+(\d{1,2})\s+(\d{4})\s+(\d{1,2}):(\d{2}):(\d{2})/)
     
-    if (localArtefact.VALUES && localArtefact.VALUES.length > 0) {
-        // Use the first value's effective date (most recent)
-        localEffectiveDate = new Date(localArtefact.EFFECTIVE_FROM)
+    let localUTCTime
+    if (dateTimeMatch) {
+        // Extract date components from local date string
+        const monthName = dateTimeMatch[2]
+        const day = parseInt(dateTimeMatch[3])
+        const year = parseInt(dateTimeMatch[4])
+        const hours = parseInt(dateTimeMatch[5])
+        const minutes = parseInt(dateTimeMatch[6])
+        const seconds = parseInt(dateTimeMatch[7])
+        
+        // Convert month name to number
+        const monthMap = {
+            'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04',
+            'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08',
+            'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'
+        }
+        
+        const month = monthMap[monthName]
+        // Create UTC date string using the local time components (treating them as UTC)
+        const utcDateString = `${year}-${month}-${day.toString().padStart(2, '0')}T${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}Z`
+        
+        localUTCTime = new Date(utcDateString).getTime()
     } else {
-        // No values, use the artefact's effective date
-        localEffectiveDate = new Date(localArtefact.EFFECTIVE_FROM)
+        // Fallback: use the original method
+        localUTCTime = new Date(localArtefact.EFFECTIVE_FROM).getTime()
     }
-
-    const sumrmDate = new Date(sumrmArtefact.effective_from)
-
-    // Compare dates
-    if (localEffectiveDate > sumrmDate) {
+    
+    const sumrmUTCTime = new Date(sumrmArtefact.effective_from).getTime()
+    
+    // Compare dates using UTC timestamps
+    if (localUTCTime > sumrmUTCTime) {
         return {
             ...localArtefact,
             source: 'local'
         }
-    } else if (sumrmDate > localEffectiveDate) {
+    } else if (sumrmUTCTime > localUTCTime) {
         return {
             ...sumrmArtefact,
             source: 'sumrm'
@@ -80,6 +100,14 @@ const compareArtefactValues = (localArtefact, sumrmArtefact) => {
  * @returns {Object} - Transformed artefact data
  */
 const transformSumrmArtefact = (sumrmArtefact) => {
+    // Create the value object that matches the local structure
+    const valueObject = {
+        ARTEFACT_VALUE: null,
+        ARTEFACT_VALUE_ID: sumrmArtefact.artefact_value_id,
+        ARTEFACT_STRING_VALUE: sumrmArtefact.artefact_string_value,
+        ARTEFACT_ORIGINAL_VALUE: sumrmArtefact.artefact_original_value
+    }
+
     return {
         ARTEFACT_ID: sumrmArtefact.artefact_id,
         MODEL_ID: sumrmArtefact.model_id,
@@ -89,7 +117,7 @@ const transformSumrmArtefact = (sumrmArtefact) => {
         CREATOR: sumrmArtefact.creator,
         EFFECTIVE_FROM: sumrmArtefact.effective_from,
         EFFECTIVE_TO: sumrmArtefact.effective_to,
-        // Add source indicator
+        VALUES: sumrmArtefact.artefact_string_value || sumrmArtefact.artefact_value_id ? [valueObject] : [],
         source: 'sumrm'
     }
 }
@@ -119,22 +147,30 @@ const mergeArtefacts = (localArtefacts, sumrmArtefacts) => {
     localArtefacts.forEach(localArtefact => {
         const artefactId = localArtefact.ARTEFACT_ID.toString()
         
-        if (SYNC_CONFIG.artefactIds.includes(artefactId)) {
-            // This artefact should be synchronized
-            const sumrmArtefact = sumrmArtefactsMap.get(artefactId)
+        const shouldSync = SYNC_CONFIG.artefactIdMapping.hasOwnProperty(artefactId)
+        
+        if (shouldSync) {
+            const sumrmArtefactId = SYNC_CONFIG.artefactIdMapping[artefactId]
+            const sumrmArtefact = sumrmArtefactsMap.get(sumrmArtefactId)
             
             if (sumrmArtefact) {
-                // Compare and potentially replace with SumRM value
                 const mergedArtefact = compareArtefactValues(localArtefact, sumrmArtefact)
                 
                 if (mergedArtefact && mergedArtefact.source === 'sumrm') {
                     // Replace local artefact with SumRM artefact
                     const transformedSumrmArtefact = transformSumrmArtefact(sumrmArtefact)
-                    // Preserve the VALUES structure from local artefact
-                    transformedSumrmArtefact.VALUES = localArtefact.VALUES || []
+                    transformedSumrmArtefact.ARTEFACT_ID = parseInt(artefactId)
+                    
+                    // Preserve local artefact properties
+                    if (localArtefact.ARTEFACT_TYPE) {
+                        transformedSumrmArtefact.ARTEFACT_TYPE = localArtefact.ARTEFACT_TYPE
+                    }
+                    if (localArtefact.ARTEFACT_NAME) {
+                        transformedSumrmArtefact.ARTEFACT_NAME = localArtefact.ARTEFACT_NAME
+                    }
                     mergedArtefacts.push(transformedSumrmArtefact)
                 } else {
-                    // Keep local artefact, just add source indicator
+                    // Keep local artefact
                     mergedArtefacts.push({
                         ...localArtefact,
                         source: 'local'
@@ -148,7 +184,7 @@ const mergeArtefacts = (localArtefacts, sumrmArtefacts) => {
                 })
             }
         } else {
-            // This artefact doesn't need synchronization, keep local value
+            // This artefact doesn't need synchronization
             mergedArtefacts.push({
                 ...localArtefact,
                 source: 'local'
@@ -158,15 +194,19 @@ const mergeArtefacts = (localArtefacts, sumrmArtefacts) => {
 
     // Add SumRM artefacts that don't exist locally
     sumrmArtefacts.forEach(sumrmArtefact => {
-        const artefactId = sumrmArtefact.artefact_id
-        if (SYNC_CONFIG.artefactIds.includes(artefactId) && !localArtefactsMap.has(parseInt(artefactId))) {
+        const sumrmArtefactId = sumrmArtefact.artefact_id
+        const sumArtefactId = Object.keys(SYNC_CONFIG.artefactIdMapping).find(
+            key => SYNC_CONFIG.artefactIdMapping[key] === sumrmArtefactId
+        )
+        
+        if (sumArtefactId && !localArtefactsMap.has(parseInt(sumArtefactId))) {
             const transformedArtefact = transformSumrmArtefact(sumrmArtefact)
-            // Initialize empty VALUES array for new artefacts
             transformedArtefact.VALUES = []
+            transformedArtefact.ARTEFACT_ID = parseInt(sumArtefactId)
             mergedArtefacts.push(transformedArtefact)
         }
     })
-
+    
     return mergedArtefacts
 }
 

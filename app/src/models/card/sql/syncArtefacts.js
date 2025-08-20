@@ -48,9 +48,9 @@ const sql = `
   WHERE
       ar.model_id = :model_id
       AND ar.artefact_id = ANY (:artefact_ids::int[])
-      AND ar.effective_to = to_timestamp('9999-12-3123:59:59', 'YYYY-MM-DDHH24:MI:SS')
   ORDER BY
       ar.artefact_id,
+      ar.effective_from DESC,
       av.artefact_value_id
 `;
 
