@@ -5,8 +5,62 @@ const fs = require('fs')
 const path = require('path')
 const https = require('https')
 const http = require('http')
+const { v4: uuidv4 } = require('uuid');
+const os = require('os');
 
 const server = require('./server')
+
+const originalConsole = {
+    log: console.log,
+    error: console.error,
+    warn: console.warn,
+    info: console.info
+};
+
+console.siem = (message) => {
+    originalConsole.log(message);
+};
+
+console.sys = (message, additionalData = {}) => {
+    const timestamp = new Date();
+    const logData = {
+        "@timestamp": timestamp.getTime() / 1000,
+        "level": "info",
+        "eventId": uuidv4(),
+        "text": typeof message === 'string' ? message : JSON.stringify(message),
+        "localTime": timestamp.toISOString(),
+        "PID": process.pid,
+        "appType": "NODEJS",
+        "projectCode": "SUM",
+        "appName": "sum-backend",
+        "timestamp": timestamp.toISOString(),
+        "envType": process.env.NODE_ENV === 'production' ? 'K8S' : 'DEV',
+        "namespace": process.env.NAMESPACE || 'local-dev',
+        "podName": os.hostname(),
+        "tec": {
+            "nodeName": os.hostname(),
+            "podIp": getLocalIP() || '127.0.0.1'
+        },
+        "tslgClientVersion": "1.0.0",
+        "eventOutcome": "Системное",
+        ...additionalData
+    };
+
+    console.siem(JSON.stringify(logData));
+};
+
+function getLocalIP() {
+    const interfaces = os.networkInterfaces();
+    for (const interfaceName in interfaces) {
+        const addresses = interfaces[interfaceName];
+        for (const address of addresses) {
+            if (address.family === 'IPv4' && !address.internal) {
+                return address.address;
+            }
+        }
+    }
+    return null;
+}
 
 const enableTls = process.env.ENABLE_TLS || true
 const tlsConfigDir = process.env.TLS_CONFIG_DIR || '/tls'

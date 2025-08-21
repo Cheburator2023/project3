@@ -2,17 +2,26 @@ const connector = require("./connector");
 const querystring = require("querystring");
 
 class Bpmn {
-  constructor(db) {
-    this.connector = connector;
-  }
-
+    constructor(db, context) {
+        this.connector = (params) => connector(params, context);
+        this.context = context;
+    }
   // Initialization main
-  start = (key = "main", body) =>
-    this.connector({
-      method: "POST",
-      path: `/process-definition/key/${key}/start`,
-      body,
-    });
+    start = (key = "main", body) =>
+        this.connector({
+            method: "POST",
+            path: `/process-definition/key/${key}/start`,
+            body,
+        }).catch(error => {
+            this.context.log?.({
+                msg: `Failed to start process: ${error.message}`,
+                event: 'Ошибка',
+                level: 'error',
+                risCode: '500',
+                error: error
+            });
+            throw error;
+        });
 
   // Start process by Definition Version.
   startByVersion = (key, versionTag, body) =>
