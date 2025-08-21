@@ -40,13 +40,14 @@ class Jira {
             }
             const jiraResponse = await this.integration
                 .jira
-                .issue(key, alias, {epic_description:  Buffer.from(model_entity.MODEL_DESC).toString('utf-8'), 
-                                    story_summary: Buffer.from(story_summary).toString('utf-8'), 
-                                    story_description: Buffer.from(story_description).toString('utf-8'), 
-                                    links, 
-                                    external_links,
-                                    estimated_time: variables.estimated_time
-                                })
+                .issue(key, alias, {
+                    epic_description: Buffer.from(model_entity.MODEL_DESC).toString('utf-8'),
+                    story_summary: Buffer.from(story_summary).toString('utf-8'),
+                    story_description: Buffer.from(story_description).toString('utf-8'),
+                    links,
+                    external_links,
+                    estimated_time: variables.estimated_time
+                }, this.context)
             const jira_msg = JSON.stringify(jiraResponse.message)
             console.info(`Jira Response ${jira_msg}`)
             await this.db
