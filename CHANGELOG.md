@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.19.0](https://git.sfera.inno.local/sumd/backend/compare/v1.18.0...v1.19.0) (2025-08-21)
+
+
+### Features
+
+* implement SumRM integration for artefact synchronization ([03f846d](https://git.sfera.inno.local/sumd/backend/commit/03f846ddf9d8f2202bf039091f0015c267bd0bdd))
+
 # [1.18.0](https://git.sfera.inno.local/sumd/backend/compare/v1.17.1...v1.18.0) (2025-08-14)
 
 
