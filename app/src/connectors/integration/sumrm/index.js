@@ -23,7 +23,7 @@ class SumRM {
             params.append('as_of', asOf)
         }
 
-        const path = `/api/rest/v1/api/v1/artefact-realizations/by-key?${params.toString()}`
+        const path = `/api/v1/artefact-realizations/by-key?${params.toString()}`
         
         try {
             const result = await this.connector({ path, token })
