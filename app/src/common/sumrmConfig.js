@@ -23,6 +23,9 @@ const SYNC_CONFIG = {
     // Whether to enable SumRM synchronization
     enabled: process.env.SUMRM_SYNC_ENABLED === 'true',
     
+    // Whether to enable SumRM history synchronization
+    historyEnabled: process.env.SUMRM_HISTORY_SYNC_ENABLED === 'true',
+    
     // Artefact ID mapping
     artefactIdMapping: ARTEFACT_ID_MAPPING,
     

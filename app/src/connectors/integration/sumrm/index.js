@@ -23,13 +23,46 @@ class SumRM {
             params.append('as_of', asOf)
         }
 
-        const path = `/api/v1/artefact-realizations/by-key?${params.toString()}`
+        const path = `/artefact-realizations/by-key?${params.toString()}`
         
         try {
             const result = await this.connector({ path, token })
             return result
         } catch (error) {
             console.sys('SUMRM', `[ERROR] Failed for model ${modelId}, artefact ${artefactId}:`, error.message)
+            return null
+        }
+    }
+
+    /**
+     * Fetch historical artefact realizations for a specific (model_id, artefact_id) pair
+     * @param {string} modelId - The model identifier
+     * @param {string} artefactId - The artefact identifier (numeric as string)
+     * @param {string} token - Authorization token (optional)
+     * @returns {Promise<Array|null>} - Array of historical artefact realizations or null if not found
+     */
+    getArtefactHistory = async (modelId, artefactId, token = null) => {
+        const params = new URLSearchParams({
+            model_id: modelId,
+            artefact_id: artefactId,
+            include_history: 'true'
+        })
+
+        const path = `/artefact-realizations/by-key?${params.toString()}`
+        
+        try {
+            const result = await this.connector({ path, token })
+            
+            // Check if the response has the history format
+            if (result && result.history && Array.isArray(result.history)) {
+                console.sys('SUMRM', `[INFO] Retrieved ${result.history.length} history records for model ${modelId}, artefact ${artefactId}`)
+                return result.history
+            } else {
+                console.sys('SUMRM', `[WARNING] Unexpected response format for history request: model ${modelId}, artefact ${artefactId}`)
+                return null
+            }
+        } catch (error) {
+            console.sys('SUMRM', `[ERROR] Failed to fetch history for model ${modelId}, artefact ${artefactId}:`, error.message)
             return null
         }
     }
