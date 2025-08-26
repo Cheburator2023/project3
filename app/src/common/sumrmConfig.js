@@ -10,9 +10,7 @@
 // Key: Sum artefact ID, Value: SumRM artefact ID
 const ARTEFACT_ID_MAPPING = {
     '803': '2073', // RFD artefact - Sum ID 803 maps to SumRM ID 2073
-    // Add more mappings as needed:
-    // '804': '2074', // Example: another artefact mapping
-    // '805': '2075', // Example: another artefact mapping
+    '69': '2104', // developing_model_reason artefact - Sum ID 69 maps to SumRM ID 2104
 }
 
 // Get SumRM artefact IDs from the mapping
