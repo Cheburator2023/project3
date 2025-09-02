@@ -86,7 +86,7 @@ module.exports = {
   artefactById: (root, args, context) => context.db.artefact.artefactById(args),
   classificators: (root, args, context) => context.db.artefact.classificators(),
   status: (root, args, context) => context.db.card.status(),
-  artefactHistory: (root, args, context) => context.db.artefact.history(args),
+  artefactHistory: (root, args, context) => context.db.artefact.history(args, context.user),
   // Auditor
   keycloakGroups: (root, args, context) =>
     context.integration.keycloak.groups(context.user),

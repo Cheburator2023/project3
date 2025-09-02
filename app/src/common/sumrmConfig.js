@@ -10,9 +10,7 @@
 // Key: Sum artefact ID, Value: SumRM artefact ID
 const ARTEFACT_ID_MAPPING = {
     '803': '2073', // RFD artefact - Sum ID 803 maps to SumRM ID 2073
-    // Add more mappings as needed:
-    // '804': '2074', // Example: another artefact mapping
-    // '805': '2075', // Example: another artefact mapping
+    '69': '2104', // developing_model_reason artefact - Sum ID 69 maps to SumRM ID 2104
 }
 
 // Get SumRM artefact IDs from the mapping
@@ -22,6 +20,9 @@ const SYNC_ARTEFACT_IDS = Object.values(ARTEFACT_ID_MAPPING)
 const SYNC_CONFIG = {
     // Whether to enable SumRM synchronization
     enabled: process.env.SUMRM_SYNC_ENABLED === 'true',
+    
+    // Whether to enable SumRM history synchronization
+    historyEnabled: process.env.SUMRM_HISTORY_SYNC_ENABLED === 'true',
     
     // Artefact ID mapping
     artefactIdMapping: ARTEFACT_ID_MAPPING,

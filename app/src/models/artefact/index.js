@@ -2,10 +2,13 @@ const sql = require("./sql");
 const artefactReduce = require("./helpers/artefactReduce");
 const dbVar = require("./helpers/dbVar");
 const artefactFilter = require("./helpers/artefactFilter");
+const { mergeHistoryData, isArtefactSynced, getSumrmArtefactId } = require("./helpers/historyMerger");
+const { SYNC_CONFIG } = require("../../common/sumrmConfig");
 
 class Artefact {
-  constructor(db) {
+  constructor(db, integration = null) {
     this.db = db;
+    this.integration = integration;
   }
 
   list = () =>
@@ -111,13 +114,59 @@ class Artefact {
       args,
     });
 
-  history = (args) =>
-    this.db
-      .execute({
-        sql: sql.history,
-        args, // MODEL_ID, ARTEFACT_ID
-      })
-      .then((d) => d.rows);
+  history = async (args, user = null) => {
+    const { MODEL_ID, ARTEFACT_ID } = args;
+    
+    // Helper method to get local history
+    const getLocalHistory = () => 
+      this.db
+        .execute({
+          sql: sql.history,
+          args: { MODEL_ID, ARTEFACT_ID },
+        })
+        .then((d) => d.rows);
+    
+    // Check if this artefact should be synchronized with SumRM
+    const shouldSync = SYNC_CONFIG.enabled && 
+                      SYNC_CONFIG.historyEnabled && 
+                      isArtefactSynced(ARTEFACT_ID) && 
+                      this.integration?.sumrm;
+    
+    if (!shouldSync) {
+      // Use existing logic for non-synced artefacts
+      return getLocalHistory();
+    }
+    
+    try {
+      // Get local history
+      const localHistory = await getLocalHistory();
+      
+      // Get SumRM history
+      const sumrmArtefactId = getSumrmArtefactId(ARTEFACT_ID);
+      const sumrmHistory = await this.integration.sumrm.getArtefactHistory(
+        MODEL_ID, 
+        sumrmArtefactId, 
+        user?.token // Use user token if available
+      );
+      
+      if (sumrmHistory === null) {
+        console.sys('SUMRM', `[WARNING] Failed to fetch SumRM history for artefact ${ARTEFACT_ID}, using local data only`)
+        return localHistory;
+      }
+      
+      // Merge local and SumRM history
+      const mergedHistory = mergeHistoryData(localHistory, sumrmHistory);
+      
+      console.sys('SUMRM', `[INFO] Merged history for artefact ${ARTEFACT_ID}: ${localHistory.length} local + ${sumrmHistory.length} SumRM = ${mergedHistory.length} total records`)
+      
+      return mergedHistory;
+      
+    } catch (error) {
+      console.sys('SUMRM', `[ERROR] Failed to merge history for artefact ${ARTEFACT_ID}:`, error.message)
+      // Fallback to local data only
+      return getLocalHistory();
+    }
+  };
 
   possibleValues = ({ ARTEFACT_ID }) =>
     this.db
