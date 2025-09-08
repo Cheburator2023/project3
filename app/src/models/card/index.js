@@ -387,14 +387,18 @@ class Card {
         },
       })
       .then((data) => {
+
         // Get the latest record for each artefact (since we ordered by effective_from DESC)
         const latestArtefacts = new Map();
+
         data.rows.forEach(row => {
-          const artefactId = row.artefact_id;
-                      if (!latestArtefacts.has(artefactId)) {
+          const artefactId = row.ARTEFACT_ID;
+
+            if (!latestArtefacts.has(artefactId)) {
               latestArtefacts.set(artefactId, row);
             }
         });
+
         return Array.from(latestArtefacts.values());
       })
       .then(cardArtefacts);
