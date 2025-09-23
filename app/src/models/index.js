@@ -18,7 +18,7 @@ module.exports = (db, bpmn, integration) => ({
   task: new Task(db, bpmn, integration),
   user: new User(db, bpmn, integration),
   stats: new Stats(db, bpmn),
-  artefact: new Artefact(db),
+  artefact: new Artefact(db, integration),
   instance: new Instance(db, bpmn),
   integration: new Integration(db),
   report: new Report(db, bpmn, integration),
