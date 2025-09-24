@@ -1,45 +1,58 @@
-const c = require('colors/safe')
-const util = require('util')
+const tslgLogger = require('./tslgLogger');
 
-function formatArgs(args){
-    return util.format.apply(util.format, Array.prototype.slice.call(args));
-}
-
-console.sys = function() {
-    console.log(
-        c.green('[SYSTEM]'),
-        `[ ${new Date().toUTCString()} ]`,
-        formatArgs(arguments)
-    )
+const originalConsole = {
+    log: console.log,
+    error: console.error,
+    warn: console.warn,
+    info: console.info
 };
 
-console.siem = function() {
-    console.log(
-        c.green('[SEIM]'),
-        formatArgs(arguments)
-    )
+const formatMessage = (args) => {
+    return args.map(arg => {
+        if (typeof arg === 'object' && arg !== null) {
+            try {
+                return JSON.stringify(arg, null, 2);
+            } catch {
+                return String(arg);
+            }
+        }
+        return String(arg);
+    }).join(' ');
 };
 
-console.info = function() {
-    console.log(
-        c.green('[INFO]'),
-        `[ ${new Date().toUTCString()} ]`,
-        formatArgs(arguments)
-    )
+const overrideConsole = () => {
+    console.log = function(...args) {
+        const message = formatMessage(args);
+        tslgLogger.info(message, 'Информация');
+    };
+
+    console.info = function(...args) {
+        const message = formatMessage(args);
+        tslgLogger.info(message, 'Информация');
+    };
+
+    console.warn = function(...args) {
+        const message = formatMessage(args);
+        tslgLogger.warn(message, 'Предупреждение');
+    };
+
+    console.error = function(...args) {
+        const message = formatMessage(args);
+        const error = args.find(arg => arg instanceof Error);
+        tslgLogger.error(message, 'Ошибка', error);
+    };
+
+    console.sys = function(...args) {
+        const message = formatMessage(args);
+        tslgLogger.sys(message);
+    };
+
+    console.siem = function(...args) {
+        const message = formatMessage(args);
+        originalConsole.log('[SIEM]', message);
+    };
 };
 
-console.warn = function() {
-    console.log(
-        c.yellow('[WARN]'),
-        `[ ${new Date().toUTCString()} ]`,
-        formatArgs(arguments)
-    )
-};
+overrideConsole();
 
-console.error = function() {
-    console.log(
-        c.red('[ERROR]'),
-        `[ ${new Date().toUTCString()} ]`,
-        formatArgs(arguments)
-    )
-};
+module.exports = tslgLogger;
