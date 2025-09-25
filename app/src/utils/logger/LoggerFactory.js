@@ -1,5 +1,5 @@
 const ConsoleLogger = require('./ConsoleLogger');
-const TSLGLogger = require('./TSLGLogger');
+const ProductionLogger = require('./ProductionLogger');
 
 /**
  * Фабрика логгеров
@@ -9,7 +9,7 @@ class LoggerFactory {
         const isProduction = process.env.NODE_ENV === 'production';
 
         if (isProduction) {
-            return new TSLGLogger(config);
+            return new ProductionLogger(config);
         }
 
         return new ConsoleLogger(config);
