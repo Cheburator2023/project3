@@ -3,6 +3,7 @@ const { Pool } = require("pg");
 const { queryConvert } = require("./utils");
 const retry = require("async-retry");
 const { get_count, instr } = require("./routines");
+const tslgLogger = require('../../../utils/logger');
 
 /**
  * Fix Numeric data type is returned as String
@@ -48,26 +49,26 @@ class PostgresDatabase {
    */
   async initialize() {
     try {
-      console.sys("Initializing database module...");
+      tslgLogger.sys("Initializing database module...");
 
       // Step 1: Create a connection pool using the provided config
       this.pool = new Pool(this.options.poolConfig);
-      console.sys("Connection pool created successfully.");
+      tslgLogger.sys("Connection pool created successfully.");
 
-      // Step 2: Attach helper routines or middleware (e.g. custom query wrappers)
+      // Step 2: Attach helper routines or middleware
       await this.executeRoutines();
-      console.sys("Database helper routines initialized.");
+      tslgLogger.sys("Database helper routines initialized.");
 
       // Step 3: Set up graceful shutdown on SIGINT/SIGTERM
       process
-        .once("SIGTERM", () => {
-          console.sys("SIGTERM received. Closing database pool...");
-          this.closePool();
-        })
-        .once("SIGINT", () => {
-          console.sys("SIGINT received. Closing database pool...");
-          this.closePool();
-        });
+          .once("SIGTERM", () => {
+            tslgLogger.sys("SIGTERM received. Closing database pool...");
+            this.closePool();
+          })
+          .once("SIGINT", () => {
+            tslgLogger.sys("SIGINT received. Closing database pool...");
+            this.closePool();
+          });
 
       // Step 4: Test connection and verify SSL is working
       const client = await this.pool.connect();
@@ -82,16 +83,12 @@ class PostgresDatabase {
         const sslValue = sslCheck.rows[0]?.["ssl"] || sslCheck.rows[0]?.["SSL"];
         const isSSLUsed = sslValue === "t" || sslValue === true;
 
-        console.log(`SSL connection in use: ${isSSLUsed ? "✅ Yes" : "❌ No"}`);
+        tslgLogger.info(`SSL connection in use: ${isSSLUsed ? "✅ Yes" : "❌ No"}`, 'ПроверкаSSL');
       } finally {
-        client.release(); // Always release the client back to the pool
+        client.release();
       }
     } catch (err) {
-      // Catch any initialization errors
-      console.error(
-        "Failed to initialize database module:",
-        err.message || err
-      );
+      tslgLogger.error("Failed to initialize database module", 'ОшибкаИнициализацииБД', err);
       throw err;
     }
   }
@@ -103,11 +100,11 @@ class PostgresDatabase {
    */
   async closePool() {
     try {
-      console.sys("Closing database connection pool");
+      tslgLogger.sys("Closing database connection pool");
       await this.pool.end();
-      console.sys("Database connection successfully closed");
+      tslgLogger.sys("Database connection successfully closed");
     } catch (err) {
-      console.error(err);
+      tslgLogger.error("Error closing database pool", 'ОшибкаЗакрытияБД', err);
     }
   }
 
@@ -131,7 +128,7 @@ class PostgresDatabase {
 
       return connection;
     } catch (err) {
-      console.error(err);
+      tslgLogger.error("Error getting database connection", 'ОшибкаСоединенияБД', err);
       throw err;
     }
   }
@@ -149,21 +146,25 @@ class PostgresDatabase {
     try {
       return await retry((_, attempt) => {
         if (attempt && attempt > 1) {
-          console.warn(`Attempting to process "query" command again`);
+          tslgLogger.warn(`Attempting to process "query" command again`, 'ПовторЗапросаБД', {
+            attempt,
+            sql: sql.substring(0, 100) + '...'
+          });
         }
 
         return connection.query(queryConvert(sql, args));
       }, this.options.retryConfig);
     } catch (err) {
-      console.error(err);
-      console.log(`Unable to process SQL query:`, sql);
-      console.log("With query arguments:", args);
+      tslgLogger.error(`Unable to process SQL query`, 'ОшибкаЗапросаБД', err, {
+        sql: sql.substring(0, 200) + '...',
+        args: JSON.stringify(args).substring(0, 200) + '...'
+      });
       throw err;
     } finally {
       try {
         await connection.release();
       } catch (err) {
-        console.error(err);
+        tslgLogger.error("Error releasing database connection", 'ОшибкаОсвобожденияБД', err);
       }
     }
   }
@@ -179,28 +180,42 @@ class PostgresDatabase {
   }
 
   async commitTransaction(connection) {
-    await connection.query("COMMIT");
-    await connection.release();
+    try {
+      await connection.query("COMMIT");
+      await connection.release();
+    } catch (err) {
+      tslgLogger.error("Error committing transaction", 'ОшибкаКоммитаБД', err);
+      throw err;
+    }
   }
 
   async rollbackTransaction(connection) {
-    await connection.query("ROLLBACK");
-    await connection.release();
+    try {
+      await connection.query("ROLLBACK");
+      await connection.release();
+    } catch (err) {
+      tslgLogger.error("Error rolling back transaction", 'ОшибкаОткатаБД', err);
+      throw err;
+    }
   }
 
   async executeWithConnection({ connection, sql, args = {} }) {
     try {
       return await retry((_, attempt) => {
         if (attempt && attempt > 1) {
-          console.warn(`Attempting to process "query" command again`);
+          tslgLogger.warn(`Attempting to process "query" command again`, 'ПовторЗапросаБД', {
+            attempt,
+            sql: sql.substring(0, 100) + '...'
+          });
         }
 
         return connection.query(queryConvert(sql, args));
       }, this.options.retryConfig);
     } catch (err) {
-      console.error(err);
-      console.log(`Unable to process SQL query:`, sql);
-      console.log("With query arguments:", args);
+      tslgLogger.error(`Unable to process SQL query with connection`, 'ОшибкаЗапросаБД', err, {
+        sql: sql.substring(0, 200) + '...',
+        args: JSON.stringify(args).substring(0, 200) + '...'
+      });
       throw err;
     }
   }

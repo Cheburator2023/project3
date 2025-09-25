@@ -1,58 +1,30 @@
-const tslgLogger = require('./tslgLogger');
+const LoggerFactory = require('./LoggerFactory');
+const ConsoleOverride = require('./ConsoleOverride');
 
-const originalConsole = {
-    log: console.log,
-    error: console.error,
-    warn: console.warn,
-    info: console.info
+const logger = LoggerFactory.createLogger({
+    appName: process.env.APP_NAME || 'sum-backend',
+    projectCode: process.env.PROJECT_CODE || 'SUMD',
+    risCode: process.env.RIS_CODE || '1661'
+});
+
+const consoleOverride = new ConsoleOverride(logger);
+consoleOverride.apply();
+
+const setupGracefulShutdown = () => {
+    const shutdown = (signal) => {
+        logger.sys(`Received ${signal}, shutting down gracefully...`);
+
+        setTimeout(() => {
+            logger.close();
+            consoleOverride.restore();
+            process.exit(0);
+        }, 5000);
+    };
+
+    process.on('SIGTERM', () => shutdown('SIGTERM'));
+    process.on('SIGINT', () => shutdown('SIGINT'));
 };
 
-const formatMessage = (args) => {
-    return args.map(arg => {
-        if (typeof arg === 'object' && arg !== null) {
-            try {
-                return JSON.stringify(arg, null, 2);
-            } catch {
-                return String(arg);
-            }
-        }
-        return String(arg);
-    }).join(' ');
-};
+setupGracefulShutdown();
 
-const overrideConsole = () => {
-    console.log = function(...args) {
-        const message = formatMessage(args);
-        tslgLogger.info(message, 'Информация');
-    };
-
-    console.info = function(...args) {
-        const message = formatMessage(args);
-        tslgLogger.info(message, 'Информация');
-    };
-
-    console.warn = function(...args) {
-        const message = formatMessage(args);
-        tslgLogger.warn(message, 'Предупреждение');
-    };
-
-    console.error = function(...args) {
-        const message = formatMessage(args);
-        const error = args.find(arg => arg instanceof Error);
-        tslgLogger.error(message, 'Ошибка', error);
-    };
-
-    console.sys = function(...args) {
-        const message = formatMessage(args);
-        tslgLogger.sys(message);
-    };
-
-    console.siem = function(...args) {
-        const message = formatMessage(args);
-        originalConsole.log('[SIEM]', message);
-    };
-};
-
-overrideConsole();
-
-module.exports = tslgLogger;
+module.exports = logger;

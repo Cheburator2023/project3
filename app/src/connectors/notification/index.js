@@ -1,5 +1,6 @@
 const scheduler = require('node-schedule');
 const rule = new scheduler.RecurrenceRule();
+const tslgLogger = require('../../utils/logger');
 
 // your timezone
 rule.tz = 'Europe/Moscow';
@@ -107,49 +108,65 @@ module.exports = async (db, bpmn, integration) => {
         }
     }
 
-    return scheduler
-        .scheduleJob(rule, async function () {
+    return scheduler.scheduleJob(rule, async function () {
+        try {
+            tslgLogger.sys('Запуск рассылки уведомлений лидам о неразобранных задачах');
 
             // Get tasks from camunda
             const camundaTasks = await bpmn.allNotAssignedTasks();
+            tslgLogger.info(`Получено задач из Camunda: ${camundaTasks.length}`, 'РассылкаУведомлений');
 
             // Prepare arguments for db requests
             const { tasksIds, bpmnInstancesIds } = getArguments(camundaTasks);
 
             // Get tasks from db
             const dbTasks = await db.task.tasksByIds(tasksIds);
+            tslgLogger.info(`Получено задач из БД: ${dbTasks.length}`, 'РассылкаУведомлений');
 
             // Get model info
             const dbModels = await db.card.modelsByBpmnIds(bpmnInstancesIds);
+            tslgLogger.info(`Получено моделей из БД: ${dbModels.length}`, 'РассылкаУведомлений');
 
             // Add model information to db task
             const tasksWithModelInfo = getTasksWithModelInfo({ dbTasks, dbModels, camundaTasks });
+            tslgLogger.info(`Сформировано задач с информацией о моделях: ${tasksWithModelInfo.length}`, 'РассылкаУведомлений');
 
             // Get lead users with assigned models
             const usersMap = await getUsers();
+            tslgLogger.info(`Найдено лидов: ${usersMap.size}`, 'РассылкаУведомлений');
 
             // Add tasks to users
             const usersWithTasks = getUsersWithTasks(usersMap, tasksWithModelInfo);
+            tslgLogger.info(`Лидов с задачами: ${usersWithTasks.size}`, 'РассылкаУведомлений');
 
             // Get users emails map
             const usersEmailsMap = await getUsersEmails(usersWithTasks);
+            tslgLogger.info(`Лидов с email: ${usersEmailsMap.size}`, 'РассылкаУведомлений');
 
             // Send email
-            Array.from(usersEmailsMap).forEach(([ username, email ]) =>
+            Array.from(usersEmailsMap).forEach(([ username, email ]) => {
+                const userTasks = usersWithTasks.get(username);
                 integration.smtp.email({
                     to: [email],
                     subject: `СУМ. Задачи в работе.`,
-                    text_content: usersWithTasks.get(username).map(({
-                        TASK_NAME,
-                        ROOT_MODEL_ID,
-                        MODEL_VERSION
-                    }) =>
+                    text_content: userTasks.map(({
+                                                     TASK_NAME,
+                                                     ROOT_MODEL_ID,
+                                                     MODEL_VERSION
+                                                 }) =>
                         `Задача: ${TASK_NAME}. Модель: ${ROOT_MODEL_ID}-v${MODEL_VERSION}.`
                     )
-                    .join('\r\n')
-                })
-            );
+                        .join('\r\n')
+                });
+                tslgLogger.info(`Отправлено уведомление лиду: ${username}`, 'РассылкаУведомлений', {
+                    email,
+                    tasksCount: userTasks.length
+                });
+            });
 
-            console.sys(new Date(), `Рассылка уведомлений лидам о неразобранных задачах. Отправлено уведомлений: ${usersEmailsMap.size}`);
-        });
+            tslgLogger.sys(`Рассылка уведомлений лидам о неразобранных задачах завершена. Отправлено уведомлений: ${usersEmailsMap.size}`);
+        } catch (error) {
+            tslgLogger.error('Ошибка при рассылке уведомлений', 'ОшибкаРассылки', error);
+        }
+    });
 }

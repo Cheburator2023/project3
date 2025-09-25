@@ -1,4 +1,5 @@
 const INTERFACE_URL = process.env.INTERFACE_URL || "http://localhost:9001/";
+const tslgLogger = require('../../../utils/logger');
 
 class Mail {
   constructor(db, integration) {
@@ -7,39 +8,55 @@ class Mail {
   }
 
   main = async ({ task, taskService }) => {
-    try {
-      const variables = task.variables.getAll();
-      const template_name = variables.template_name;
+    const variables = task.variables.getAll();
+    const template_name = variables.template_name;
 
+    tslgLogger.info(`Отправка уведомления: ${template_name}`, 'ОтправкаУведомления', {
+      templateName: template_name,
+      modelId: variables.model,
+      taskId: task.id
+    });
+
+    try {
       //get model id
       const model = variables.model;
       const model_entity = await this.db.integration
-        .modelGet(model)
-        .then((d) => d.rows[0]);
+          .modelGet(model)
+          .then((d) => d.rows[0]);
+
       const model_alias = `model${model_entity.ROOT_MODEL_ID}-v${model_entity.MODEL_VERSION}`;
       const model_name = model_entity.MODEL_NAME;
-      console.sys(`New notification ${template_name} for ${model_alias}`);
+
+      tslgLogger.info(`Новое уведомление ${template_name} для ${model_alias}`, 'ПодготовкаУведомления', {
+        modelId: model,
+        modelAlias: model_alias,
+        templateName: template_name
+      });
 
       const role_name = variables.role_name;
       const model_card_URL = `${INTERFACE_URL}model/${model_entity.ROOT_MODEL_ID}/${model_entity.MODEL_VERSION}/main`;
 
       const modelUsers = await this.db.user
-        .card(model)
-        .then((data) =>
-          data
-            .filter(
-              (d) => d.role === role_name || d.role === `${role_name}_lead`
-            )
-            .map((d) => d.username)
-        );
+          .card(model)
+          .then((data) =>
+              data
+                  .filter(
+                      (d) => d.role === role_name || d.role === `${role_name}_lead`
+                  )
+                  .map((d) => d.username)
+          );
 
-      const users = await this.integration.keycloak.getUsersByGroupSystem(
-        role_name
-      );
+      const users = await this.integration.keycloak.getUsersByGroupSystem(role_name);
 
       const users_mail = users
-        .filter((item) => item.email && modelUsers.includes(item.username))
-        .map((item) => item.email);
+          .filter((item) => item.email && modelUsers.includes(item.username))
+          .map((item) => item.email);
+
+      tslgLogger.info(`Найдено пользователей для уведомления: ${users_mail.length}`, 'ПоискПользователей', {
+        modelId: model,
+        role: role_name,
+        usersCount: users_mail.length
+      });
 
       const msg_args = {
         INTERFACE_URL,
@@ -48,104 +65,115 @@ class Mail {
         role_name,
         model_card_URL,
       };
+
       switch (template_name) {
         case "developingCancel":
-          {
-            msg_args.cancel_role = variables.cancel_role;
-          }
+        {
+          msg_args.cancel_role = variables.cancel_role;
+        }
           break;
         case "developingRemove":
-          {
-            const removeReason = await this.db.artefact.artefactRealizationById(
-              {
-                artefactId: 778,
-                modelId: model,
-              }
-            );
+        {
+          const removeReason = await this.db.artefact.artefactRealizationById({
+            artefactId: 778,
+            modelId: model,
+          });
 
-            msg_args.remove_role = variables.remove_role;
-            msg_args.remove_reason = removeReason?.ARTEFACT_STRING_VALUE;
-          }
+          msg_args.remove_role = variables.remove_role;
+          msg_args.remove_reason = removeReason?.ARTEFACT_STRING_VALUE;
+        }
           break;
         case "modelCancel":
-          {
-            msg_args.stage_name = variables.stage_name;
-            msg_args.jira_comment = "Требуется доработка артефактов"; //variables.jira_comment
-            msg_args.step_name = variables.step_name;
-          }
+        {
+          msg_args.stage_name = variables.stage_name;
+          msg_args.jira_comment = "Требуется доработка артефактов";
+          msg_args.step_name = variables.step_name;
+        }
           break;
         case "modelCreate":
-          {
-            const classificators = await this.db.integration
+        {
+          const classificators = await this.db.integration
               .modelClassificators(model)
               .then((d) => d.rows);
-            const classificators_string = classificators.map(
+          const classificators_string = classificators.map(
               (item) => `${item.ARTEFACT_LABEL}: ${item.ARTEFACT_STRING_VALUE}`
-            );
-            msg_args.classificators = classificators_string;
-            msg_args.model_description = model_entity.MODEL_DESC;
-            msg_args.related_models = "";
-          }
+          );
+          msg_args.classificators = classificators_string;
+          msg_args.model_description = model_entity.MODEL_DESC;
+          msg_args.related_models = "";
+        }
           break;
         case "processChange":
-          {
-            msg_args.step_name = variables.step_name;
-            msg_args.stage_name = variables.stage_name;
-            msg_args.next_step_name = variables.next_step_name;
-            msg_args.next_stage_name = variables.next_stage_name;
-          }
+        {
+          msg_args.step_name = variables.step_name;
+          msg_args.stage_name = variables.stage_name;
+          msg_args.next_step_name = variables.next_step_name;
+          msg_args.next_stage_name = variables.next_stage_name;
+        }
           break;
         case "processDecision":
-          {
-            msg_args.step_name = variables.step_name;
-            msg_args.stage_name = variables.stage_name;
-            msg_args.decision_name = variables.decision_name;
-            msg_args.next_step_name = variables.next_step_name;
-            msg_args.next_stage_name = variables.next_stage_name;
-          }
+        {
+          msg_args.step_name = variables.step_name;
+          msg_args.stage_name = variables.stage_name;
+          msg_args.decision_name = variables.decision_name;
+          msg_args.next_step_name = variables.next_step_name;
+          msg_args.next_stage_name = variables.next_stage_name;
+        }
           break;
         case "statusChange":
-          {
-            msg_args.step_name = variables.step_name;
-            msg_args.stage_name = variables.stage_name;
-            msg_args.status_name = variables.status_name;
-          }
+        {
+          msg_args.step_name = variables.step_name;
+          msg_args.stage_name = variables.stage_name;
+          msg_args.status_name = variables.status_name;
+        }
           break;
         case "validationEnd":
-          {
-            msg_args.step_name = variables.step_name;
-            msg_args.stage_name = variables.stage_name;
-            msg_args.start_validation = variables.start_validation;
-            msg_args.end_validation = new Date().toUTCString();
-          }
+        {
+          msg_args.step_name = variables.step_name;
+          msg_args.stage_name = variables.stage_name;
+          msg_args.start_validation = variables.start_validation;
+          msg_args.end_validation = new Date().toUTCString();
+        }
           break;
         default:
-          console.sys("Error");
+          tslgLogger.warn(`Неизвестный шаблон уведомления: ${template_name}`, 'НеизвестныйШаблон', {
+            templateName: template_name
+          });
       }
 
-      const text_content = this.integration.smtp.getMsgBody(
-        template_name,
-        msg_args
-      );
+      const text_content = this.integration.smtp.getMsgBody(template_name, msg_args);
+      const message_subject = this.integration.smtp.getMsgSubject(template_name, model_alias);
 
-      const message_subject = this.integration.smtp.getMsgSubject(
-        template_name,
-        model_alias
-      );
-
-      console.sys(`Send message ${JSON.stringify(message_subject)}`);
-      console.sys(JSON.stringify(text_content));
+      tslgLogger.info(`Отправка сообщения: ${message_subject}`, 'ОтправкаПисьма', {
+        modelId: model,
+        templateName: template_name,
+        recipientsCount: users_mail.length,
+        subject: message_subject
+      });
 
       await this.integration.smtp.email({
         to: users_mail,
         subject: message_subject,
         text_content: text_content,
       });
-    } catch (e) {
-      console.sys(JSON.stringify(e));
-    }
 
-    await taskService.complete(task);
+      await taskService.complete(task);
+
+      tslgLogger.info(`Уведомление отправлено успешно: ${template_name}`, 'УспехОтправкиУведомления', {
+        modelId: model,
+        templateName: template_name,
+        recipientsCount: users_mail.length,
+        taskId: task.id
+      });
+
+    } catch (error) {
+      tslgLogger.error(`Ошибка отправки уведомления: ${template_name}`, 'ОшибкаОтправкиУведомления', error, {
+        templateName: template_name,
+        modelId: variables.model,
+        taskId: task.id
+      });
+      throw error;
+    }
   };
 }
 

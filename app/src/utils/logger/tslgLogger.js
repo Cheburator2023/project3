@@ -1,41 +1,68 @@
 const net = require('net');
 const { v4: uuidv4 } = require('uuid');
 const os = require('os');
+const LoggerInterface = require('./LoggerInterface');
 
-class TSLGLogger {
-    constructor() {
+/**
+ * TSLG логгер для production
+ */
+class TSLGLogger extends LoggerInterface {
+    constructor(config = {}) {
+        super();
         this.socket = null;
         this.reconnectTimeout = null;
         this.lastConnectionTime = 0;
-        this.isProduction = process.env.NODE_ENV === 'production';
+        this.isFlushing = false;
+        this.logBuffer = [];
 
-        this.originalConsole = {
-            log: console.log,
-            error: console.error,
-            warn: console.warn,
-            info: console.info
-        };
+        this.config = this.mergeWithDefaults(config);
+        this.metrics = this.initializeMetrics();
+        this.originalConsole = this.getOriginalConsole();
 
-        this.config = {
-            host: process.env.TSLG_AGENT_HOST || 'tslg-agent-svc-main.dk1-sumd01-sumd-core.svc.cluster.local',
+        this.initializeBuffer();
+        this.startMetricsMonitoring();
+        this.connect();
+    }
+
+    mergeWithDefaults(config) {
+        const defaults = {
+            host: process.env.TSLG_AGENT_HOST || 'tslg-agent-svc-main',
             port: parseInt(process.env.TSLG_AGENT_PORT || '5170', 10),
-            appName: process.env.APP_NAME || 'sum-backend',
-            projectCode: process.env.PROJECT_CODE || 'SUM',
+            appName: process.env.APP_NAME || 'unknown-app',
+            projectCode: process.env.PROJECT_CODE || 'UNKNOWN',
             risCode: process.env.RIS_CODE || '1404',
             appType: 'NODEJS',
-            envType: this.isProduction ? 'K8S' : 'DEV',
+            envType: 'K8S',
             tslgClientVersion: process.env.TSLG_CLIENT_VERSION || '1.0.0',
-            reconnectionDelay: parseInt(process.env.TSLG_RECONNECTION_DELAY_MS || '1000', 10),
-            connectionTTL: parseInt(process.env.TSLG_CONNECTION_TTL_MS || '2000', 10),
-            namespace: process.env.KUBERNETES_NAMESPACE || 'local-dev',
+            reconnectionDelay: parseInt(process.env.TSLG_RECONNECTION_DELAY_MS || '2000', 10),
+            connectionTTL: parseInt(process.env.TSLG_CONNECTION_TTL_MS || '30000', 10),
+            socketTimeout: parseInt(process.env.TSLG_SOCKET_TIMEOUT_MS || '15000', 10),
+            maxBufferSize: parseInt(process.env.TSLG_MAX_BUFFER_SIZE || '1000', 10),
+            namespace: process.env.KUBERNETES_NAMESPACE || 'default',
             podName: process.env.POD_NAME || os.hostname(),
             podIp: process.env.POD_IP || this.getLocalIP() || '127.0.0.1',
             nodeName: process.env.NODE_NAME || os.hostname()
         };
 
-        if (this.isProduction) {
-            this.connect();
-        }
+        return { ...defaults, ...config };
+    }
+
+    initializeMetrics() {
+        return {
+            sentLogs: 0,
+            failedLogs: 0,
+            reconnections: 0,
+            bufferFlushes: 0
+        };
+    }
+
+    getOriginalConsole() {
+        return {
+            log: console.log,
+            error: console.error,
+            warn: console.warn,
+            info: console.info
+        };
     }
 
     getLocalIP() {
@@ -51,9 +78,29 @@ class TSLGLogger {
         return null;
     }
 
-    connect() {
-        if (!this.isProduction) return;
+    initializeBuffer() {
+        this.logBuffer = [];
+        this.maxBufferSize = this.config.maxBufferSize;
+        this.isFlushing = false;
+    }
 
+    startMetricsMonitoring() {
+        setInterval(() => {
+            this.originalConsole.log('TSLG Metrics:', {
+                sent: this.metrics.sentLogs,
+                failed: this.metrics.failedLogs,
+                reconnections: this.metrics.reconnections,
+                bufferSize: this.logBuffer.length,
+                connected: this.isConnected()
+            });
+        }, 60000);
+    }
+
+    isConnected() {
+        return !!(this.socket && !this.socket.destroyed && this.socket.writable);
+    }
+
+    connect() {
         try {
             this.socket = net.createConnection(
                 {
@@ -62,27 +109,14 @@ class TSLGLogger {
                 },
                 () => {
                     this.lastConnectionTime = Date.now();
-                    this.originalConsole.error('TSLG Logger connected successfully');
+                    this.metrics.reconnections++;
+                    this.originalConsole.log(`TSLG connected to ${this.config.host}:${this.config.port}`);
+                    this.flushBuffer();
                 }
             );
 
-            this.socket.on('error', (error) => {
-                this.originalConsole.error('TSLG Logger connection error:', error.message);
-                this.scheduleReconnect();
-            });
-
-            this.socket.on('close', () => {
-                this.originalConsole.error('TSLG Logger connection closed');
-                this.scheduleReconnect();
-            });
-
-            this.socket.on('timeout', () => {
-                this.originalConsole.error('TSLG Logger connection timeout');
-                this.socket.destroy();
-                this.scheduleReconnect();
-            });
-
-            this.socket.setTimeout(5000);
+            this.setupSocketEventHandlers();
+            this.socket.setTimeout(this.config.socketTimeout);
 
         } catch (error) {
             this.originalConsole.error('Failed to create TSLG connection:', error.message);
@@ -90,9 +124,28 @@ class TSLGLogger {
         }
     }
 
-    scheduleReconnect() {
-        if (!this.isProduction) return;
+    setupSocketEventHandlers() {
+        this.socket.on('error', (error) => {
+            this.originalConsole.error('TSLG connection error:', error.message);
+            this.scheduleReconnect();
+        });
 
+        this.socket.on('close', (hadError) => {
+            this.originalConsole.log(`TSLG connection closed${hadError ? ' with error' : ''}`);
+            this.scheduleReconnect();
+        });
+
+        this.socket.on('timeout', () => {
+            this.originalConsole.error('TSLG connection timeout');
+            this.safeReconnect();
+        });
+
+        this.socket.on('drain', () => {
+            this.flushBuffer();
+        });
+    }
+
+    scheduleReconnect() {
         if (this.reconnectTimeout) {
             clearTimeout(this.reconnectTimeout);
         }
@@ -103,43 +156,77 @@ class TSLGLogger {
     }
 
     shouldReconnect() {
-        if (!this.isProduction) return false;
-        return Date.now() - this.lastConnectionTime >= this.config.connectionTTL;
+        const timeSinceLastConnection = Date.now() - this.lastConnectionTime;
+        const needsBalanceReconnect = timeSinceLastConnection >= this.config.connectionTTL;
+
+        return !this.isConnected() || needsBalanceReconnect;
     }
 
-    log(level, message, event = 'Информация', error = null, additionalData = {}) {
-        const logEntry = this.formatLogEntry(level, message, event, error, additionalData);
+    safeReconnect() {
+        if (this.reconnectTimeout) {
+            clearTimeout(this.reconnectTimeout);
+        }
 
-        if (!this.isProduction) {
-            this.consoleLog(logEntry);
+        if (this.socket) {
+            this.socket.destroy();
+            this.socket = null;
+        }
+
+        this.scheduleReconnect();
+    }
+
+    bufferLog(logData) {
+        if (this.logBuffer.length >= this.maxBufferSize) {
+            this.logBuffer.shift();
+            this.metrics.failedLogs++;
+        }
+
+        this.logBuffer.push(logData);
+
+        if (!this.isFlushing && this.isConnected()) {
+            setTimeout(() => this.flushBuffer(), 10);
+        }
+    }
+
+    async flushBuffer() {
+        if (!this.isConnected() || this.isFlushing || this.logBuffer.length === 0) {
             return;
         }
 
-        if (this.socket && this.socket.writable) {
-            if (this.shouldReconnect()) {
-                this.socket.destroy();
-                this.connect();
-                return;
-            }
+        this.isFlushing = true;
+        this.metrics.bufferFlushes++;
 
-            try {
-                const logData = JSON.stringify(logEntry);
-                this.socket.write(logData + '\n');
-            } catch (error) {
-                this.originalConsole.error('Failed to send log to TSLG:', error.message);
+        try {
+            while (this.logBuffer.length > 0 && this.isConnected()) {
+                const logData = this.logBuffer[0];
+                const success = this.socket.write(logData);
+
+                if (success) {
+                    this.logBuffer.shift();
+                    this.metrics.sentLogs++;
+                } else {
+                    break;
+                }
+
+                if (this.logBuffer.length > 10) {
+                    await new Promise(resolve => setImmediate(resolve));
+                }
             }
+        } catch (error) {
+            this.originalConsole.error('Buffer flush error:', error.message);
+        } finally {
+            this.isFlushing = false;
         }
-
-        this.consoleLog(logEntry);
     }
 
-    formatLogEntry(level, message, event, error, additionalData) {
+    createLogEntry(level, message, event, error, additionalData) {
         const timestamp = new Date();
-        const logEntry = {
+
+        return {
             "@timestamp": timestamp.getTime() / 1000,
             "level": level.toLowerCase(),
             "eventId": uuidv4(),
-            "text": typeof message === 'string' ? message : JSON.stringify(message),
+            "text": typeof message === 'string' ? message : JSON.stringify(message, null, 2),
             "localTime": timestamp.toISOString(),
             "PID": process.pid,
             "appType": this.config.appType,
@@ -155,41 +242,27 @@ class TSLGLogger {
             },
             "tslgClientVersion": this.config.tslgClientVersion,
             "eventOutcome": event,
-            "risCode": this.config.risCode
+            "risCode": this.config.risCode,
+            ...this.sanitizeData(additionalData),
+            ...this.formatError(error)
         };
+    }
 
-        if (Object.keys(additionalData).length > 0) {
-            Object.assign(logEntry, this.sanitizeData(additionalData));
+    formatError(error) {
+        if (!error) return {};
+
+        if (error instanceof Error) {
+            return {
+                stack: this.cleanStack(error.stack),
+                errorMessage: error.message
+            };
         }
 
-        if (error) {
-            if (error instanceof Error) {
-                logEntry.stack = this.cleanStack(error.stack);
-                logEntry.errorMessage = error.message;
-            } else {
-                logEntry.error = JSON.stringify(error);
-            }
-        }
-
-        return logEntry;
+        return { error: JSON.stringify(error) };
     }
 
     cleanStack(stack) {
-        if (!stack) return '';
-        return stack.split('\n')
-            .map(line => line.trim())
-            .join('\n');
-    }
-
-    consoleLog(logEntry) {
-        if (!this.isProduction) {
-            const jsonLog = JSON.stringify(logEntry, null, 2);
-            this.originalConsole.log(jsonLog);
-            return;
-        }
-
-        const jsonLog = JSON.stringify(logEntry);
-        this.originalConsole.log(jsonLog);
+        return stack ? stack.split('\n').map(line => line.trim()).join('\n') : '';
     }
 
     sanitizeData(data) {
@@ -198,52 +271,140 @@ class TSLGLogger {
             'authorization', 'secret', 'apiKey', 'credentials'
         ];
 
-        const sanitized = { ...data };
-        for (const [key, value] of Object.entries(sanitized)) {
-            if (sensitiveFields.includes(key.toLowerCase())) {
-                sanitized[key] = '*****';
-            } else if (typeof value === 'object' && value !== null) {
-                sanitized[key] = this.sanitizeData(value);
-            }
-        }
+        const sanitized = JSON.parse(JSON.stringify(data));
 
+        const sanitizeRecursive = (obj) => {
+            for (const key in obj) {
+                if (sensitiveFields.includes(key.toLowerCase())) {
+                    obj[key] = '*****';
+                } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+                    sanitizeRecursive(obj[key]);
+                }
+            }
+        };
+
+        sanitizeRecursive(sanitized);
         return sanitized;
     }
 
-    close() {
-        if (!this.isProduction) return;
+    log(level, message, event = 'Информация', error = null, additionalData = {}) {
+        const logEntry = this.createLogEntry(level, message, event, error, additionalData);
+        const logData = JSON.stringify(logEntry) + '\n';
 
+        this.writeToConsole(logEntry);
+
+        if (this.shouldReconnect()) {
+            this.safeReconnect();
+        }
+
+        if (this.isConnected()) {
+            this.tryDirectSend(logData);
+        } else {
+            this.bufferLog(logData);
+            this.safeReconnect();
+        }
+    }
+
+    tryDirectSend(logData) {
+        try {
+            if (this.socket.writableLength < 65536) {
+                const success = this.socket.write(logData);
+                if (success) {
+                    this.metrics.sentLogs++;
+                } else {
+                    this.bufferLog(logData);
+                }
+            } else {
+                this.bufferLog(logData);
+            }
+        } catch (error) {
+            this.originalConsole.error('Send error:', error.message);
+            this.bufferLog(logData);
+        }
+    }
+
+    writeToConsole(logEntry) {
+        const timestamp = new Date().toISOString();
+        const level = logEntry.level.toUpperCase();
+        const message = `[${timestamp}] [${level}] ${logEntry.text}`;
+
+        switch (logEntry.level) {
+            case 'error':
+                this.originalConsole.error(message);
+                break;
+            case 'warn':
+                this.originalConsole.warn(message);
+                break;
+            default:
+                this.originalConsole.log(message);
+        }
+    }
+
+    info(message, event = 'Информация', additionalData = {}) {
+        this.log('info', message, event, null, additionalData);
+    }
+
+    warn(message, event = 'Предупреждение', additionalData = {}) {
+        this.log('warn', message, event, null, additionalData);
+    }
+
+    error(message, event = 'Ошибка', error = null, additionalData = {}) {
+        this.log('error', message, event, error, additionalData);
+    }
+
+    sys(message, additionalData = {}) {
+        this.log('info', message, 'Системное', null, additionalData);
+    }
+
+    close() {
         if (this.reconnectTimeout) {
             clearTimeout(this.reconnectTimeout);
         }
+
+        if (this.logBuffer.length > 0 && this.isConnected()) {
+            this.originalConsole.log(`Flushing ${this.logBuffer.length} logs before shutdown`);
+            this.flushBufferSync();
+        }
+
         if (this.socket) {
             this.socket.destroy();
         }
+
+        this.originalConsole.log('TSLG logger closed');
+    }
+
+    flushBufferSync() {
+        if (!this.isConnected()) return;
+
+        for (let i = 0; i < 3 && this.logBuffer.length > 0; i++) {
+            try {
+                const logData = this.logBuffer[0];
+                const success = this.socket.write(logData);
+
+                if (success) {
+                    this.logBuffer.shift();
+                    this.metrics.sentLogs++;
+                }
+            } catch (error) {
+                break;
+            }
+        }
+    }
+
+    getStatus() {
+        return {
+            type: 'TSLGLogger',
+            isProduction: true,
+            isConnected: this.isConnected(),
+            config: {
+                host: this.config.host,
+                port: this.config.port,
+                appName: this.config.appName
+            },
+            metrics: { ...this.metrics },
+            bufferSize: this.logBuffer.length
+        };
     }
 }
 
-const tslgLogger = new TSLGLogger();
-
-module.exports = {
-    log: (msg, event = 'Информация', level = 'info', error = null, additionalData = {}) => {
-        tslgLogger.log(level, msg, event, error, additionalData);
-    },
-
-    info: (msg, event = 'Информация', additionalData = {}) => {
-        tslgLogger.log('info', msg, event, null, additionalData);
-    },
-
-    error: (msg, event = 'Ошибка', error = null, additionalData = {}) => {
-        tslgLogger.log('error', msg, event, error, additionalData);
-    },
-
-    warn: (msg, event = 'Предупреждение', additionalData = {}) => {
-        tslgLogger.log('warn', msg, event, null, additionalData);
-    },
-
-    sys: (msg, additionalData = {}) => {
-        tslgLogger.log('info', msg, 'Системное', null, additionalData);
-    },
-
-    close: () => tslgLogger.close()
-};
+module.exports = TSLGLogger;
