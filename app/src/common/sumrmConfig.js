@@ -11,6 +11,9 @@
 const ARTEFACT_ID_MAPPING = {
     '803': '2073', // RFD artefact - Sum ID 803 maps to SumRM ID 2073
     '69': '2104', // developing_model_reason artefact - Sum ID 69 maps to SumRM ID 2104
+    '914': '2660', // output_table artefact - Sum ID 914 maps to SumRM ID 2660
+    '915': '2661', // allocation_assessment_class artefact - Sum ID 915 maps to SumRM ID 2661
+    '916': '2662', // allocation_assessment_parameters artefact - Sum ID 916 maps to SumRM ID 2662
 }
 
 // Get SumRM artefact IDs from the mapping
