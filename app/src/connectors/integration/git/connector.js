@@ -1,20 +1,26 @@
 const fetch = require('isomorphic-fetch')
+const tslgLogger = require('../../../utils/logger');
 
 const gitHost = process.env.GIT_API
 
-module.exports = ({ 
-    path, 
-    method = 'GET',
-    body,
-    file
-}) => {
-    console.sys('GIT', `${gitHost}${path}`)
+module.exports = ({
+                      path,
+                      method = 'GET',
+                      body,
+                      file
+                  }, context = {}) => {
+
+    tslgLogger.log(`GIT request: ${method} ${gitHost}${path}`, 'Запрос', 'info', null, {
+        system: 'GIT',
+        path,
+        method
+    });
 
     const headers = {}
     if (!file)
         headers['Content-Type'] = 'application/json'
-    return fetch
-    (
+
+    return fetch(
         `${gitHost}${path}`,
         {
             method: body ? 'POST' : method,
@@ -22,14 +28,36 @@ module.exports = ({
             body
         }
     )
-    .then(data => {
-        console.sys('GIT', data.status, data.statusText)
-        if (data.status === 200) return data.json()
+        .then(data => {
+            if (data.status === 200) {
+                tslgLogger.log(`GIT response: ${data.status} ${data.statusText}`, 'Ответ', 'info', null, {
+                    system: 'GIT',
+                    path,
+                    method,
+                    status: data.status
+                });
+                return data.json()
+            }
 
-        const error = new Error(data.statusText)
-        error.status = data.status
-        error.system = 'GIT'
+            const error = new Error(data.statusText)
+            error.status = data.status
+            error.system = 'GIT'
 
-        throw error
-    })
+            tslgLogger.log(`GIT error: ${data.statusText}`, 'Ошибка', 'error', error, {
+                system: 'GIT',
+                path,
+                method,
+                status: data.status
+            });
+
+            throw error
+        })
+        .catch(error => {
+            tslgLogger.log(`GIT unexpected error: ${error.message}`, 'Ошибка', 'error', error, {
+                system: 'GIT',
+                path,
+                method
+            });
+            throw error
+        })
 }

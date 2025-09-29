@@ -1,45 +1,38 @@
-const c = require('colors/safe')
-const util = require('util')
+const LoggerFactory = require('./LoggerFactory');
+const ConsoleOverride = require('./ConsoleOverride');
 
-function formatArgs(args){
-    return util.format.apply(util.format, Array.prototype.slice.call(args));
-}
-
-console.sys = function() {
-    console.log(
-        c.green('[SYSTEM]'),
-        `[ ${new Date().toUTCString()} ]`,
-        formatArgs(arguments)
-    )
+const defaultConfig = {
+    appName: process.env.APP_NAME || 'sum-backend',
+    projectCode: process.env.PROJECT_CODE || 'SUMD',
+    risCode: process.env.RIS_CODE || '1661',
+    host: process.env.TSLG_AGENT_HOST || 'tslg-agent-svc-main',
+    port: parseInt(process.env.TSLG_AGENT_PORT || '5170', 10)
 };
 
-console.siem = function() {
-    console.log(
-        c.green('[SEIM]'),
-        formatArgs(arguments)
-    )
+const logger = LoggerFactory.createLogger(defaultConfig);
+
+const consoleOverride = new ConsoleOverride(logger);
+
+setTimeout(() => {
+    consoleOverride.apply();
+    console.sys('Logger initialization completed');
+}, 100);
+
+const setupGracefulShutdown = () => {
+    const shutdown = (signal) => {
+        console.original.log(`Received ${signal}, shutting down gracefully...`);
+
+        setTimeout(() => {
+            logger.close();
+            consoleOverride.restore();
+            process.exit(0);
+        }, 3000);
+    };
+
+    process.on('SIGTERM', () => shutdown('SIGTERM'));
+    process.on('SIGINT', () => shutdown('SIGINT'));
 };
 
-console.info = function() {
-    console.log(
-        c.green('[INFO]'),
-        `[ ${new Date().toUTCString()} ]`,
-        formatArgs(arguments)
-    )
-};
+setupGracefulShutdown();
 
-console.warn = function() {
-    console.log(
-        c.yellow('[WARN]'),
-        `[ ${new Date().toUTCString()} ]`,
-        formatArgs(arguments)
-    )
-};
-
-console.error = function() {
-    console.log(
-        c.red('[ERROR]'),
-        `[ ${new Date().toUTCString()} ]`,
-        formatArgs(arguments)
-    )
-};
+module.exports = logger;

@@ -1,12 +1,18 @@
 const fetch = require('isomorphic-fetch')
+const tslgLogger = require('../../../utils/logger');
 
 const keycloakHost = process.env.KEYCLOAK_URL
 
-module.exports = ({ 
-    path, 
-    token
-}) => 
-    fetch(
+module.exports = ({
+                      path,
+                      token
+                  }) => {
+    tslgLogger.log(`Keycloak request: GET ${keycloakHost}${path}`, 'Запрос', 'info', null, {
+        system: 'Keycloak',
+        path
+    });
+
+    return fetch(
         `${keycloakHost}${path}`,
         {
             headers:  {
@@ -15,17 +21,32 @@ module.exports = ({
             }
         }
     )
-    .then(data => {
-        console.sys('Keycloak.', data.status, data.statusText)
-        if (data.status === 200) return data.json()
+        .then(data => {
+            tslgLogger.log(`Keycloak response: ${data.status} ${data.statusText}`, 'Ответ', 'info', null, {
+                system: 'Keycloak',
+                path,
+                status: data.status
+            });
 
-        const error = new Error(data.statusText)
-        error.status = data.status
-        error.system = 'Keycloak'
+            if (data.status === 200) return data.json()
 
-        throw error
-    })
-    .catch(e => {
-        console.sys(e)
-        throw e
-    })
+            const error = new Error(data.statusText)
+            error.status = data.status
+            error.system = 'Keycloak'
+
+            tslgLogger.log(`Keycloak error: ${data.statusText}`, 'Ошибка', 'error', error, {
+                system: 'Keycloak',
+                path,
+                status: data.status
+            });
+
+            throw error
+        })
+        .catch(error => {
+            tslgLogger.log(`Keycloak unexpected error: ${error.message}`, 'Ошибка', 'error', error, {
+                system: 'Keycloak',
+                path
+            });
+            throw error
+        })
+}
