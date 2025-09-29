@@ -20,6 +20,7 @@ module.exports = ({
     const headers = {}
     headers['Content-Type'] = 'application/json'
 
+    // Add authorization header if token is provided
     if (token) {
         headers['Authorization'] = `Bearer ${token}`
     }
@@ -30,19 +31,23 @@ module.exports = ({
         body
     }
 
-    return fetch(fullUrl, requestConfig)
-        .then(async data => {
-            let responseBody = null
+    return fetch
+    (
+        fullUrl,
+        requestConfig
+    )
+    .then(async data => {
+        let responseBody = null
+        try {
+            const responseText = await data.text()
             try {
-                const responseText = await data.text()
-                try {
-                    responseBody = JSON.parse(responseText)
-                } catch (parseError) {
-                    responseBody = responseText
-                }
-            } catch (bodyError) {
-                // Ignore body parsing errors
+                responseBody = JSON.parse(responseText)
+            } catch (parseError) {
+                responseBody = responseText
             }
+        } catch (bodyError) {
+            // Ignore body parsing errors
+        }
 
             tslgLogger.log(`SUMRM response: ${data.status} ${data.statusText}`, 'Ответ', 'info', null, {
                 system: 'SUMRM',

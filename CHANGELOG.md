@@ -1,5 +1,25 @@
 # Semantic Versioning Changelog
 
+# [1.20.0](https://git.sfera.inno.local/sumd/backend/compare/v1.19.0...v1.20.0) (2025-09-08)
+
+
+### Bug Fixes
+
+* update artefact ID reference in card model to ensure consistency in data processing ([7245f55](https://git.sfera.inno.local/sumd/backend/commit/7245f557d82546352e6d754e3a5e8dbeea4a733b))
+
+
+### Features
+
+* add history synchronization for artefacts with SumRM integration ([eee37fa](https://git.sfera.inno.local/sumd/backend/commit/eee37fa4fbe3eded8315fed96a5a76075e22bcfa))
+* update sumrmConfig.js to include developing_model_reason ([780c2d6](https://git.sfera.inno.local/sumd/backend/commit/780c2d610dd312309ffaa7570bf4351474659a35))
+
+# [1.19.0](https://git.sfera.inno.local/sumd/backend/compare/v1.18.0...v1.19.0) (2025-08-21)
+
+
+### Features
+
+* implement SumRM integration for artefact synchronization ([03f846d](https://git.sfera.inno.local/sumd/backend/commit/03f846ddf9d8f2202bf039091f0015c267bd0bdd))
+
 # [1.18.0](https://git.sfera.inno.local/sumd/backend/compare/v1.17.1...v1.18.0) (2025-08-14)
 
 
