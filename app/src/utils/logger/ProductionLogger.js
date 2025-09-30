@@ -46,7 +46,7 @@ class ProductionLogger extends LoggerInterface {
             const isAvailable = await tester.isTSLGAvailable();
 
             if (isAvailable) {
-                const TSLGLogger = require('./TSLGLogger');
+                const TSLGLogger = require('./tslgLogger');
                 const tslgLogger = new TSLGLogger(this.config);
 
                 if (this.currentLogger && this.currentLogger.close) {
