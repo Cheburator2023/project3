@@ -1,5 +1,29 @@
 # Semantic Versioning Changelog
 
+# [1.21.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.20.0...v1.21.0) (2025-09-30)
+
+
+### Bug Fixes
+
+* update artefact ID reference in card model to ensure consistency in data processing ([163fa53](https://git.sfera.inno.local:7999/SUMD/backend/commit/163fa532029813a0435361cf584b2990345f10e6))
+* Актуализировал ветку относительно develop ([95f6d40](https://git.sfera.inno.local:7999/SUMD/backend/commit/95f6d401730ebcdc3d3a20ea6ab299343f0d7c19))
+* Добавил потерявшиеся файлы ([1ddd71a](https://git.sfera.inno.local:7999/SUMD/backend/commit/1ddd71a0f0bb69b91182d6340363aa61451e5664))
+
+
+### Features
+
+* add detailed debug logging for artefact merging process ([451569e](https://git.sfera.inno.local:7999/SUMD/backend/commit/451569ef78044961443a4e57780dfec078d7c009))
+* add history synchronization for artefacts with SumRM integration ([dead6cc](https://git.sfera.inno.local:7999/SUMD/backend/commit/dead6cc2ac708db4f2ee4827a8d1a75b8291a30e))
+* enhance debug logging for SumRM API calls and responses ([b221a28](https://git.sfera.inno.local:7999/SUMD/backend/commit/b221a28fb5dc44c53c976bb7d9eabc4852662691))
+* implement SumRM integration for artefact synchronization ([a7612c4](https://git.sfera.inno.local:7999/SUMD/backend/commit/a7612c499be176e10734755e1349ca7bac8a4fd7))
+* update sumrmConfig.js to include developing_model_reason ([a4243ba](https://git.sfera.inno.local:7999/SUMD/backend/commit/a4243ba26d647ecc2bb35fd3d84ffc349dd1a414))
+* Добавил интеграцию с TSLG ([2715fa4](https://git.sfera.inno.local:7999/SUMD/backend/commit/2715fa463d2cdad48eb6ea97dd41f4597caafc93))
+* Добавил логер в код, исправил подключение к TSLG и обработку логов ([cab7f5c](https://git.sfera.inno.local:7999/SUMD/backend/commit/cab7f5c6833545480cb5266c9e33952d2f45c9fc))
+* изменение схемы продуктивизация ([d20cca8](https://git.sfera.inno.local:7999/SUMD/backend/commit/d20cca87e9fc2ffe9f253bbab08fb98b0dc501a2))
+* Исправил сообщение согласно шаблона в ТЗ ([b943a0b](https://git.sfera.inno.local:7999/SUMD/backend/commit/b943a0baf9bf2c9ec42e9080782f0f06c76b96e5))
+* Исправил сообщение согласно шаблона в ТЗ ([7b7f057](https://git.sfera.inno.local:7999/SUMD/backend/commit/7b7f057eacfb13e5e53d972fa79a7c7dd1a0f991))
+* Поправил выбор логера ([f200610](https://git.sfera.inno.local:7999/SUMD/backend/commit/f200610d036fc9a93ba69e4e15205d6f856a414b))
+
 # [1.20.0](https://git.sfera.inno.local/sumd/backend/compare/v1.19.0...v1.20.0) (2025-09-08)
 
 
