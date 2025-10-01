@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.22.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.21.0...v1.22.0) (2025-10-01)
+
+
+### Features
+
+* Поправил название модуля ([50e83e7](https://git.sfera.inno.local:7999/SUMD/backend/commit/50e83e73ecd6e7d84aea2e4ef222463b18fcd0fb))
+
 # [1.21.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.20.0...v1.21.0) (2025-09-30)
 
 
