@@ -53,6 +53,7 @@ module.exports = (db, integration, bpmn, common) => {
   client.subscribe("bpmnFinish", system.bpmnFinish);
   client.subscribe("bpmnStatus", system.bpmnStatus);
   client.subscribe("putJobDue", system.putJobDue);
+  client.subscribe("needModelOps", system.needModelOps);
 
   // AutoML Handler
   const automl = new AutoMl(db, integration, bpmn);

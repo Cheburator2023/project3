@@ -5,7 +5,7 @@ const status = require("./status");
 const sql = `
     SELECT
         m.model_status as camunda_model_status,
-        st.status as artefacts_model_status,
+        st.status as artefacts_model_status
     FROM
         models m
     LEFT JOIN (${status}) st

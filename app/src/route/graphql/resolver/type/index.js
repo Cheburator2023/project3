@@ -1,12 +1,11 @@
 const moment = require("moment");
 const activity = require("./bpmnActivity");
-const { status, model_status } = require("./status");
-
+const { status, model_status } = require("../../../../common/status-map");
 const {
   getLastActiveStatus,
   hasSpecificArtefactValue,
   determineLifecycleStageToImplemented,
-} = require("./helpers");
+} = require("../../../../common/status-helpers");
 
 // Особенности маппинга статусов:
 // Ести статус модели Разработана не внедрена, Этап ЖЦМ тоже должен быть Разработана не внедрена
