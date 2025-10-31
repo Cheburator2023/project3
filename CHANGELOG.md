@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.23.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.22.0...v1.23.0) (2025-10-31)
+
+
+### Features
+
+* add external service task for model state transition process ([55b5450](https://git.sfera.inno.local:7999/SUMD/backend/commit/55b5450c35c16d73863883a52db7b7134754806b))
+
 # [1.22.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.21.0...v1.22.0) (2025-10-01)
 
 
