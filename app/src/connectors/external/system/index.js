@@ -1,5 +1,7 @@
 const moment = require("moment");
 const { Variables } = require("camunda-external-task-client-js");
+const { model_status } = require("../../../common/status-map");
+const { getLastActiveStatus } = require("../../../common/status-helpers");
 
 class System {
   constructor(db, bpmn) {
@@ -190,6 +192,37 @@ class System {
           )
         );
       await taskService.complete(task);
+    } catch (e) {
+      console.sys(e);
+    }
+  };
+
+  /**
+   * External Task Worker for process: model_state_transition
+   * Topic: model_state_transition.needModelOps
+   *
+   * Purpose:
+   *   Determines if ModelOps involvement is required when archiving a model.
+   */
+  needModelOps = async ({ task, taskService }) => {
+    const variables = task.variables.getAll();
+
+    try {
+      const processVariables = new Variables();
+
+      const { CAMUNDA_MODEL_STATUS, ARTEFACTS_MODEL_STATUS } = await this.db.card.getCurrentModelStatus(variables.model)
+      const status = CAMUNDA_MODEL_STATUS || getLastActiveStatus(ARTEFACTS_MODEL_STATUS)
+      const filteredValues = [
+        model_status.developed_not_implemented,
+        model_status.validated_outside_pim,
+        model_status.implemented_outside_pim,
+        model_status.implementing_outside_pim
+      ]
+
+      processVariables.setAll({
+        need_model_ops: !filteredValues.includes(status)
+      });
+      await taskService.complete(task, processVariables);
     } catch (e) {
       console.sys(e);
     }
