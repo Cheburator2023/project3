@@ -34,6 +34,7 @@ const model_status = {
   developed_not_implemented: 'Разработана, не внедрена',
   implemented_in_pim: 'Разработана, внедрена в ПИМ',
   implemented_outside_pim: 'Разработана, внедрена вне ПИМ',
+  implementing_outside_pim: 'Модель внедряется вне ПИМ',
   removed_from_operation: 'Вывод модели из эксплуатации',
   validated_outside_pim: 'Внедрена вне ПИМ',
   validated_in_pim: 'Внедрена в ПИМ',

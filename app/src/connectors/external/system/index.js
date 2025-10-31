@@ -215,7 +215,8 @@ class System {
       const filteredValues = [
         model_status.developed_not_implemented,
         model_status.validated_outside_pim,
-        model_status.implemented_outside_pim
+        model_status.implemented_outside_pim,
+        model_status.implementing_outside_pim
       ]
 
       processVariables.setAll({
