@@ -85,6 +85,15 @@ class Instance {
       })
       .then(d => d.rows)
   }
+  
+  getBpmnProcessByKey = key => {
+    return this.db
+      .execute({
+        sql: sql.getBpmnProcessByKey,
+        args: { key }
+      })
+      .then(d => d.rows)
+  }
 }
 
 module.exports = Instance

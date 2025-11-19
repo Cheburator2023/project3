@@ -43,6 +43,37 @@ const getActiveTask = async (MODEL_ID, context) => {
     return null;
   }
 };
+
+/**
+ * Retrieves the first active task for a given model, excluding tasks with specific IDs.
+ *
+ * @param {string} MODEL_ID - The ID of the model to retrieve tasks for.
+ * @param {object} context - The context containing the database and user information.
+ * @returns {object|null} The first active task object or null if no active tasks are found.
+ * @throws Will log an error message if an exception occurs during the retrieval process.
+ */
+const getActiveTaskAfterRollback = async (MODEL_ID, context) => {
+  try {
+    const activeTasks = (
+      await context.bpmn.tasksByModel(MODEL_ID)
+    ).filter(({ taskDefinitionKey }) => !TASK_IDS_NOT_TO_COUNT.includes(taskDefinitionKey));
+
+    console.log('Got active tasks from Camunda', activeTasks);
+
+    if (!activeTasks.length) {
+      return null;
+    }
+
+    const definition = await context.bpmn.definition(activeTasks[0].processDefinitionId);
+    const bpmnProcess = await context.db.instance.getBpmnProcessByKey(definition.key);
+
+    return {...activeTasks[0], BPMN_KEY_ID: bpmnProcess.BPMN_KEY_ID, MODEL_ID: MODEL_ID};
+  } catch (e) {
+    console.error("Error on getActiveTaskAfterRollback", e);
+    return null;
+  }
+};
+
 // TODO: refactor this function
 const deleteRolledBackProcessInstances = async ({
   taskRolledBackTo,
@@ -242,7 +273,7 @@ module.exports = async (root, { activity }, context) => {
 
     // 0. Modify process instance to rollback
     return context.bpmn.modify(activity).then(async (data) => {
-      const activeTaskAfterRollback = await getActiveTask(MODEL_ID, context);
+      const activeTaskAfterRollback = await getActiveTaskAfterRollback(MODEL_ID, context);
 
       if (!activeTaskAfterRollback) {
         throw new Error(
