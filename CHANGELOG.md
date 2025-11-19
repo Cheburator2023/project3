@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.23.1](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.23.0...v1.23.1) (2025-11-19)
+
+
+### Bug Fixes
+
+* исправление получения активной таски после отката ([ff04e4a](https://git.sfera.inno.local:7999/SUMD/backend/commit/ff04e4a60505ec76e252a9811292ad5119d21b36))
+
 # [1.23.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.22.0...v1.23.0) (2025-10-31)
 
 
