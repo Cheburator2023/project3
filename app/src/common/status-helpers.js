@@ -94,9 +94,47 @@ const acquireStageAndStatusFromCamunda = async (id, taskId, processDefinitionId,
   return {modelStage: modelStage, modelStatus: modelStatus};
 }
 
+const camundaExternalTaskStatusDecorator = (callback, bpmn, db, changeStage = false) => {
+  return async (task, taskService) => {
+    await callback(task, taskService);
+
+    const variables = task.variables.getAll();
+
+    const { modelStage: modelStage, modelStatus: modelStatus } = await acquireStageAndStatusFromCamunda(
+      task.id,
+      task.activityId,
+      task.processDefinitionId,
+      variables,
+      {
+        bpmn: bpmn,
+        db: db,
+      },
+    );
+
+    if (changeStage && modelStage) {
+      await this.db.card.changeStage({
+        modelId: variables.model,
+        modelStage: modelStage,
+      });
+    }
+
+    if (modelStatus) {
+      await db.card.changeStatus({
+        modelId: variables.model,
+        modelStatus: modelStatus ? modelStatus : null,
+      });
+      // проставляем флаг активности если модель перешла в архив (для моделей со статусом из камунды)
+      if (modelStatus === 'Архив') {
+        await db.card.editActiveStatus({MODEL_ID: variables.model, MODELS_IS_ACTIVE_FLG: 0});
+      }
+    }
+  };
+}
+
 module.exports = {
   getLastActiveStatus,
   hasSpecificArtefactValue,
   determineLifecycleStageToImplemented,
   acquireStageAndStatusFromCamunda,
+  camundaExternalTaskStatusDecorator,
 };

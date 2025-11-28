@@ -1,4 +1,5 @@
 const getUserName = require("../card/helpers");
+const { acquireStageAndStatusFromCamunda } = require("../../../../../common/status-helpers");
 
 module.exports = async (root, args, context) => {
     // Get Task Info
@@ -48,9 +49,13 @@ module.exports = async (root, args, context) => {
 
     console.sys(addNewArtefactStatus)
 
-    const modelStatus = await context.bpmn.getTaskVar(args.id, 'model_status');
-    const modelStage = await context.bpmn.getTaskVar(args.id, 'model_stage');
-
+    const {modelStage: modelStage, modelStatus: modelStatus} = await acquireStageAndStatusFromCamunda(
+        args.id,
+        taskInfo.taskDefinitionKey,
+        taskInfo.processDefinitionId,
+        null,
+        context
+    );
     console.log(`Получен новый статус модели model${taskInfo.MODEL.ROOT_MODEL_ID}-v${taskInfo.MODEL.MODEL_VERSION}: ${modelStatus}`)
 
     // Camunda close task
