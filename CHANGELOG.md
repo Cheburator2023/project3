@@ -1,5 +1,19 @@
 # Semantic Versioning Changelog
 
+# [1.25.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.24.0...v1.25.0) (2025-12-09)
+
+
+### Features
+
+* add scripts directory and include it in dockerfile copy step ([44d377c](https://git.sfera.inno.local:7999/SUMD/backend/commit/44d377cefc301f3f019f248a744a9d3e0f0bf7cc))
+
+# [1.24.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.23.1...v1.24.0) (2025-12-09)
+
+
+### Features
+
+* скрипт для предзаполнения этапов и статусов старых моделей ([c8e486a](https://git.sfera.inno.local:7999/SUMD/backend/commit/c8e486a0237e930c68989f60dd634f0e47847ad0))
+
 ## [1.23.1](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.23.0...v1.23.1) (2025-11-19)
 
 
