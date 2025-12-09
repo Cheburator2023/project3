@@ -340,4 +340,23 @@ class Task {
   };
 }
 
+getStatusStageMapByTask = async(taskId, processDefinitionId) => {
+  const definition = await this.bpmn.definition(processDefinitionId);
+  
+  if (!definition) {
+    console.error(`Cannot get definition by id ${processDefinitionId} on getStatusStageMapByTask for task ${taskId}`);
+    return null;
+  }
+
+  return await this.db.execute({
+    sql: sql.modelStatusAndStageByTask,
+    args: {
+      task_id: taskId,
+      key: definition.key,
+      version_tag: definition.versionTag
+    },
+  })
+  .then((data) => data.rows[0]);
+};
+
 module.exports = Task;

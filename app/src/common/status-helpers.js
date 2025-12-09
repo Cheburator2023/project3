@@ -71,8 +71,32 @@ const determineLifecycleStageToImplemented = (businessStatus, modelStatus) => {
   return businessStatus;
 };
 
+const acquireStageAndStatusFromCamunda = async (id, taskId, processDefinitionId, variables, context) => {
+  let modelStatus = null;
+  let modelStage = null;
+
+  // Пробуем получить этап и статус из переменных Камунды (новые схемы)
+  modelStatus = variables ? variables.model_status : await context.bpmn.getTaskVar(id, 'model_status');
+  modelStage = variables ? variables.model_stage : await context.bpmn.getTaskVar(id, 'model_stage');
+
+  if (!modelStatus && !modelStage) {
+    // Не получили из переменных, пробуем найти в маппинге по текущей activity (user task или external task)
+    const stageStatusMap = await context.db.task.getStatusStageMapByTask(taskId, processDefinitionId);
+
+    if (stageStatusMap) {
+      modelStatus = stageStatusMap.MODEL_STATUS;
+      modelStage = stageStatusMap.MODEL_STAGE;
+    } else {
+      console.log('Ошибка получения статуса/этапа из Камунды.')
+    }
+  }
+
+  return {modelStage: modelStage, modelStatus: modelStatus};
+}
+
 module.exports = {
   getLastActiveStatus,
   hasSpecificArtefactValue,
   determineLifecycleStageToImplemented,
+  acquireStageAndStatusFromCamunda,
 };
