@@ -11,5 +11,6 @@ module.exports = {
   addOperationLog: require("./addOperationLog"),
   taskOperationsLogs: require("./taskOperationsLogs"),
   tasksOperations: require("./tasksOperations"),
-  bpmnKeyByTaskId: require("./bpmnKeyByTaskId")
+  bpmnKeyByTaskId: require("./bpmnKeyByTaskId"),
+  modelStatusAndStageByTask: require("./modelStatusAndStageByTask")
 }

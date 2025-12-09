@@ -432,6 +432,18 @@ class Bpmn {
       );
     }
   };
+
+  externalTasksByInstanceId = (instanceId) =>
+    this.connector({
+      path: `/external-task?processInstanceId=${instanceId}`,
+    });
+
+  historyTasksByModel = (modelId) =>
+    this.connector({
+      path: `/history/task?${querystring.stringify({
+        processVariables: "model_eq_" + modelId,
+      })}`,
+    });
 }
 
 module.exports = Bpmn;
