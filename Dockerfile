@@ -28,6 +28,7 @@ FROM docker.repo-ci.sfera.inno.local/sumd-docker-lib/ubi8-base-backend:v1.0.1
 #    npm i --only-production
 
 COPY app/src /app/src
+COPY app/scripts /app/scripts
 
 WORKDIR /configuration
 COPY configuration/oracle /configuration/oracle
