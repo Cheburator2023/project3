@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.26.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.25.0...v1.26.0) (2025-12-09)
+
+
+### Features
+
+* fix скрипт для предзаполнения этапов и статусов старых моделей ([ad0f61c](https://git.sfera.inno.local:7999/SUMD/backend/commit/ad0f61c2b6f458885c55dcb908a5c751f5cd502c))
+
 # [1.25.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.24.0...v1.25.0) (2025-12-09)
 
 
