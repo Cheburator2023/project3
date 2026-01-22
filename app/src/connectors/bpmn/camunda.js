@@ -444,6 +444,14 @@ class Bpmn {
         processVariables: "model_eq_" + modelId,
       })}`,
     });
+
+  historyExternalTasksByInstanceId = (processInstanceId) =>
+    this.connector({
+      path: `/history/external-task-log?${querystring.stringify({
+        processInstanceId: processInstanceId,
+        successLog: true
+      })}`,
+    });
 }
 
 module.exports = Bpmn;

@@ -15,6 +15,7 @@ const getModels = async (limit, database) => {
                 where m.model_status is null 
                     and m.model_stage is null 
                     and m.model_id <> ALL (:failed_ids)
+                    and m.model_desc <> 'AutoML'
                     and not exists(select mt.model_id from models_tmp mt where m.model_id = mt.model_id)
                     and exists (select bi.bpmn_instance_id from bpmn_instances bi where m.model_id = bi.model_id)
                 limit :limit`,
@@ -23,7 +24,7 @@ const getModels = async (limit, database) => {
     .then((data) => data.rows);
 }
 
-const setCurrentStageAndStatusByTask = async (model, task, bpmn, db, database) => {
+const setCurrentStageAndStatusByTask = async (model, task, bpmn, db, database, setStage = true, setStatus = true) => {
     const {modelStage: modelStage, modelStatus: modelStatus} = await acquireStageAndStatusFromCamunda(
         task.id,
         task.taskDefinitionKey,
@@ -41,7 +42,7 @@ const setCurrentStageAndStatusByTask = async (model, task, bpmn, db, database) =
         args: { model_id: model.MODEL_ID, root_model_id: model.ROOT_MODEL_ID },
     });
 
-    if (modelStatus) {
+    if (setStatus && modelStatus) {
         await database.execute({
             sql: `UPDATE models_tmp SET model_status = :model_status
                 WHERE model_id = :model_id`,
@@ -55,13 +56,9 @@ const setCurrentStageAndStatusByTask = async (model, task, bpmn, db, database) =
             `,
             args: { model_id: model.MODEL_ID, status: modelStatus },
         });
-
-        // db.card.changeStatus({ modelId: model.MODEL_ID, modelStatus })
-        //     .then()
-        //     .catch((err) => console.log(`Ошибка при смене статуса модели ${model.MODEL_ID}: ${err}`));
     }
 
-    if (modelStage) {
+    if (setStage && modelStage) {
         await database.execute({
             sql: `UPDATE models_tmp SET model_stage = :model_stage
                 WHERE model_id = :model_id`,
@@ -75,10 +72,6 @@ const setCurrentStageAndStatusByTask = async (model, task, bpmn, db, database) =
             `,
             args: { model_id: model.MODEL_ID, stage: modelStage },
         });
-
-        // db.card.addStage({ modelId: model.MODEL_ID, modelStage })
-        //     .then()
-        //     .catch((err) => console.log(`Ошибка при смене этапа модели ${model.MODEL_ID}: ${err}`));
     }
 }
 
@@ -149,21 +142,43 @@ const addHistoryLogByTask = async (model, task, bpmn, db, database) => {
     }
 }
 
+const getLastBpmnInstance = async (modelId, database) => {
+    return lastInstance = await database.execute({
+            sql: `SELECT * FROM bpmn_instances bi WHERE bi.model_id = :model_id 
+                ORDER BY bi.effective_to DESC 
+                LIMIT 1`,
+            args: { model_id: modelId },
+    }).then((data) => data.rows[0]);
+}
+
 const processModel = async (model, bpmn, db, database) => {
     let tasks = await bpmn.tasksByModel(model.MODEL_ID);
+    let setStage = true;
 
     if (tasks.length == 0) {
-       tasks = await bpmn.externalTasksByInstanceId(model.BPMN_INSTANCE_ID);
+        const lastBpmnInstance = await getLastBpmnInstance(model.MODEL_ID, database);
+
+        if (lastBpmnInstance.EFFECTIVE_TO.getFullYear() < 9999) {
+            // Если процесс завершён, то получаем external task из истории. Важно, этап устанавливать не нужно, поскольку мы берём bpmnFinish
+            tasks = await bpmn.historyExternalTasksByInstanceId(lastBpmnInstance.BPMN_INSTANCE_ID);
+            setStage = false;
+            tasks = tasks.filter((el) => el.topicName === 'bpmnFinish');
+        } else {
+            // Иначе получаем текущую активную external task
+            tasks = await bpmn.externalTasksByInstanceId(lastBpmnInstance.BPMN_INSTANCE_ID);
+        }
     }
 
     if (tasks.length == 0) {
-        console.log(`Пропуск. Не удалось получить активные задачи по модели ${model.MODEL_ID}`);
+        console.log(`Пропуск. Не удалось получить актуальные задачи по модели ${model.MODEL_ID}`);
         failedModelIds.push(model.MODEL_ID);
+        return;
     }
 
     for (const task of tasks) {
-        await setCurrentStageAndStatusByTask(model, task, bpmn, db, database);
+        await setCurrentStageAndStatusByTask(model, task, bpmn, db, database, setStage);
         console.log(`Добавлены текущие этап и статус по модели ${model.MODEL_ID}`);
+        break;
     }
 
     // fill historical stages and statuses
