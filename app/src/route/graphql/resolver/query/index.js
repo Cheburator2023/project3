@@ -64,7 +64,7 @@ module.exports = {
       return context.db.user.role(
         args.groups && args.groups.length ? args.groups[0] : ""
       );
-    return context.integration.keycloak.usersByGroups(args, context.user); // business_customer
+    return context.integration.keycloak.searchUsers(args, context.user);
   },
   lead: () => ({ users: [], tasks: [] }),
   // Dash

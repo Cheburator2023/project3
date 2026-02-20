@@ -80,6 +80,16 @@ class Keycloak {
             token
         }))
 
+    searchUsers = ({ search, first = 0, max = 100 }, { token }) => connector({
+        path: `auth/admin/realms/${realms}/users?${querystring.stringify({
+            search,
+            first,
+            max
+        })}`,
+        method: 'GET',
+        token
+    })
+
     getDsLead = async dept => {
         const dsUsers = await this.getUsersByGroupSystem(dept)
         const dsLeads = await this.getUsersByGroupSystem('ds_lead')

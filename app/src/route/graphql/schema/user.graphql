@@ -1,5 +1,11 @@
 type Query {
-    users(groups: [String] = ["mipm"], db: Boolean = false ): [User]
+    users(
+        groups: [String] = ["mipm"]
+        db: Boolean = false
+        search: String
+        first: Int = 0
+        max: Int = 100
+    ): [User]
     
     keycloakGroups: [KeycloakGroup]
 
