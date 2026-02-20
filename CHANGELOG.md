@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.27.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.26.1...v1.27.0) (2026-02-20)
+
+
+### Features
+
+* добавлена выгрузка пользователей из keyckloak ([3a8e14a](https://git.sfera.inno.local:7999/SUMD/backend/commit/3a8e14a4312646ced7287b52fffb1c1c8fdb9b12))
+
 ## [1.26.1](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.26.0...v1.26.1) (2026-01-22)
 
 
