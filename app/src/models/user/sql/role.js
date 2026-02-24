@@ -6,8 +6,7 @@ const sql = `
     FROM 
         assignee_hist
     WHERE 
-        (:group_name IS NULL OR :group_name = '' OR FUNCTIONAL_ROLE = :group_name)
-        AND effective_to = to_timestamp('9999-12-3123:59:59', 'YYYY-MM-DDHH24:MI:SS')
+        FUNCTIONAL_ROLE = :group_name
 `
 
 module.exports = sql
