@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.27.1](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.27.0...v1.27.1) (2026-02-24)
+
+
+### Bug Fixes
+
+* вернул список пользователей во владельце моделей из assigne_hist ([70a8afe](https://git.sfera.inno.local:7999/SUMD/backend/commit/70a8afec4503f5e3753919eca0d93d28b5c63b9f))
+
 # [1.27.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.26.1...v1.27.0) (2026-02-20)
 
 
