@@ -1,4 +1,4 @@
-const { AuthenticationError, UserInputError } = require('apollo-server-express');
+const { AuthenticationError } = require('apollo-server-express');
 const userCanWrite = require('../../../../../utils/permissions/userCanWrite');
 
 module.exports = async (root, args, context) => {
@@ -15,19 +15,6 @@ module.exports = async (root, args, context) => {
   // Проверяем уровень доступа текущего пользователя
   if (!userCanWrite(context.user)) {
     throw new AuthenticationError(`Недостаточно прав для редактирования артефакта: "${ARTEFACT_ID}"`);
-  }
-
-  // Проверяем, существует ли артефакт с переданным значением
-  const artefacts = await context.db
-    .artefact
-    .specific({
-      MODEL_ID,
-      ARTEFACT_ID,
-      ARTEFACT_STRING_VALUE,
-    });
-
-  if (artefacts?.length) {
-    throw new UserInputError(`Артефакт со значением: "${ARTEFACT_STRING_VALUE}" уже существует.`);
   }
 
   // Архивируем существующий артефакт
