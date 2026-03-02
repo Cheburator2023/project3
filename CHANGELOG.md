@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.27.2](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.27.1...v1.27.2) (2026-03-02)
+
+
+### Bug Fixes
+
+* исправлена загрузка файлового артефакта на вкладке артефактов ([409bc32](https://git.sfera.inno.local:7999/SUMD/backend/commit/409bc32c84fc9872f6701614ff57b8f358ffd2d7))
+
 ## [1.27.1](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.27.0...v1.27.1) (2026-02-24)
 
 
