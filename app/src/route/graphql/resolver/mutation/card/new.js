@@ -22,6 +22,29 @@ module.exports = async (root, args, context) => {
   args.MODEL_ID = camundaInstance.id;
   args.MODEL_CREATOR = getUserName(context.user);
 
+  // --- Ensure ARTEFACTS array + upsert assignment_contractor ---
+  if (!Array.isArray(args.ARTEFACTS)) {
+    args.ARTEFACTS = []
+  }
+
+  const contractorArtefact = {
+    ARTEFACT_ID: 687,
+    ARTEFACT_ORIGINAL_VALUE: null,
+    ARTEFACT_STRING_VALUE: getUserName(context.user),
+    ARTEFACT_TECH_LABEL: 'assignment_contractor',
+  }
+
+  const contractorIdx = args.ARTEFACTS.findIndex(
+    (a) => Number(a?.ARTEFACT_ID) === 687 || a?.ARTEFACT_TECH_LABEL === 'assignment_contractor'
+  )
+
+  if (contractorIdx >= 0) {
+    args.ARTEFACTS[contractorIdx] = { ...args.ARTEFACTS[contractorIdx], ...contractorArtefact }
+  } else {
+    args.ARTEFACTS.push(contractorArtefact)
+  }
+  // --- end upsert ---
+
   await context.db.card.new(args);
   // Create git
   const dbNewModel = await context.db.card.info(args);

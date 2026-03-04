@@ -1,8 +1,33 @@
+const getUserName = require("../card/helpers");
+
 module.exports = async (root, args, context) => {
     // Get Task Info
     const taskInfo = await context.db
         .task
         .one(args, context.user)
+
+    // --- Ensure ARTEFACTS array ---
+    if (!Array.isArray(args.ARTEFACTS)) {
+      args.ARTEFACTS = []
+    }
+
+    // --- Add assignment_contractor artefact for specific tasks ---
+    const contractorTasks = new Set([
+      'data_source_analysis_and_need_involve_de',
+      'development_results_approving',
+      'fast_model_config',
+    ])
+
+    if (contractorTasks.has(taskInfo.TASK_ID)) {
+      console.log(taskInfo.TASK_ID, 'taskInfo.TASK_ID')
+      args.ARTEFACTS.push({
+        ARTEFACT_ID: 687,
+        ARTEFACT_ORIGINAL_VALUE: null,
+        ARTEFACT_STRING_VALUE: getUserName(context.user),
+        ARTEFACT_TECH_LABEL: 'assignment_contractor',
+      })
+    }
+
     // Close artefact_realization version
     const updateArtefactArgs = {
         MODEL_ID: taskInfo.MODEL.MODEL_ID,
@@ -48,7 +73,7 @@ module.exports = async (root, args, context) => {
                     .then()
                     .catch((err) => console.log(`Ошибка при смене этапа модели model${taskInfo.MODEL.ROOT_MODEL_ID}-v${taskInfo.MODEL.MODEL_VERSION}: ${err}`))
             }
-           
+
             return data
         })
         .catch(e => {
