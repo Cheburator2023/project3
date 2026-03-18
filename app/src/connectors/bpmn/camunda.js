@@ -464,18 +464,41 @@ class Bpmn {
       path: `/external-task?processInstanceId=${instanceId}`,
     });
 
-  historyTasksByModel = (modelId) =>
+  historyTasksByModel = (modelId, sortBy = 'endTime', sortOrder = 'desc') =>
     this.connector({
       path: `/history/task?${querystring.stringify({
+        sortBy: sortBy,
+        sortOrder: sortOrder,
         processVariables: "model_eq_" + modelId,
       })}`,
     });
 
-  historyExternalTasksByInstanceId = (processInstanceId) =>
+  historyExternalTasksByInstanceId = (processInstanceId, successLog = true, sortBy = 'timestamp', sortOrder = 'desc') =>
     this.connector({
       path: `/history/external-task-log?${querystring.stringify({
+        sortBy: sortBy,
+        sortOrder: sortOrder,
         processInstanceId: processInstanceId,
-        successLog: true
+        successLog: successLog,
+      })}`,
+    });
+
+  historyExternalTasksByTaskId = (taskId, successLog = true, sortBy = 'timestamp', sortOrder = 'desc') =>
+    this.connector({
+      path: `/history/external-task-log?${querystring.stringify({
+        sortBy: sortBy,
+        sortOrder: sortOrder,
+        externalTaskId: taskId,
+        successLog: successLog,
+      })}`,
+    });
+
+  historyProcessInstancesByModel = (modelId, sortBy = 'endTime', sortOrder = 'desc') => 
+    this.connector({
+      path: `/history/process-instance?${querystring.stringify({
+        sortBy: sortBy,
+        sortOrder: sortOrder,
+        variables: "model_eq_" + modelId,
       })}`,
     });
 }
