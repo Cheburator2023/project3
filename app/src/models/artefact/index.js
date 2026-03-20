@@ -70,6 +70,14 @@ class Artefact {
       })
       : true;
 
+  addNullable = ({ MODEL_ID, ARTEFACTS }) =>
+    ARTEFACTS.length > 0
+      ? this.db.executeMany({
+        sql: sql.new,
+        args: ARTEFACTS.map(dbVar(MODEL_ID)),
+      })
+      : true;
+
   techAdd = (ARTEFACTS) =>
     ARTEFACTS.length > 0
       ? this.db
@@ -177,6 +185,27 @@ class Artefact {
     this.db
       .execute({ sql: sql.getArtefactValueIdByValue, args: { artefact_id: artefactId, value }})
       .then((d) => d.rows[0] ? d.rows[0] : null);
+
+  getArtefactsListToClearAfterRollback = ({completedTasksList, rolledBackTasksList, modelId, deploymentId}) => 
+    this.db
+      .execute({ 
+        sql: sql.getArtefactsListToClearAfterRollback, 
+        args: {
+          completed_task_ids: completedTasksList,
+          rolled_task_ids: rolledBackTasksList,
+          model_id: modelId,
+          deployment_id: deploymentId
+        }
+      }).then((d) => d.rows);
+
+  expireRealizationsByIdsAndModel = ({artefactIds, modelId}) => 
+    this.db.execute({
+      sql: sql.expireRealizationsByIdsAndModel,
+      args: {
+        artefact_ids: artefactIds,
+        model_id: modelId
+      }
+    });
 }
 
 module.exports = Artefact;
