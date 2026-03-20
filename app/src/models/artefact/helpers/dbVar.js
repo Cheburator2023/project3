@@ -3,7 +3,8 @@ const dbVar = MODEL_ID => artefact => ({
   ARTEFACT_ID: artefact.ARTEFACT_ID,
   ARTEFACT_VALUE_ID: artefact.ARTEFACT_VALUE_ID || null,
   ARTEFACT_STRING_VALUE: artefact.ARTEFACT_STRING_VALUE || null,
-  ARTEFACT_ORIGINAL_VALUE: artefact.ARTEFACT_ORIGINAL_VALUE || null
+  ARTEFACT_ORIGINAL_VALUE: artefact.ARTEFACT_ORIGINAL_VALUE || null,
+  CREATOR: artefact.CREATOR || null
 })
 
 module.exports = dbVar

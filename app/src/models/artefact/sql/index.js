@@ -17,4 +17,6 @@ module.exports = {
   artefactById: require("./artefactById"),
   artefactRealizationById: require("./artefactRealizationById"),
   getArtefactValueIdByValue: require("./getArtefactValueIdByValue"),
+  getArtefactsListToClearAfterRollback: require("./getArtefactsListToClearAfterRollback"),
+  expireRealizationsByIdsAndModel: require("./expireRealizationsByIdsAndModel"),
 };

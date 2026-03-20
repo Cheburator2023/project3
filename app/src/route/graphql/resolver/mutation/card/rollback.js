@@ -101,6 +101,68 @@ const deleteRolledBackProcessInstances = async ({
   }
 };
 
+const removeArtefactValues = async ({
+  taskRolledBackTo,
+  modelId,
+  deploymentId,
+  context,
+}) => {
+  try {
+      const operationsLogQueryResult = await context.db.task.getTasksOperationsLogsByModelOrdered(modelId);
+
+      let completedTasksList = [];
+      let rolledBackTasksList = [];
+
+      // Собираем список user task со статусом complete
+      for (const operation of operationsLogQueryResult) {
+        if (operation.OPERATION === 'complete') {
+          completedTasksList.push(operation.TASK_ID);
+        } else if (operation.OPERATION === 'rollback') {
+          const rolledBackIndex = completedTasksList.findIndex(
+            (el) => el === operation.TASK_ID
+          )
+          if (rolledBackIndex >= 0) {
+            completedTasksList = completedTasksList.slice(0, rolledBackIndex);
+          }
+        }
+      }
+
+      // Получаем список всех откаченных тасок
+      const rolledBackIndex = completedTasksList.findIndex(
+        (el) => el === taskRolledBackTo.taskDefinitionKey
+      );
+
+      if (rolledBackIndex >= 0) {
+        rolledBackTasksList = completedTasksList.slice(rolledBackIndex);
+        completedTasksList = completedTasksList.slice(0, rolledBackIndex);
+      }
+
+      // Получаем список всех артефактов, которые должны быть недоступны по процессу
+      const artefacts = await context.db.artefact.getArtefactsListToClearAfterRollback({
+        completedTasksList, rolledBackTasksList, modelId, deploymentId
+      });
+
+      const artefactIds = artefacts.map((e) => e.ARTEFACT_ID);
+
+      // Удаление текущего значения
+      await context.db.artefact.expireRealizationsByIdsAndModel({artefactIds, modelId});
+
+      // Добавляем новые записи со значением null и текущим пользователем
+      await context.db.artefact.addNullable({
+        MODEL_ID: modelId,
+        ARTEFACTS: artefactIds.map((e) => {
+          return {
+            ARTEFACT_ID: e,
+            CREATOR: getUserName(context.user),
+          }
+        })
+      });
+
+  } catch (e) {
+    throw new Error(`Error on removeArtefactValues, ${e.message}`);
+  }
+};
+
 const sendEmails = async (
   { MODEL_ID, ROOT_MODEL_ID, MODEL_VERSION },
   taskRolledBackTo,
@@ -232,7 +294,7 @@ const checkModelFinalStatus = async (modelId, context) => {
 
 module.exports = async (root, { activity }, context) => {
   try {
-    const { MODEL_ID, MODELS_IS_ACTIVE_FLG } = await getModelInfo(
+    const { MODEL_ID, MODELS_IS_ACTIVE_FLG, DEPLOYMENT_ID } = await getModelInfo(
       activity,
       context
     );
@@ -288,6 +350,14 @@ module.exports = async (root, { activity }, context) => {
       await deleteRolledBackProcessInstances({
         taskRolledBackTo: activeTaskAfterRollback,
         modelId: MODEL_ID,
+        context,
+      });
+
+      // 2.5 Set artefacts from rolled back tasks to null
+      await removeArtefactValues({
+        taskRolledBackTo: activeTaskAfterRollback,
+        modelId: MODEL_ID,
+        deploymentId: DEPLOYMENT_ID,
         context,
       });
 
