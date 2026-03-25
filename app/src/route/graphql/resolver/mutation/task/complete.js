@@ -15,7 +15,7 @@ module.exports = async (root, args, context) => {
     const contractorTasks = new Set([
       'data_source_analysis_and_need_involve_de',
       'development_results_approving',
-      'fast_model_config',
+      'filling_info_model_dev',
     ])
 
     if (contractorTasks.has(taskInfo.TASK_ID)) {
