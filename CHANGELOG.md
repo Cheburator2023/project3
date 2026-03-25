@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.28.1](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.28.0...v1.28.1) (2026-03-25)
+
+
+### Bug Fixes
+
+* update assignment contractor artefact processing ([1ab2565](https://git.sfera.inno.local:7999/SUMD/backend/commit/1ab2565c7f3cc1299164f229643cc67b6958c83f))
+
 # [1.28.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.27.2...v1.28.0) (2026-03-04)
 
 
