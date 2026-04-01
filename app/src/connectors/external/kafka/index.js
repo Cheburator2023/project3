@@ -1,4 +1,5 @@
 const tslgLogger = require('../../../utils/logger');
+const auditClient = require('../../../utils/audit/auditClient');
 
 class Kafka {
   constructor(db, integration) {
@@ -143,18 +144,27 @@ class Kafka {
 
       await taskService.complete(task);
 
-      tslgLogger.info(`Модель архивирована: ${alias}`, 'УспехАрхивацииМодели', {
+        auditClient.send('SUMD_REMOVEMODEL', 'SUCCESS', {
+            modelId: variables.model,
+            modelAlias: alias,
+        }).catch(err => tslgLogger.error('Ошибка отправки аудита архивации модели', 'AuditError', err));
+
+        tslgLogger.info(`Модель архивирована: ${alias}`, 'УспехАрхивацииМодели', {
         modelId: variables.model,
         alias,
         taskId: task.id
       });
 
     } catch (error) {
-      tslgLogger.error(`Ошибка архивации модели`, 'ОшибкаАрхивацииМодели', error, {
+        auditClient.send('SUMD_REMOVEMODEL', 'FAILURE', {
+            modelId: variables.model,
+            error: error.message,
+        }).catch(err => tslgLogger.error('Ошибка отправки аудита ошибки архивации модели', 'AuditError', err));
+        tslgLogger.error(`Ошибка архивации модели`, 'ОшибкаАрхивацииМодели', error, {
         modelId: variables.model,
         taskId: task.id
-      });
-      throw error;
+        });
+        throw error;
     }
   };
 }

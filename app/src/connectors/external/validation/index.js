@@ -1,5 +1,7 @@
 const fetch = require('isomorphic-fetch')
 const { Variables } = require("camunda-external-task-client-js");
+const auditClient = require('../../../utils/audit/auditClient');
+const tslgLogger = require("../../../utils/logger");
 
 const host = "http://oraca.eastus2.cloudapp.azure.com:5000/"
 
@@ -59,9 +61,23 @@ class Validation {
                 risk_scale_exist_flg: "yes"
                 });
             await taskService.complete(task, processVariables)
+
+            // Отправка аудита: выгрузка отчета (SUCCESS)
+            auditClient.send('SUMD_UPLOADREPORT', 'SUCCESS', {
+                modelId: variables.model,
+                modelAlias: alias,
+            }).catch(err => {
+                tslgLogger.error('Ошибка отправки аудита выгрузки отчета', 'AuditError', err);
+            });
         }
         catch(e){
             console.sys(e)
+            auditClient.send('SUMD_UPLOADREPORT', 'FAILURE', {
+                modelId: variables.model,
+                error: e.message,
+            }).catch(err => {
+                tslgLogger.error('Ошибка отправки аудита ошибки выгрузки отчета', 'AuditError', err);
+            });
         }
     }
 
