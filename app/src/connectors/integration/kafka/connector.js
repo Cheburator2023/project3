@@ -3,12 +3,17 @@ const tslgLogger = require('../../../utils/logger');
 
 const kafkaHost = process.env.KAFKA_API
 
+function consoleDebug(...args) {
+    const consoleToUse = console.original?.log || console.log;
+    consoleToUse('[DEBUG}', ...args);
+}
+
 module.exports = ({
                       path,
                       method = 'GET',
                       body
                   }) => {
-    tslgLogger.log(`Kafka request: ${method} ${kafkaHost}${path}`, 'Запрос', 'info', null, {
+    tslgLogger.log('info', `Kafka request: ${method} ${kafkaHost}${path}`, 'Запрос Kafka response', null, {
         system: 'Kafka',
         path,
         method
@@ -26,7 +31,7 @@ module.exports = ({
         }
     )
         .then(data => {
-            tslgLogger.log(`Kafka response: ${data.status}`, 'Ответ', 'info', null, {
+            tslgLogger.log('info', `Kafka response: ${data.status}`, 'Ответ Kafka response', null, {
                 system: 'Kafka',
                 path,
                 method,
@@ -39,21 +44,27 @@ module.exports = ({
             error.status = data.status
             error.system = 'Kafka'
 
-            tslgLogger.log(`Kafka error: ${data.statusText}`, 'Ошибка', 'error', error, {
-                system: 'Kafka',
-                path,
-                method,
-                status: data.status
-            });
+            if (process.env.NODE_ENV !== 'production') {
+                consoleDebug(`Kafka error: ${data.statusText} - ${error.message}`, {
+                    system: 'Kafka',
+                    path,
+                    method,
+                    status: data.status,
+                    error: error.message
+                });
+            }
 
             throw error
         })
         .catch(error => {
-            tslgLogger.log(`Kafka unexpected error: ${error.message}`, 'Ошибка', 'error', error, {
-                system: 'Kafka',
-                path,
-                method
-            });
+            if (process.env.NODE_ENV !== 'production') {
+                consoleDebug(`Kafka unexpected error: ${error.message}`, {
+                    system: 'Kafka',
+                    path,
+                    method,
+                    error: error.message
+                });
+            }
             throw error
         })
 }
