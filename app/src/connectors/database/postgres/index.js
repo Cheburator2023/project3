@@ -133,6 +133,11 @@ class PostgresDatabase {
     }
   }
 
+  static consoleDebug(...args) {
+      const consoleToUse = console.original?.log || console.log;
+      consoleToUse('[DEBUG}', ...args);
+  }
+
   /**
    * Execute query.
    *
@@ -155,10 +160,14 @@ class PostgresDatabase {
         return connection.query(queryConvert(sql, args));
       }, this.options.retryConfig);
     } catch (err) {
-      tslgLogger.error(`Unable to process SQL query`, 'ОшибкаЗапросаБД', err, {
-        sql: sql.substring(0, 200) + '...',
-        args: JSON.stringify(args).substring(0, 200) + '...'
-      });
+      if (process.env.NODE_ENV !== 'production') {
+          const debugMessage = `Unable to process SQL query: ${err.message}`;
+          const debugData = {
+              sql: sql.substring(0, 200) + '...',
+              args: JSON.stringify(args).substring(0, 200) + '...'
+          };
+          PostgresDatabase.consoleDebug(debugMessage, debugData);
+      }
       throw err;
     } finally {
       try {
@@ -212,10 +221,14 @@ class PostgresDatabase {
         return connection.query(queryConvert(sql, args));
       }, this.options.retryConfig);
     } catch (err) {
-      tslgLogger.error(`Unable to process SQL query with connection`, 'ОшибкаЗапросаБД', err, {
-        sql: sql.substring(0, 200) + '...',
-        args: JSON.stringify(args).substring(0, 200) + '...'
-      });
+        if (process.env.NODE_ENV !== 'production') {
+            const debugMessage = `Unable to process SQL query with connection: ${err.message}`;
+            const debugData = {
+                sql: sql.substring(0, 200) + '...',
+                args: JSON.stringify(args).substring(0, 200) + '...'
+            };
+            PostgresDatabase.consoleDebug(debugMessage, debugData);
+      }
       throw err;
     }
   }
