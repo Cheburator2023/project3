@@ -14,6 +14,11 @@ const headers = {
     Authorization
 }
 
+function consoleDebug(...args) {
+    const consoleToUse = console.original?.log || console.log;
+    consoleToUse('[DEBUG}', ...args);
+}
+
 const connector = ({ path, method = 'GET', body }, context = {}) => {
 
     const requestId = context?.requestId || 'unknown';
@@ -52,11 +57,14 @@ const connector = ({ path, method = 'GET', body }, context = {}) => {
             error.status = status
             error.system = 'BPMN'
 
-            tslgLogger.log(`BPMN error: ${msg}`, 'Ошибка', 'error', error, {
+            if (process.env.NODE_ENV !== 'production') {
+                consoleDebug(`BPMN error: ${msg}`, {
                 requestId,
-                system: 'BPMN',
-                status
-            });
+                system: error.system,
+                status,
+                error: error.message
+                });
+            }
 
             throw error
         })
@@ -68,10 +76,13 @@ const connector = ({ path, method = 'GET', body }, context = {}) => {
             return data
         })
         .catch(e => {
-            tslgLogger.log(`Unexpected BPMN error: ${e.message}`, 'Ошибка', 'error', e, {
-                requestId,
-                system: 'BPMN'
-            });
+            if (process.env.NODE_ENV !== 'production') {
+                consoleDebug(`Unexpected BPMN error: ${e.msg}`, {
+                    requestId,
+                    system: 'BPMN',
+                    error: e.message
+                });
+            }
             throw e
         })
 }

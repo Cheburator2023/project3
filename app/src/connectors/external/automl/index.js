@@ -8,6 +8,11 @@ class AutoMl {
     this.bpmn = bpmn;
   }
 
+    static consoleDebug(...args) {
+        const consoleToUse = console.original?.log || console.log;
+        consoleToUse('[DEBUG}', ...args);
+    }
+
   createModel = async ({ task, taskService }) => {
     const vars = task.variables.getAll();
 
@@ -85,10 +90,14 @@ class AutoMl {
       });
 
     } catch (error) {
-      tslgLogger.error(`Ошибка создания модели AutoML: ${modeldev_name}`, 'ОшибкаAutoML', error, {
-        modeldev_name,
-        taskId: task.id
-      });
+        if (process.env.NODE_ENV !== 'production') {
+            const debugMessage = `Ошибка создания модели AutoML: ${modeldev_name} - ${err.message}`;
+            const debugData = {
+                modeldev_name,
+                taskId: task.id
+            };
+            AutoMl.consoleDebug(debugMessage, debugData);
+        }
       throw error;
     }
   };
@@ -152,10 +161,14 @@ class AutoMl {
       });
 
     } catch (error) {
-      tslgLogger.error(`Ошибка добавления артефактов к модели: ${model}`, 'ОшибкаДобавленияАртефактов', error, {
-        modelId: model,
-        taskId: task.id
-      });
+        if (process.env.NODE_ENV !== 'production') {
+            const debugMessage = `Ошибка добавления артефактов к модели: ${model} - ${err.message}`;
+            const debugData = {
+                modelId: model,
+                taskId: task.id
+            };
+            AutoMl.consoleDebug(debugMessage, debugData);
+        }
       throw error;
     }
   };
