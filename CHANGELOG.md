@@ -1,5 +1,14 @@
 # Semantic Versioning Changelog
 
+## [1.28.2](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.28.1...v1.28.2) (2026-04-02)
+
+
+### Bug Fixes
+
+* Исправил ошибки для bpmn, automl ([0ab0c18](https://git.sfera.inno.local:7999/SUMD/backend/commit/0ab0c18c81ad4e41486a037b03c9fe873505c019))
+* Исправил ошибки для camunda, db, mail ([46a91e0](https://git.sfera.inno.local:7999/SUMD/backend/commit/46a91e0c8942e5655f8fb26a58f3edf02ecfa22b))
+* Исправил ошибки для kafka, git ([910db97](https://git.sfera.inno.local:7999/SUMD/backend/commit/910db979a2692ed9ba1d93bd2c4252f7ace57cb8))
+
 ## [1.28.1](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.28.0...v1.28.1) (2026-03-25)
 
 

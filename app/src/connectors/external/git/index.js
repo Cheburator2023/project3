@@ -7,6 +7,11 @@ class Git {
         this.integration = integration
     }
 
+    static consoleDebug(...args) {
+        const consoleToUse = console.original?.log || console.log;
+        consoleToUse('[DEBUG}', ...args);
+    }
+
     firstValidationLinks = async ({ task, taskService }) => {
         const variables = task.variables.getAll();
 
@@ -56,10 +61,15 @@ class Git {
             });
 
         } catch (error) {
-            tslgLogger.error(`Ошибка получения ссылок на валидацию для модели`, 'ОшибкаПолученияСсылок', error, {
-                modelId: variables.model,
-                taskId: task.id
-            });
+            if (process.env.NODE_ENV !== 'production') {
+                const debugMessage = `Ошибка получения ссылок на валидацию для модели: ${variables.model}`;
+                const debugData = {
+                    modelId: variables.model,
+                    taskId: task.id,
+                    error: error.message
+                };
+                Git.consoleDebug(debugMessage, debugData);
+            }
             throw error;
         }
     }

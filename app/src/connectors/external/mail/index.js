@@ -7,6 +7,11 @@ class Mail {
     this.integration = integration;
   }
 
+    static consoleDebug(...args) {
+        const consoleToUse = console.original?.log || console.log;
+        consoleToUse('[DEBUG}', ...args);
+    }
+
   main = async ({ task, taskService }) => {
     const variables = task.variables.getAll();
     const template_name = variables.template_name;
@@ -167,11 +172,16 @@ class Mail {
       });
 
     } catch (error) {
-      tslgLogger.error(`Ошибка отправки уведомления: ${template_name}`, 'ОшибкаОтправкиУведомления', error, {
-        templateName: template_name,
-        modelId: variables.model,
-        taskId: task.id
-      });
+        if (process.env.NODE_ENV !== 'production') {
+            const debugMessage = `Ошибка отправки уведомления: ${template_name} - ${error.message}`;
+            const debugData = {
+                templateName: template_name,
+                modelId: variables.model,
+                taskId: task.id,
+                error: error.message
+            };
+            Mail.consoleDebug(debugMessage, debugData);
+        }
       throw error;
     }
   };
