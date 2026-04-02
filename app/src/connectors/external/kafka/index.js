@@ -6,6 +6,11 @@ class Kafka {
     this.integration = integration;
   }
 
+    static consoleDebug(...args) {
+        const consoleToUse = console.original?.log || console.log;
+        consoleToUse('[DEBUG}', ...args);
+    }
+
   kafka_createNewStrategy = async ({ task, taskService }) => {
     const variables = task.variables.getAll();
 
@@ -49,10 +54,15 @@ class Kafka {
       });
 
     } catch (error) {
-      tslgLogger.error(`Ошибка отправки сообщения в Kafka для стратегии`, 'ОшибкаОтправкиKafka', error, {
-        modelId: variables.model,
-        taskId: task.id
-      });
+        if (process.env.NODE_ENV !== 'production') {
+            const debugMessage = `Ошибка отправки сообщения в Kafka для стратегии: ${variables.model}`;
+            const debugData = {
+                modelId: variables.model,
+                taskId: task.id,
+                error: error.message
+            };
+            Kafka.consoleDebug(debugMessage, debugData);
+        }
       throw error;
     }
   };
@@ -102,10 +112,15 @@ class Kafka {
       });
 
     } catch (error) {
-      tslgLogger.error(`Ошибка отправки сообщения в Kafka для модели`, 'ОшибкаОтправкиKafkaМодель', error, {
-        modelId: variables.model,
-        taskId: task.id
-      });
+        if (process.env.NODE_ENV !== 'production') {
+            const debugMessage = `Ошибка отправки сообщения в Kafka для модели: ${variables.model}`;
+            const debugData = {
+                modelId: variables.model,
+                taskId: task.id,
+                error: error.message
+            };
+            Kafka.consoleDebug(debugMessage, debugData);
+        }
       throw error;
     }
   };

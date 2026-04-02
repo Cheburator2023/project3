@@ -317,7 +317,15 @@ class Bpmn {
       method: "GET",
     })
       .then((data) => data.value)
-      .catch((e) => console.log(e));
+      .catch((e) => { if (process.env.NODE_ENV !== 'production') {
+          this.context.log?.({
+              msg: `Failed to get task variable: ${e.message}`,
+              event: 'Error',
+              level: 'debug',
+              error: e
+          });
+        }
+      });
 
   /* ***** SUSPEND MODEL FEATURE ***** */
 
