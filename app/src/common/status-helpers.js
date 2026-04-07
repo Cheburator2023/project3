@@ -91,6 +91,17 @@ const acquireStageAndStatusFromCamunda = async (id, taskId, processDefinitionId,
     }
   }
 
+  // В схемах Камунды остались некорректные этапы и статусы, которые исправить невозможно, поэтому ловим и исправляем на лету
+  if (modelStage === 'Вывод из эксплуатации') {
+    modelStage = 'Вывод модели из эксплуатации';
+  } else if (modelStage === 'Разаработка модели') {
+    modelStage = 'Разработка модели';
+  }
+
+  if (modelStatus === 'Разработана в процессе \nвнедрения') {
+    modelStatus = 'Разработана в процессе внедрения'
+  }
+
   return {modelStage: modelStage, modelStatus: modelStatus};
 }
 
