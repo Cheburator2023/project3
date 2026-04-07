@@ -339,6 +339,7 @@ class Task {
     return camundaCompleteTask;
   };
 
+  // Может вернуть несколько маппингов, если для точного сопоставления требуется проверять артефакты
   getStatusStageMapByTask = async(taskId, processDefinitionId) => {
     const definition = await this.bpmn.definition(processDefinitionId);
     
@@ -355,7 +356,7 @@ class Task {
         version_tag: definition.versionTag
       },
     })
-    .then((data) => data.rows[0]);
+    .then((data) => data.rows);
   };
 }
 

@@ -345,6 +345,14 @@ class Bpmn {
         }
       });
 
+  getTaskVars = (taskId) =>
+  this.connector({
+    path: `/task/${taskId}/variables`,
+    method: "GET",
+  })
+    .then((data) => data.value)
+    .catch((e) => console.log(e));
+
   /* ***** SUSPEND MODEL FEATURE ***** */
 
   /**

@@ -1,9 +1,106 @@
 require('dotenv').config();
-const { acquireStageAndStatusFromCamunda } = require("../src/common/status-helpers");
+// const { acquireStageAndStatusFromCamunda } = require("../src/common/status-helpers");
 const models = require("../src/models");
 const bpmn = require('../src/connectors/bpmn');
 const database = require('../src/connectors/database');
 const integration = require('../src/connectors/integration');
+
+const querystring = require("querystring");
+
+const historyTasksByModel = (modelId, sortBy = 'endTime', sortOrder = 'desc', bpmn) =>
+    bpmn.connector({
+      path: `/history/task?${querystring.stringify({
+        sortBy: sortBy,
+        sortOrder: sortOrder,
+        processVariables: "model_eq_" + modelId,
+      })}`,
+    });
+
+const historyExternalTasksByInstanceId = (processInstanceId, successLog = true, sortBy = 'timestamp', sortOrder = 'desc', bpmn) =>
+    bpmn.connector({
+      path: `/history/external-task-log?${querystring.stringify({
+        sortBy: sortBy,
+        sortOrder: sortOrder,
+        processInstanceId: processInstanceId,
+        successLog: successLog,
+      })}`,
+    });
+
+const historyProcessInstancesByModel = (modelId, sortBy = 'endTime', sortOrder = 'desc', bpmn) => 
+    bpmn.connector({
+      path: `/history/process-instance?${querystring.stringify({
+        sortBy: sortBy,
+        sortOrder: sortOrder,
+        variables: "model_eq_" + modelId,
+      })}`,
+    });
+
+const versionTags = [];
+
+const { modelStatusAndStageByTask } = require('../src/models/task/sql');
+// переработанная копия из ../src/models/task/index
+const getStatusStageMapByTask = async(taskId, processDefinitionId, context) => {
+    const definition = await context.bpmn.definition(processDefinitionId);
+
+    if (!definition) {
+        console.error(`Cannot get definition by id ${processDefinitionId} on getStatusStageMapByTask for task ${taskId}`);
+        return null;
+    }
+
+    if (!versionTags.find((e) => e == definition.versionTag)) {
+        versionTags.push(definition.versionTag);
+    }
+
+    return await database.execute({
+        sql: modelStatusAndStageByTask,
+        args: {
+            task_id: taskId,
+            key: definition.key,
+            version_tag: definition.versionTag
+        },
+    })
+    .then((data) => data.rows);
+};
+
+// переработанная копия из ../src/common/status-helpers
+const acquireStageAndStatusFromCamunda = async (id, taskId, processDefinitionId, variables, context) => {
+  let modelStatus = null;
+  let modelStage = null;
+
+  // Пробуем получить этап и статус из переменных Камунды (новые схемы)
+  modelStatus = variables ? variables.model_status : await context.bpmn.getTaskVar(id, 'model_status');
+  modelStage = variables ? variables.model_stage : await context.bpmn.getTaskVar(id, 'model_stage');
+
+  if (!modelStatus && !modelStage) {
+    // Не получили из переменных, пробуем найти в маппинге по текущей activity (user task или external task)
+    let stageStatusMap = await getStatusStageMapByTask(taskId, processDefinitionId, context);
+
+    if (stageStatusMap.length > 1) {
+      // скорее всего есть дополнительные признаки, переменные по которым нужно выбрать точный вариант маппинга
+      const model_deployment_approving_flg = await context.bpmn.getTaskVar(id, 'model_deployment_approving_flg');
+      const pim_integration_flg = await context.bpmn.getTaskVar(id, 'pim_integration_flg');
+
+      stageStatusMap = stageStatusMap.filter((item) => {
+        if (item.MODEL_DEPLOYMENT_APPROVING_FLG && item.MODEL_DEPLOYMENT_APPROVING_FLG !== model_deployment_approving_flg) {
+          return false;
+        }
+        if (item.PIM_INTEGRATION_FLG && item.PIM_INTEGRATION_FLG !== pim_integration_flg) {
+          return false;
+        }
+        return true;
+      })
+    }
+
+    if (stageStatusMap[0]) {
+      modelStatus = stageStatusMap[0].MODEL_STATUS;
+      modelStage = stageStatusMap[0].MODEL_STAGE;
+    } else {
+      console.log(`Run Error. Ошибка получения статуса/этапа из Камунды. task ${id} taskId ${taskId} process definition ${processDefinitionId}`)
+    }
+  }
+
+  return {modelStage: modelStage, modelStatus: modelStatus};
+}
 
 class Stage {
     constructor(stage, effectiveFrom, effectiveTo) {
@@ -65,7 +162,7 @@ class Model {
         return this._statuses[this._statuses.length - 1];
     }
 
-    getCurrentStatus() {
+    getCurrentStatusString() {
         const lastStatus = this.getLastStatus();
         return lastStatus ? lastStatus.status : null;
     }
@@ -83,7 +180,7 @@ class Model {
         return this._stages[this._stages.length - 1];
     }
 
-    getCurrentStage() {
+    getCurrentStageString() {
         const activeStages = this._stages.filter((stage) => stage.effectiveTo === '9999-12-31T23:59:59.000+0000');
         if (activeStages.length === 0) {
             return null;
@@ -98,8 +195,8 @@ class ModelSaver {
     }
 
     flush(model) {
-        console.log('=============TEST modelData ', model);
-        this._insertModel(model.modelId, model.rootModelId, model.modelVersion, model.getCurrentStage(), model.getCurrentStatus());
+        // console.log('=============TEST modelData ', model);
+        this._insertModel(model.modelId, model.rootModelId, model.modelVersion, model.getCurrentStageString(), model.getCurrentStatusString());
         for (const status of model.statuses) {
             this._insertModelStatus(model.modelId, status.status, status.effectiveFrom, status.effectiveTo);
         }
@@ -109,7 +206,7 @@ class ModelSaver {
     }
 
     async _insertModel(modelId, rootModelId, modelVersion, stage, status) {
-        await database.execute({
+        await this._database.execute({
             sql: `INSERT INTO models_tmp_v2 (model_id, root_model_id, model_version, model_status, model_stage)
                 VALUES (:model_id, :root_model_id, :model_version, :model_status, :model_stage)
                 ON CONFLICT DO NOTHING`,
@@ -118,7 +215,7 @@ class ModelSaver {
     }
 
     async _insertModelStatus(modelId, status, effectiveFrom, effectiveTo) {
-        await database.execute({
+        await this._database.execute({
             sql: `INSERT INTO model_status_tmp_v2 (model_id, status, effective_from, effective_to)
             VALUES (:model_id, :status, TO_TIMESTAMP(:effective_from, 'YYYY-MM-DDXHH24:MI:SS.MSTZHTZM'), TO_TIMESTAMP(:effective_to, 'YYYY-MM-DDXHH24:MI:SS.MSTZHTZM'))`,
             args: { model_id: modelId, status: status, effective_from: effectiveFrom, effective_to: effectiveTo },
@@ -126,7 +223,7 @@ class ModelSaver {
     }
 
     async _insertModelStage(modelId, stage, effectiveFrom, effectiveTo) {
-        await database.execute({
+        await this._database.execute({
             sql: `INSERT INTO model_stage_tmp_v2 (model_id, stage, effective_from, effective_to)
             VALUES (:model_id, :stage, TO_TIMESTAMP(:effective_from, 'YYYY-MM-DDXHH24:MI:SS.MSTZHTZM'), TO_TIMESTAMP(:effective_to, 'YYYY-MM-DDXHH24:MI:SS.MSTZHTZM'))`,
             args: { model_id: modelId, stage: stage, effective_from: effectiveFrom, effective_to: effectiveTo },
@@ -134,9 +231,7 @@ class ModelSaver {
     }
 }
 
-let failedModelIds = [];
-
-const getModels = async (limit, database) => {
+const getModels = async (limit, database, failedModelIds) => {
     return database.execute({
             sql: `select * 
                 from models m
@@ -157,12 +252,13 @@ const getLastProcessInstanceFromList = (list) => {
 }
 
 const processModel = async (model, bpmn, db) => {
-    const tasks = await bpmn.historyTasksByModel(model.MODEL_ID, 'startTime', 'asc');
+    const tasks = await historyTasksByModel(model.MODEL_ID, 'startTime', 'asc', bpmn);
     const modelData = new Model(model.MODEL_ID, model.ROOT_MODEL_ID, model.MODEL_VERSION);
     let activeTaskExists = false;
 
     if (tasks.length == 0) {
         // TODO Нужно ли как-то обрабатывать ситуации, если история не собралась вообще, т.е. исторических юзер тасок нет?
+        console.log(`Run Error. Не удалось получить задачи по модели ${model.MODEL_ID}`);
         return;
     }
 
@@ -187,25 +283,30 @@ const processModel = async (model, bpmn, db) => {
             modelData.addStatus(new Status(modelStatus, task.startTime, task.endTime));
         }
 
-        console.log(`Добавлены исторические этапы и статусы по модели ${model.MODEL_ID}`);
+        if (modelStatus || modelStage) {
+            console.log(`Добавлены исторические этапы и статусы по модели ${model.MODEL_ID}`);
+        } else {
+            console.log(`Run Error. Не удалось получить этапы и статусы по модели ${model.MODEL_ID} задача ${task.id}`);
+        }
     }
     
     // Обработать финальные статусы по external task для моделей с завершёнными процессами
-    const processInstances = await bpmn.historyProcessInstancesByModel(model.MODEL_ID, 'endTime', 'desc');
+    const processInstances = await historyProcessInstancesByModel(model.MODEL_ID, 'endTime', 'desc', bpmn);
     const lastProcessInstance = getLastProcessInstanceFromList(processInstances);
     let task = null;
 
     if (!activeTaskExists && lastProcessInstance.state === 'ACTIVE') {
         // Есть активный не main процесс и активная user task отсутствует. Скорее всего процесс завис, пробуем получить текущую активную external task
-        const exTasks = await bpmn.externalTasksByInstanceId(lastProcessInstance.id);
-        console.log('===========TEST extasks ', exTasks);
-        task = exTasks[0];
-        const exHistoryTasks = await bpmn.historyExternalTasksByTaskId(task.id, false, 'timestamp', 'desc');
-        console.log('===========TEST exHistoryTasks ', exHistoryTasks);
-        task = exHistoryTasks[0];
+        const exHistoryTasks = await historyExternalTasksByInstanceId(lastProcessInstance.id, false, 'timestamp', 'desc', bpmn);
+
+        if (exHistoryTasks.length && exHistoryTasks[0].successLog === false) {
+            task = exHistoryTasks[0];
+        } else {
+            console.log(`Run Error. У модели нет активной задачи, есть активный процесс и не удалось найти external task ${model.MODEL_ID}`);
+        }
     } else {
         // Если процесс завершён, то получаем external task из истории.
-        const tasks = await bpmn.historyExternalTasksByInstanceId(lastProcessInstance.id, true, 'timestamp', 'desc');
+        const tasks = await historyExternalTasksByInstanceId(lastProcessInstance.id, true, 'timestamp', 'desc', bpmn);
         task = tasks.find((el) => el.topicName === 'bpmnFinish');
     }
 
@@ -226,10 +327,18 @@ const processModel = async (model, bpmn, db) => {
             modelData.addStatus(new Status(modelStatus, task.timestamp, null));
         }
 
-        console.log(`Добавлены данные external task по модели ${model.MODEL_ID}`);
+        if (modelStatus || modelStage) {
+            console.log(`Добавлены данные external task по модели ${model.MODEL_ID}`);
+        } else {
+            console.log(`Run Error. Не удалось получить этапы и статусы по модели ${model.MODEL_ID} external task ${task.externalTaskId}`);
+        }
     }
 
-    return modelData;
+    if (modelData.statuses.length || modelData.stages.length) {
+        return modelData;
+    } else {
+        return;
+    }
 }
 
 const initialize = async () => {
@@ -265,13 +374,14 @@ const initialize = async () => {
 
 const main = async (batchSize = 100, batchesCount = 0) => {
     let countModelsOverall = 0;
+    let failedModelIds = [];
     await database.initialize();
     const db = models(database, bpmn, integration);
     const modelSaver = new ModelSaver(database);
 
     await initialize();
 
-    let modelsList = await getModels(batchSize, database);
+    let modelsList = await getModels(batchSize, database, failedModelIds);
 
     let countIterations = 0;
     while (modelsList.length) {
@@ -282,7 +392,7 @@ const main = async (batchSize = 100, batchesCount = 0) => {
                 console.log(`Сохранение данных модели ${modelData.modelId}`);
                 modelSaver.flush(modelData);
             } else {
-                console.log(`Пропуск. Не удалось получить задачи по модели ${model.MODEL_ID}`);
+                console.log(`Пропуск. ${model.MODEL_ID}`);
                 failedModelIds.push(model.MODEL_ID);
             }
             countModelsOverall += 1;
@@ -292,10 +402,10 @@ const main = async (batchSize = 100, batchesCount = 0) => {
         if (batchesCount > 0 && countIterations >= batchesCount) {
             break;
         }
-        modelsList = await getModels(batchSize, database);
+        modelsList = await getModels(batchSize, database, failedModelIds);
     }
 
-    console.log(`Обработка завершена успешно. Всего моделей ${countModelsOverall}. Из них с ошибкой ${failedModelIds.length}`);
+    console.log(`Обработка завершена успешно. Всего моделей ${countModelsOverall}. Из них с ошибкой ${failedModelIds.length} \n version tags ${versionTags}`);
 }
 
 const args = process.argv.slice(2);
