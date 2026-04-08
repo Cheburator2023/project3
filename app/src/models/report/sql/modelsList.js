@@ -8,8 +8,8 @@ select
   m_.model_name,
   m_.model_version,
   m_.model_desc,
-  m_.model_stage as new_model_stage,
-  m_.model_status as new_model_status,
+  model_stage_hist.active_stage as new_model_stage,
+  model_status_hist.status as new_model_status,
   to_char(
     cast(m_.create_date as date),
     'DD.MM.YYYY'
@@ -79,6 +79,24 @@ select
   -- coalesce(dm_.name_monit_data, 'Нет данных')         as name_monit_data
 from
   models m_
+  LEFT JOIN (
+    SELECT DISTINCT ON (model_id)
+        model_id,
+        status
+    FROM model_status
+    WHERE effective_to = TO_TIMESTAMP('9999-12-31 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+    ORDER BY model_id, effective_from DESC
+  ) AS model_status_hist
+    ON m_.model_id = model_status_hist.model_id
+  LEFT JOIN (
+    SELECT
+        model_id,
+        ARRAY_TO_STRING(ARRAY_AGG(stage ORDER BY effective_from DESC), ';') AS active_stage
+    FROM model_stage
+    WHERE effective_to = TO_TIMESTAMP('9999-12-31 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+    GROUP BY model_id
+  ) AS model_stage_hist
+    ON m_.model_id = model_stage_hist.model_id
   left join (
     select
       ar_.model_id,
