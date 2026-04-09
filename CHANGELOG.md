@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.28.3](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.28.2...v1.28.3) (2026-04-09)
+
+
+### Bug Fixes
+
+* complete mail external task on smtp error ([d8477c4](https://git.sfera.inno.local:7999/SUMD/backend/commit/d8477c427dcc86990498b032858006626c72171b))
+
 ## [1.28.2](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.28.1...v1.28.2) (2026-04-02)
 
 
