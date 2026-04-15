@@ -9,7 +9,7 @@ image:
   pullPolicy: IfNotPresent
 
 auditSidecar:
-  enabled: false
+  enabled: true
   name: audit-proxy
   image:
     repository: docker.repo-ci.sfera.inno.local/sumd-docker-lib/audit-proxy
