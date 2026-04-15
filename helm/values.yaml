@@ -8,6 +8,20 @@ image:
   tag: v10
   pullPolicy: IfNotPresent
 
+auditSidecar:
+  enabled: false
+  name: audit-proxy
+  image:
+    repository: docker.repo-ci.sfera.inno.local/sumd-docker-lib/audit-proxy
+    tag: v1.0.3
+    pullPolicy: Always
+  env:
+    SPRING_PROFILES_ACTIVE: dev
+    KAFKA_BOOTSTRAP_SERVERS: omni1-emulator-kafka:9092
+    MS_PROPERTIES_INFO_SYSTEM_CODE: SUMD
+    MS_PROPERTIES_INFO_SYSTEM_ID: "1661"
+  resources: {}
+
 resources:
   limits:
     cpu: 600m
