@@ -1,5 +1,13 @@
 # Semantic Versioning Changelog
 
+## [1.28.4](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.28.3...v1.28.4) (2026-04-15)
+
+
+### Bug Fixes
+
+* add-audit-sidecar ([fae5200](https://git.sfera.inno.local:7999/SUMD/backend/commit/fae5200be7328b42cf493596cc31a0ba24ace7f4))
+* add-audit-sidecar ([99e90d2](https://git.sfera.inno.local:7999/SUMD/backend/commit/99e90d25213e18f7487e2bdde717c2f4fdaa2077))
+
 ## [1.28.3](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.28.2...v1.28.3) (2026-04-09)
 
 
