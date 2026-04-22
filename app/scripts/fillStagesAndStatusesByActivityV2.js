@@ -7,31 +7,28 @@ const integration = require('../src/connectors/integration');
 
 const querystring = require("querystring");
 
-const historyTasksByModel = (modelId, sortBy = 'endTime', sortOrder = 'desc', bpmn) =>
-    bpmn.connector({
-      path: `/history/task?${querystring.stringify({
-        sortBy: sortBy,
-        sortOrder: sortOrder,
-        processVariables: "model_eq_" + modelId,
-      })}`,
-    });
-
-const historyExternalTasksByInstanceId = (processInstanceId, successLog = true, sortBy = 'timestamp', sortOrder = 'desc', bpmn) =>
-    bpmn.connector({
-      path: `/history/external-task-log?${querystring.stringify({
-        sortBy: sortBy,
-        sortOrder: sortOrder,
-        processInstanceId: processInstanceId,
-        successLog: successLog,
-      })}`,
-    });
-
 const historyProcessInstancesByModel = (modelId, sortBy = 'endTime', sortOrder = 'desc', bpmn) => 
     bpmn.connector({
       path: `/history/process-instance?${querystring.stringify({
         sortBy: sortBy,
         sortOrder: sortOrder,
         variables: "model_eq_" + modelId,
+      })}`,
+    });
+
+const historyActivityInstancesByProcessId = (processInstanceId, sortBy = 'endTime', sortOrder = 'desc', bpmn) => 
+    bpmn.connector({
+      path: `/history/activity-instance?${querystring.stringify({
+        sortBy: sortBy,
+        sortOrder: sortOrder,
+        processInstanceId: processInstanceId,
+      })}`,
+    });
+
+const historyVariableInstancesByProcessId = (processInstanceId, bpmn) => 
+    bpmn.connector({
+      path: `/history/variable-instance?${querystring.stringify({
+        processInstanceId: processInstanceId,
       })}`,
     });
 
@@ -43,7 +40,7 @@ const getStatusStageMapByTask = async(taskId, processDefinitionId, context) => {
     const definition = await context.bpmn.definition(processDefinitionId);
 
     if (!definition) {
-        console.error(`Cannot get definition by id ${processDefinitionId} on getStatusStageMapByTask for task ${taskId}`);
+        console.log(`Cannot get definition by id ${processDefinitionId} on getStatusStageMapByTask for task ${taskId}`);
         return null;
     }
 
@@ -63,7 +60,7 @@ const getStatusStageMapByTask = async(taskId, processDefinitionId, context) => {
 };
 
 // переработанная копия из ../src/common/status-helpers
-const acquireStageAndStatusFromCamunda = async (id, taskId, processDefinitionId, variables, context) => {
+const acquireStageAndStatusFromCamunda = async (id, taskId, processDefinitionId, processInstanceId, variables, context) => {
   let modelStatus = null;
   let modelStage = null;
 
@@ -77,8 +74,10 @@ const acquireStageAndStatusFromCamunda = async (id, taskId, processDefinitionId,
 
     if (stageStatusMap.length > 1) {
       // скорее всего есть дополнительные признаки, переменные по которым нужно выбрать точный вариант маппинга
-      const model_deployment_approving_flg = await context.bpmn.getTaskVar(id, 'model_deployment_approving_flg');
-      const pim_integration_flg = await context.bpmn.getTaskVar(id, 'pim_integration_flg');
+      console.log(`Пробуем получить переменные для маппинга по процессу ${processInstanceId}`)
+      const processVariables = await historyVariableInstancesByProcessId(processInstanceId, context.bpmn);
+      const model_deployment_approving_flg = processVariables.find((item) => item.name === 'model_deployment_approving_flg').value;
+      const pim_integration_flg = processVariables.find((item) => item.name === 'pim_integration_flg').value;
 
       stageStatusMap = stageStatusMap.filter((item) => {
         if (item.MODEL_DEPLOYMENT_APPROVING_FLG && item.MODEL_DEPLOYMENT_APPROVING_FLG !== model_deployment_approving_flg) {
@@ -88,14 +87,14 @@ const acquireStageAndStatusFromCamunda = async (id, taskId, processDefinitionId,
           return false;
         }
         return true;
-      })
+      });
     }
 
     if (stageStatusMap[0]) {
       modelStatus = stageStatusMap[0].MODEL_STATUS;
       modelStage = stageStatusMap[0].MODEL_STAGE;
     } else {
-      console.log(`Run Error. Ошибка получения статуса/этапа из Камунды. task ${id} taskId ${taskId} process definition ${processDefinitionId}`)
+      console.log(`Run err. Ошибка получения статуса/этапа из Камунды. task ${id} taskId ${taskId} process definition ${processDefinitionId}`)
     }
   }
 
@@ -103,23 +102,29 @@ const acquireStageAndStatusFromCamunda = async (id, taskId, processDefinitionId,
 }
 
 class Stage {
-    constructor(stage, effectiveFrom, effectiveTo) {
+    constructor(stage, processInstanceId, effectiveFrom, effectiveTo = null) {
         this._stage = stage;
         this._effectiveFrom = effectiveFrom;
         this._effectiveTo = effectiveTo ? effectiveTo : '9999-12-31T23:59:59.000+0000';
+        this._processInstanceId = processInstanceId;
     }
 
     get stage() { return this._stage }
     get effectiveFrom() { return this._effectiveFrom }
     get effectiveTo() { return this._effectiveTo }
+    get processInstanceId() { return this._processInstanceId }
 
     setEffectiveTo(effectiveTo) {
         this._effectiveTo = effectiveTo;
     }
+
+    setProcessInstanceId(processInstanceId) {
+        this._processInstanceId = processInstanceId;
+    }
 }
 
 class Status {
-    constructor(status, effectiveFrom, effectiveTo) {
+    constructor(status, effectiveFrom, effectiveTo = null) {
         this._status = status;
         this._effectiveFrom = effectiveFrom;
         this._effectiveTo = effectiveTo ? effectiveTo : '9999-12-31T23:59:59.000+0000';
@@ -151,9 +156,10 @@ class Model {
 
     addStatus(status) {
         const lastStatus = this.getLastStatus();
-        if (lastStatus && lastStatus.status === status.status) {
-            lastStatus.setEffectiveTo(status.effectiveTo);
-        } else {
+        if (!lastStatus) {
+            this._statuses.push(status);
+        } else if (lastStatus.status !== status.status) {
+            lastStatus.setEffectiveTo(status.effectiveFrom);
             this._statuses.push(status);
         }
     }
@@ -169,15 +175,27 @@ class Model {
 
     addStage(stage) {
         const lastStage = this.getLastStage();
+        const stageByProcess = this.getStageByProcess(stage.processInstanceId);
+
+        if (stageByProcess && stageByProcess.stage === stage.stage) {
+            stageByProcess.setEffectiveTo(stage.effectiveTo);
+            return;
+        }
+
         if (lastStage && lastStage.stage === stage.stage) {
             lastStage.setEffectiveTo(stage.effectiveTo);
-        } else {
-            this._stages.push(stage);
+            return
         }
+
+        this._stages.push(stage);
     }
 
     getLastStage() {
         return this._stages[this._stages.length - 1];
+    }
+
+    getStageByProcess(processInstanceId) {
+        return this._stages.slice().reverse().find((stage) => stage.processInstanceId === processInstanceId);
     }
 
     getCurrentStageString() {
@@ -195,7 +213,6 @@ class ModelSaver {
     }
 
     flush(model) {
-        // console.log('=============TEST modelData ', model);
         this._insertModel(model.modelId, model.rootModelId, model.modelVersion, model.getCurrentStageString(), model.getCurrentStatusString());
         for (const status of model.statuses) {
             this._insertModelStatus(model.modelId, status.status, status.effectiveFrom, status.effectiveTo);
@@ -252,85 +269,63 @@ const getLastProcessInstanceFromList = (list) => {
 }
 
 const processModel = async (model, bpmn, db) => {
-    const tasks = await historyTasksByModel(model.MODEL_ID, 'startTime', 'asc', bpmn);
     const modelData = new Model(model.MODEL_ID, model.ROOT_MODEL_ID, model.MODEL_VERSION);
     let activeTaskExists = false;
+    const tasks = [];
+
+    // сортировка по startTime нужна чтобы вложенные процессы не оказались раньше родительского. Но может быть проблема с финальным статусом при параллельных процессах
+    // TODO Вручную пересортировывать дочерние таски? Или полагаться на сортировку общего массива тасок?
+    const processInstances = await historyProcessInstancesByModel(model.MODEL_ID, 'startTime', 'asc', bpmn);
+
+    for (const processInstance of processInstances) {
+        if (processInstance.processDefinitionKey === 'main') {
+            continue;
+        }
+
+        const activities = await historyActivityInstancesByProcessId(processInstance.id, 'startTime', 'asc', bpmn);
+
+        for (const activity of activities) {
+            if (activity.activityType !== 'userTask' && activity.activityType !== 'serviceTask') {
+                continue;
+            }
+
+            tasks.push(activity);
+        }
+    }
 
     if (tasks.length == 0) {
         // TODO Нужно ли как-то обрабатывать ситуации, если история не собралась вообще, т.е. исторических юзер тасок нет?
-        console.log(`Run Error. Не удалось получить задачи по модели ${model.MODEL_ID}`);
+        console.log(`Run err. Не удалось получить задачи по модели ${model.MODEL_ID}`);
         return;
     }
 
+    // TODO стоит ли сортировать общий массив тасок?
     for (const task of tasks) {
         if (!task.endTime) {
             activeTaskExists = true;
         }
 
         const {modelStage: modelStage, modelStatus: modelStatus} = await acquireStageAndStatusFromCamunda(
-            task.id,
-            task.taskDefinitionKey,
+            task.taskId,
+            task.activityId,
             task.processDefinitionId,
+            task.processInstanceId,
             { model_status: null, model_stage: null },
             { bpmn: bpmn, db: db }
         );
 
         if (modelStage) {
-            modelData.addStage(new Stage(modelStage, task.startTime, task.endTime));
+            modelData.addStage(new Stage(modelStage, task.processInstanceId, task.startTime, task.endTime));
         }
 
         if (modelStatus) {
-            modelData.addStatus(new Status(modelStatus, task.startTime, task.endTime));
+            modelData.addStatus(new Status(modelStatus, task.startTime));
         }
 
         if (modelStatus || modelStage) {
             console.log(`Добавлены исторические этапы и статусы по модели ${model.MODEL_ID}`);
         } else {
-            console.log(`Run Error. Не удалось получить этапы и статусы по модели ${model.MODEL_ID} задача ${task.id}`);
-        }
-    }
-    
-    // Обработать финальные статусы по external task для моделей с завершёнными процессами
-    const processInstances = await historyProcessInstancesByModel(model.MODEL_ID, 'endTime', 'desc', bpmn);
-    const lastProcessInstance = getLastProcessInstanceFromList(processInstances);
-    let task = null;
-
-    if (!activeTaskExists && lastProcessInstance.state === 'ACTIVE') {
-        // Есть активный не main процесс и активная user task отсутствует. Скорее всего процесс завис, пробуем получить текущую активную external task
-        const exHistoryTasks = await historyExternalTasksByInstanceId(lastProcessInstance.id, false, 'timestamp', 'desc', bpmn);
-
-        if (exHistoryTasks.length && exHistoryTasks[0].successLog === false) {
-            task = exHistoryTasks[0];
-        } else {
-            console.log(`Run Error. У модели нет активной задачи, есть активный процесс и не удалось найти external task ${model.MODEL_ID}`);
-        }
-    } else {
-        // Если процесс завершён, то получаем external task из истории.
-        const tasks = await historyExternalTasksByInstanceId(lastProcessInstance.id, true, 'timestamp', 'desc', bpmn);
-        task = tasks.find((el) => el.topicName === 'bpmnFinish');
-    }
-
-    if (task) {
-        const {modelStage: modelStage, modelStatus: modelStatus} = await acquireStageAndStatusFromCamunda(
-            task.externalTaskId,
-            task.activityId,
-            task.processDefinitionId,
-            { model_status: null, model_stage: null },
-            { bpmn: bpmn, db: db }
-        );
-
-        if (modelStage && task.topicName !== 'bpmnFinish') { // Этап устанавливать не нужно, если мы берём bpmnFinish
-            modelData.addStage(new Stage(modelStage, task.timestamp, null));
-        }
-
-        if (modelStatus) {
-            modelData.addStatus(new Status(modelStatus, task.timestamp, null));
-        }
-
-        if (modelStatus || modelStage) {
-            console.log(`Добавлены данные external task по модели ${model.MODEL_ID}`);
-        } else {
-            console.log(`Run Error. Не удалось получить этапы и статусы по модели ${model.MODEL_ID} external task ${task.externalTaskId}`);
+            console.log(`Run err. Не удалось получить этапы и статусы по модели ${model.MODEL_ID} задача ${task.id}`);
         }
     }
 
@@ -409,4 +404,18 @@ const main = async (batchSize = 100, batchesCount = 0) => {
 }
 
 const args = process.argv.slice(2);
-main(args[0] ? args[0] : 100, args[1] ? args[1] : 0);
+
+try {
+    main(args[0] ? args[0] : 100, args[1] ? args[1] : 0);
+} catch (e) {
+    if (!e) {
+        e = 'Обработка прервана неизвестной ошибкой';
+    }
+
+    console.log(e.message || e);
+
+    if (!e.stack) {
+        e = new Error();
+    }
+    console.log(e.stack);
+}

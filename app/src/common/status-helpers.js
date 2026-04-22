@@ -85,22 +85,27 @@ const acquireStageAndStatusFromCamunda = async (id, taskId, processDefinitionId,
 
     if (stageStatusMap.length > 1) {
       // скорее всего есть дополнительные признаки, переменные по которым нужно выбрать точный вариант маппинга
-      const taskVars = await context.bpmn.getTaskVars(id);
+      const model_deployment_approving_flg = variables.model_deployment_approving_flg
+        ? variables.model_deployment_approving_flg 
+        : await context.bpmn.getTaskVar(id, 'model_deployment_approving_flg');
+      const pim_integration_flg = variables.pim_integration_flg 
+        ? variables.pim_integration_flg 
+        : await context.bpmn.getTaskVar(id, 'pim_integration_flg');
 
       stageStatusMap = stageStatusMap.filter((item) => {
-        if (item.MODEL_DEPLOYMENT_APPROVING_FLG && item.MODEL_DEPLOYMENT_APPROVING_FLG !== taskVars.model_deployment_approving_flg) {
+        if (item.MODEL_DEPLOYMENT_APPROVING_FLG && item.MODEL_DEPLOYMENT_APPROVING_FLG !== model_deployment_approving_flg) {
           return false;
         }
-        if (item.PIM_INTEGRATION_FLG && item.PIM_INTEGRATION_FLG !== taskVars.pim_integration_flg) {
+        if (item.PIM_INTEGRATION_FLG && item.PIM_INTEGRATION_FLG !== pim_integration_flg) {
           return false;
         }
         return true;
-      })
+      });
     }
 
     if (stageStatusMap[0]) {
-      modelStatus = stageStatusMap.MODEL_STATUS;
-      modelStage = stageStatusMap.MODEL_STAGE;
+      modelStatus = stageStatusMap[0].MODEL_STATUS;
+      modelStage = stageStatusMap[0].MODEL_STAGE;
     } else {
       console.log('Ошибка получения статуса/этапа из Камунды.')
     }
