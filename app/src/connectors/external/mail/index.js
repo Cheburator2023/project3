@@ -172,17 +172,21 @@ class Mail {
       });
 
     } catch (error) {
-        if (process.env.NODE_ENV !== 'production') {
-            const debugMessage = `Ошибка отправки уведомления: ${template_name} - ${error.message}`;
-            const debugData = {
-                templateName: template_name,
-                modelId: variables.model,
-                taskId: task.id,
-                error: error.message
-            };
-            Mail.consoleDebug(debugMessage, debugData);
-        }
-      throw error;
+      // Временная заглушка для legacy-моделей и старых бизнес-процессов:
+      // SMTP notification сервис сейчас не работает, поэтому завершаем external task,
+      // чтобы mail-tasks не застревали в процессе.
+      await taskService.complete(task);
+
+      if (process.env.NODE_ENV !== 'production') {
+        const debugMessage = `Ошибка отправки уведомления: ${ template_name } - ${ error.message }`;
+        const debugData = {
+          templateName: template_name,
+          modelId: variables.model,
+          taskId: task.id,
+          error: error.message
+        };
+        Mail.consoleDebug(debugMessage, debugData);
+      }
     }
   };
 }
