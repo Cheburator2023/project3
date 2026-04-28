@@ -1,3 +1,6 @@
+const auditClient = require('../../../utils/audit/auditClient');
+const tslgLogger = require("../../../utils/logger");
+
 class System{
     constructor(db, bpmn){
         this.bpmn = bpmn
@@ -29,6 +32,13 @@ class System{
             inst => this.bpmn.deleteProcess(inst.BPMN_INSTANCE_ID)
         ))
         await this.db.card.cancel({ model })
+
+        // Отправка аудита: отмена разработки
+        auditClient.send('SUMD_CANCELMODEL', 'SUCCESS', {
+            modelId: model,
+        }).catch(err => {
+            tslgLogger.error('Ошибка отправки аудита отмены разработки модели', 'AuditError', err);
+        });
 
         await taskService.complete(task)
     }

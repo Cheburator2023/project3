@@ -1,5 +1,6 @@
 const { Variables } = require('camunda-external-task-client-js');
 const tslgLogger = require('../../../utils/logger');
+const auditClient = require('../../../utils/audit/auditClient');
 
 class AutoMl {
   constructor(db, integration, bpmn) {
@@ -83,6 +84,15 @@ class AutoMl {
       /* COMPLETE CAMUNDA EXTERNAL TASK */
       await taskService.complete(task, processVariables);
 
+        // Отправка аудита: успешное создание модели
+        auditClient.send('SUMD_CREATEMODEL', 'SUCCESS', {
+            modelId: model.MODEL_ID,
+            modelAlias: alias,
+            source: 'AutoML',
+        }).catch(err => {
+            tslgLogger.error('Ошибка отправки аудита создания модели:','AuditError', err);
+        });
+
       tslgLogger.info(`Модель AutoML создана успешно: ${alias}`, 'СозданиеAutoML', {
         modelId: model.MODEL_ID,
         alias,
@@ -90,6 +100,11 @@ class AutoMl {
       });
 
     } catch (error) {
+        auditClient.send('SUMD_CREATEMODEL', 'FAILURE', {
+            modeldev_name,
+            error: error.message,
+            source: 'AutoML',
+        }).catch(err => tslgLogger.error('Ошибка отправки аудита ошибки создания модели', 'AuditError', err));
         if (process.env.NODE_ENV !== 'production') {
             const debugMessage = `Ошибка создания модели AutoML: ${modeldev_name} - ${err.message}`;
             const debugData = {
@@ -98,7 +113,7 @@ class AutoMl {
             };
             AutoMl.consoleDebug(debugMessage, debugData);
         }
-      throw error;
+        throw error;
     }
   };
 

@@ -2,6 +2,8 @@ const moment = require("moment");
 const { Variables } = require("camunda-external-task-client-js");
 const { model_status } = require("../../../common/status-map");
 const { getLastActiveStatus } = require("../../../common/status-helpers");
+const auditClient = require('../../../utils/audit/auditClient');
+const tslgLogger = require('../../../utils/logger');
 
 class System {
   constructor(db, bpmn) {
@@ -26,6 +28,10 @@ class System {
       console.log(e);
     }
     await taskService.complete(task);
+    auditClient.send('SUMD_TASKCOMPLETE', 'SUCCESS', {
+        taskId: task.id,
+        taskName: 'endEvent',
+    }).catch(err => tslgLogger.error('Ошибка отправки аудита завершения задачи','AuditError', err));
   };
 
   // Update model data in DB
@@ -35,6 +41,13 @@ class System {
 
       // Set model_is_active_flg to 0 in models table
       await this.db.card.cancel({ model });
+
+      // Отправка аудита: отмена разработки
+      auditClient.send('SUMD_CANCELMODEL','SUCCESS', {
+          modelId: model,
+      }).catch(err => {
+          tslgLogger.error('Ошибка отправки аудита отмены разработки', 'AuditError', err);
+      });
 
       // Replace all stages, including parallel ones, with the current stage
       await this.db.card.changeStage({
@@ -159,8 +172,17 @@ class System {
           await this.db.card.editActiveStatus({MODEL_ID: variables.model, MODELS_IS_ACTIVE_FLG: 0});
         }
       }
+      auditClient.send('SUMD_TASKCOMPLETE', 'SUCCES', {
+          modelId: variables.model,
+          processInstanceId: task.processInstanceId,
+      }).catch(err => tslgLogger.error('Ошибка отправки аудита завершенния задачи','AuditError', err));
     } catch (e) {
-      console.sys(e);
+        console.sys(e);
+        auditClient.send('SUMD_TASKCOMPLETE', 'FAILURE', {
+            modeldev_name,
+            error: error.message,
+            source: 'AutoML',
+        }).catch(err => tslgLogger.error('Ошибка отправки аудита ошибки завершения задачи', 'AuditError', err));
     }
   };
 

@@ -1,5 +1,6 @@
 const connector = require("./connector");
 const querystring = require("querystring");
+const auditClient = require('../../utils/audit/auditClient');
 
 class Bpmn {
     constructor(db, context) {
@@ -186,55 +187,72 @@ class Bpmn {
 
   // Tree modification
   modify = async (data, index = 0) => {
-    // tree deep
-    if (index > data.length - 1) return true;
+      try {
+          // tree deep
+          if (index > data.length - 1) return true;
 
-    const treeEl = data[index];
-    const { processInstanceId, activityId, endTime } = treeEl;
+          const treeEl = data[index];
+          const {processInstanceId, activityId, endTime} = treeEl;
 
-    if (!endTime) return this.modify(data, index + 1);
-    // First modification
-    if (index === 0) {
-      const activityData = await this.activity(processInstanceId);
-      const chouseActivity = activityData.filter(
-        (d) => d.activityId === activityId
-      )[0];
-      const b = new Date(chouseActivity.endTime).getTime();
-      const cancelActivity = activityData.filter((d) => {
-        const a = new Date(d.startTime).getTime();
-        return a >= b || d.activityId === activityId;
-      });
+          if (!endTime) return this.modify(data, index + 1);
+          // First modification
+          if (index === 0) {
+              const activityData = await this.activity(processInstanceId);
+              const chouseActivity = activityData.filter(
+                  (d) => d.activityId === activityId
+              )[0];
+              const b = new Date(chouseActivity.endTime).getTime();
+              const cancelActivity = activityData.filter((d) => {
+                  const a = new Date(d.startTime).getTime();
+                  return a >= b || d.activityId === activityId;
+              });
 
-      await this.modification(processInstanceId, cancelActivity, activityId);
-      return this.modify(data, index + 1);
-    }
+              await this.modification(processInstanceId, cancelActivity, activityId);
+              return this.modify(data, index + 1);
+          }
 
-    // Get new Instance
-    const prevTreeEl = data[index - 1];
-    const newPrevActivity = await this.activity(prevTreeEl.processInstanceId);
-    const newInstance = newPrevActivity.filter(
-      (a) => a.activityId === prevTreeEl.activityId && !a.endTime
-    )[0];
-    const oldVars = await this.getVars(prevTreeEl.calledProcessInstanceId);
+          // Get new Instance
+          const prevTreeEl = data[index - 1];
+          const newPrevActivity = await this.activity(prevTreeEl.processInstanceId);
+          const newInstance = newPrevActivity.filter(
+              (a) => a.activityId === prevTreeEl.activityId && !a.endTime
+          )[0];
+          const oldVars = await this.getVars(prevTreeEl.calledProcessInstanceId);
 
-    (data[index].processInstanceId = newInstance.calledProcessInstanceId),
-      await this.setVars(data[index].processInstanceId, oldVars);
+          (data[index].processInstanceId = newInstance.calledProcessInstanceId),
+              await this.setVars(data[index].processInstanceId, oldVars);
 
-    // Modification
-    const activityData = await this.activity(data[index].processInstanceId);
-    await this.modification(
-      data[index].processInstanceId,
-      activityData.filter(
-        (item) =>
-          ![
-            "Инициализация бизнес-процесса",
-            "Инициализация бизнес процесса",
-          ].includes(item.activityName)
-      ),
-      activityId
-    );
+          // Modification
+          const activityData = await this.activity(data[index].processInstanceId);
+          await this.modification(
+              data[index].processInstanceId,
+              activityData.filter(
+                  (item) =>
+                      ![
+                          "Инициализация бизнес-процесса",
+                          "Инициализация бизнес процесса",
+                      ].includes(item.activityName)
+              ),
+              activityId
+          );
 
-    return this.modify(data, index + 1);
+          // Успешный откат модели
+          const modelId = data[0]?.processInstanceId;
+          auditClient.send('SUMD_ROLLBACKMODEL', 'SUCCESS', {
+              processInstanceId: processInstanceId,
+              targetActivityId: activityId,
+              modelId: modelId
+          }).catch(err => console.error('Ошибка аудита', err));
+
+          return this.modify(data, index + 1);
+      } catch (error) {
+          // Отправляем FAILURE в случае ошибки
+          auditClient.send('SUMD_ROLLBACKMODEL', 'FAILURE', {
+              processInstanceId: data[0]?.processInstanceId,
+              error: error.message
+          }).catch(err => console.error('Ошибка Аудита', err));
+          throw error;
+      }
   };
 
   getVars = (id) =>
