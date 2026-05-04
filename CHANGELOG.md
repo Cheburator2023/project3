@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.30.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.29.0...v1.30.0) (2026-05-04)
+
+
+### Features
+
+* ограничение редактирования атрибутов ([db8bf3c](https://git.sfera.inno.local:7999/SUMD/backend/commit/db8bf3cf318c758e9a39c1475b4ffbf2958b874e))
+
 # [1.29.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.28.4...v1.29.0) (2026-04-28)
 
 
