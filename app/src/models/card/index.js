@@ -299,6 +299,7 @@ class Card {
         },
       })
       .then((data) => data.rows)
+      .then((data) => data.filter((e) => e.ARTEFACT_STRING_VALUE || e.ARTEFACT_VALUE_ID))
       .then((data) => artefactRestrictions(data, user));
 
     // Apply SumRM synchronization if enabled

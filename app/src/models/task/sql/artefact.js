@@ -1,8 +1,20 @@
 /* 
     Должен возвращаться всю информацию о задаче по ее TASK_ID и MODEL_ID
+	При выборке артефактов необходимо получить последнее НЕ NULL значение для предзаполнения формы задачи
 */
 
 const sql = `
+WITH ranked_artefact_realizations AS (
+	SELECT *, ROW_NUMBER() OVER(
+		PARTITION BY 
+			ar2.artefact_id, 
+			ar2.model_id 
+		ORDER BY 
+			(ar2.artefact_string_value IS NULL and ar2.artefact_value_id IS NULL) ASC, 
+			ar2.effective_to DESC
+		) AS RN 
+	FROM artefact_realizations ar2
+)
 SELECT 
 	T.TASK_ID,
 	T.TASK_NAME,
@@ -49,11 +61,11 @@ LEFT JOIN ARTEFACT_VALUES AR_V
 INNER JOIN ARTEFACT_X_TYPE AR_T
 	ON AR.ARTEFACT_TYPE_ID = AR_T.ARTEFACT_TYPE_ID
 
-LEFT JOIN ARTEFACT_REALIZATIONS AR_R
+LEFT JOIN ranked_artefact_realizations AR_R
 	ON AR.ARTEFACT_ID = AR_R.ARTEFACT_ID
 		AND AR_R.MODEL_ID = :MODEL_ID
 			AND COALESCE(AR_V.ARTEFACT_VALUE_ID, 0) = COALESCE(AR_R.ARTEFACT_VALUE_ID, 0)
-				AND AR_R.EFFECTIVE_TO = TO_TIMESTAMP('9999-12-3123:59:59','YYYY-MM-DDHH24:MI:SS')
+				AND AR_R.RN = 1
 
 LEFT JOIN MODELS M
 	ON m.MODEL_ID = :MODEL_ID

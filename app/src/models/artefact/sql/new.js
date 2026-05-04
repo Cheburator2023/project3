@@ -6,7 +6,8 @@ const sql = `
             ARTEFACT_ID,
             ARTEFACT_VALUE_ID,
             ARTEFACT_STRING_VALUE,
-            ARTEFACT_ORIGINAL_VALUE
+            ARTEFACT_ORIGINAL_VALUE,
+            CREATOR
         )
     VALUES
         (
@@ -14,7 +15,8 @@ const sql = `
             :ARTEFACT_ID,
             :ARTEFACT_VALUE_ID,
             :ARTEFACT_STRING_VALUE,
-            :ARTEFACT_ORIGINAL_VALUE
+            :ARTEFACT_ORIGINAL_VALUE,
+            :CREATOR
         )
 `
 
