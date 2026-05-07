@@ -2,8 +2,7 @@ const fetch = require('isomorphic-fetch');
 
 /**
  * Клиент для отправки событий аудита в сайдкар с отказоустойчивостью.
- * - Не выбрасывает исключений, только логирует ошибки.
- * - Поддерживает отключение через AUDIT_ENABLED=false.
+ * Не использует AbortController для совместимости со старыми версиями Node.js.
  */
 class AuditClient {
     /**
@@ -18,12 +17,12 @@ class AuditClient {
     }
 
     /**
-     * Отправить событие аудита (ошибки не пробрасываются).
-     * @param {string} eventCode - код события (должен быть зарегистрирован в сайдкаре)
-     * @param {string} eventClass - класс события: 'START', 'SUCCESS', 'FAILURE'
-     * @param {Object} additionalFields - дополнительные поля, которые будут переданы в `additionalFields` запроса
-     * @param {string} [timestamp] - ISO-строка времени события (по умолчанию текущее)
-     * @returns {Promise<void>} – всегда резолвится, ошибки подавлены.
+     * Отправить событие аудита (безопасно – ошибки не пробрасываются наружу).
+     * @param {string} eventCode
+     * @param {string} eventClass
+     * @param {Object} additionalFields
+     * @param {string} timestamp
+     * @returns {Promise<void>}
      */
     async send(eventCode, eventClass, additionalFields = {}, timestamp = new Date().toISOString()) {
         // Если аудит отключён – ничего не делаем
@@ -38,18 +37,18 @@ class AuditClient {
             additionalFields,
         };
 
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+        const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error(`Request timeout after ${this.timeout} ms`)), this.timeout)
+        );
+
+        const fetchPromise = fetch(this.sidecarUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        });
 
         try {
-            const response = await fetch(this.sidecarUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
-                signal: controller.signal,
-            });
-            clearTimeout(timeoutId);
-
+            const response = await Promise.race([fetchPromise, timeoutPromise]);
             if (!response.ok) {
                 const errorText = await response.text();
                 throw new Error(`Audit sidecar responded with ${response.status}: ${errorText}`);
@@ -58,14 +57,12 @@ class AuditClient {
             console.debug(`[Audit] Event ${eventCode}/${eventClass} sent`);
         } catch (error) {
             console.error(`[AuditClient] Failed to send event ${eventCode}/${eventClass}:`, error.message);
-        } finally {
-            clearTimeout(timeoutId);
         }
     }
 }
 
 const sidecarUrl = process.env.AUDIT_SIDECAR_URL || 'http://localhost:8081/api/v1/audit';
 const timeout = parseInt(process.env.AUDIT_SIDECAR_TIMEOUT, 10) || 5000;
-const enabled = process.env.AUDIT_ENABLED !== 'false'; // по умолчанию true
+const enabled = process.env.AUDIT_ENABLED !== 'false';
 
 module.exports = new AuditClient(sidecarUrl, timeout, enabled);
