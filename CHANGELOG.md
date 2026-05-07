@@ -1,5 +1,29 @@
 # Semantic Versioning Changelog
 
+# [1.30.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.29.0...v1.30.0) (2026-05-04)
+
+
+### Features
+
+* ограничение редактирования атрибутов ([db8bf3c](https://git.sfera.inno.local:7999/SUMD/backend/commit/db8bf3cf318c758e9a39c1475b4ffbf2958b874e))
+
+# [1.29.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.28.4...v1.29.0) (2026-04-28)
+
+
+### Bug Fixes
+
+* add-audit-values ([d08b31e](https://git.sfera.inno.local:7999/SUMD/backend/commit/d08b31e1dd36db73b6275ff39442b976ab0a0ff7))
+* add-sidecar ([90b2e85](https://git.sfera.inno.local:7999/SUMD/backend/commit/90b2e85b84d75c5a3a626739202242b6ddc75a1a))
+* audit-sidecar-true ([3f3f0fc](https://git.sfera.inno.local:7999/SUMD/backend/commit/3f3f0fc00dc75697fa8b7928c5f3e432717fbdd8))
+* Добавил auth и rollback ([a54c689](https://git.sfera.inno.local:7999/SUMD/backend/commit/a54c689646540e4a136baa0d56df08d2cda6b1b4))
+* Добавил актуальные изменения из master ([53fff0f](https://git.sfera.inno.local:7999/SUMD/backend/commit/53fff0f5bd2ca9a6fb5890f7f43307c162aa296e))
+* Добавил актуальные изменения из master ([020624d](https://git.sfera.inno.local:7999/SUMD/backend/commit/020624dce097cebb699506e8246417a1d108eaf9))
+
+
+### Features
+
+* Добавил сервис Аудит ([1100307](https://git.sfera.inno.local:7999/SUMD/backend/commit/1100307353c0ffb3d9f202074dfab08156660500))
+
 ## [1.28.4](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.28.3...v1.28.4) (2026-04-15)
 
 

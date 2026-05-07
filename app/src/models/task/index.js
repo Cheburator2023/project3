@@ -357,6 +357,16 @@ class Task {
     })
     .then((data) => data.rows[0]);
   };
+
+  getTasksOperationsLogsByModelOrdered = async (modelId) => {
+    return await this.db.execute({
+        sql: sql.tasksOperationsByModelOrdered,
+        args: {
+          model_id: modelId,
+        },
+      })
+      .then((data) => data.rows);
+  };
 }
 
 module.exports = Task;
