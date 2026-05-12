@@ -12,7 +12,11 @@ class Validation {
     }
 
     validation = async ({ task, taskService }) => {
-        try{
+        const variables = task.variables.getAll();
+        const initiator = { sub: 'validation', channel: 'validation', method: 'validation' };
+        let correlationId;
+        try {
+            correlationId = await auditClient.start('SUMD_UPLOADREPORT', initiator, { modelId: variables.model });
             const processVariables = new Variables()
             const variables  = task.variables.getAll()
             const model_entity = await this.db
@@ -63,21 +67,11 @@ class Validation {
             await taskService.complete(task, processVariables)
 
             // Отправка аудита: выгрузка отчета (SUCCESS)
-            auditClient.send('SUMD_UPLOADREPORT', 'SUCCESS', {
-                modelId: variables.model,
-                modelAlias: alias,
-            }).catch(err => {
-                tslgLogger.error('Ошибка отправки аудита выгрузки отчета', 'AuditError', err);
-            });
-        }
-        catch(e){
-            console.sys(e)
-            auditClient.send('SUMD_UPLOADREPORT', 'FAILURE', {
-                modelId: variables.model,
-                error: e.message,
-            }).catch(err => {
-                tslgLogger.error('Ошибка отправки аудита ошибки выгрузки отчета', 'AuditError', err);
-            });
+            await auditClient.success('SUMD_UPLOADREPORT', correlationId, initiator, { modelId: variables.model, alias });
+        } catch (e) {
+            // Отправка аудита: выгрузка отчета (FAILURE)
+            await auditClient.failure('SUMD_UPLOADREPORT', correlationId, e, initiator, { modelId: variables.model });
+            tslgLogger.error('Ошибка отправки аудита выгрузки отчета', 'AuditError', err);
         }
     }
 

@@ -15,12 +15,16 @@ class Kafka {
   kafka_createNewStrategy = async ({ task, taskService }) => {
     const variables = task.variables.getAll();
 
+      const initiator = { sub: 'kafka', channel: 'kafka', method: 'kafka_createNewStrategy' };
+      let correlationId;
+
     tslgLogger.info(`Создание новой стратегии через Kafka`, 'СозданиеСтратегииKafka', {
       modelId: variables.model,
       taskId: task.id
     });
 
     try {
+      correlationId = await auditClient.start('SUMD_CREATEMODEL', initiator, { modelId: variables.model });
       const model_entity = await this.db.integration
           .modelGet(variables.model)
           .then((d) => d.rows[0]);
@@ -54,6 +58,8 @@ class Kafka {
         taskId: task.id
       });
 
+      await auditClient.success('SUMD_CREATEMODEL', correlationId, initiator, { modelId: variables.model, alias });
+
     } catch (error) {
         if (process.env.NODE_ENV !== 'production') {
             const debugMessage = `Ошибка отправки сообщения в Kafka для стратегии: ${variables.model}`;
@@ -64,12 +70,15 @@ class Kafka {
             };
             Kafka.consoleDebug(debugMessage, debugData);
         }
-      throw error;
+        await auditClient.failure('SUMD_CREATEMODEL', correlationId, error, initiator, { modelId: variables.model });
+        throw error;
     }
   };
 
   createNewModel = async ({ task, taskService }) => {
     const variables = task.variables.getAll();
+    const initiator = { sub: 'kafka', channel: 'kafka', method: 'createNewModel' };
+    let correlationId;
 
     tslgLogger.info(`Создание новой модели через Kafka`, 'СозданиеМоделиKafka', {
       modelId: variables.model,
@@ -77,6 +86,7 @@ class Kafka {
     });
 
     try {
+      correlationId = await auditClient.start('SUMD_CREATEMODEL', initiator, { modelId: variables.model });
       const model_entity = await this.db.integration
           .modelGet(variables.model)
           .then((d) => d.rows[0]);
@@ -111,6 +121,7 @@ class Kafka {
         alias,
         taskId: task.id
       });
+      await auditClient.success('SUMD_CREATEMODEL', correlationId, initiator, { modelId: variables.model, alias });
 
     } catch (error) {
         if (process.env.NODE_ENV !== 'production') {
@@ -122,12 +133,15 @@ class Kafka {
             };
             Kafka.consoleDebug(debugMessage, debugData);
         }
+      await auditClient.failure('SUMD_CREATEMODEL', correlationId, error, initiator, { modelId: variables.model });
       throw error;
     }
   };
 
   archiveModel = async ({ task, taskService }) => {
     const variables = task.variables.getAll();
+    const initiator = { sub: 'kafka', channel: 'kafka', method: 'archiveModel' };
+    let correlationId;
 
     tslgLogger.info(`Архивация модели через Kafka`, 'АрхивацияМоделиKafka', {
       modelId: variables.model,
@@ -135,6 +149,7 @@ class Kafka {
     });
 
     try {
+      correlationId = await auditClient.start('SUMD_REMOVEMODEL', initiator, { modelId: variables.model });
       const model_entity = await this.db.integration
           .modelGet(variables.model)
           .then((d) => d.rows[0]);
@@ -159,10 +174,7 @@ class Kafka {
 
       await taskService.complete(task);
 
-        auditClient.send('SUMD_REMOVEMODEL', 'SUCCESS', {
-            modelId: variables.model,
-            modelAlias: alias,
-        }).catch(err => tslgLogger.error('Ошибка отправки аудита архивации модели', 'AuditError', err));
+      await auditClient.success('SUMD_REMOVEMODEL', correlationId, initiator, { modelId: variables.model, alias });
 
         tslgLogger.info(`Модель архивирована: ${alias}`, 'УспехАрхивацииМодели', {
         modelId: variables.model,
@@ -171,10 +183,8 @@ class Kafka {
       });
 
     } catch (error) {
-        auditClient.send('SUMD_REMOVEMODEL', 'FAILURE', {
-            modelId: variables.model,
-            error: error.message,
-        }).catch(err => tslgLogger.error('Ошибка отправки аудита ошибки архивации модели', 'AuditError', err));
+        await auditClient.failure('SUMD_REMOVEMODEL', correlationId, error, initiator, { modelId: variables.model });
+
         tslgLogger.error(`Ошибка архивации модели`, 'ОшибкаАрхивацииМодели', error, {
         modelId: variables.model,
         taskId: task.id
