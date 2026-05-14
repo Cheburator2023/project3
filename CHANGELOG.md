@@ -1,5 +1,15 @@
 # Semantic Versioning Changelog
 
+# [1.31.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.30.0...v1.31.0) (2026-05-12)
+
+
+### Features
+
+* Добавил генератор событий ([50af143](https://git.sfera.inno.local:7999/SUMD/backend/commit/50af1430bc9615d92d6cefbfe8611eeda81cd0b2))
+* Добавил отключение аудита ([ecb5798](https://git.sfera.inno.local:7999/SUMD/backend/commit/ecb5798a12fa5231b08d7bdd7db75308e47ff47d))
+* Добавил ретрай ([623e01b](https://git.sfera.inno.local:7999/SUMD/backend/commit/623e01bb74687afcec663df78767ada62bf1ebfe))
+* Убрал AbortController ([a18570e](https://git.sfera.inno.local:7999/SUMD/backend/commit/a18570e9e891fc0f663d51fbae4b6529585d807b))
+
 # [1.30.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.29.0...v1.30.0) (2026-05-04)
 
 
