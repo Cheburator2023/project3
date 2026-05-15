@@ -15,97 +15,129 @@ const realms = process.env.KEYCLOAK_REALMS || 'cym'
 
 class Keycloak {
 
-    getToken = () => fetch(
-        `${keycloakHost}auth/realms/${realms}/protocol/openid-connect/token`,
-        {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: qs.stringify({
-                grant_type: 'password',
-                client_id: keycloakClient,
-                username: keycloakUser,
-                password: keycloakPwd
-            })
+    getToken = async () => {
+        const username = keycloakUser;
+        const password = keycloakPwd;
+        const initiator = {
+            sub: username,
+            channel: 'keycloak',
+            realm: realms,
+            method: 'authenticate'
+        };
+        let correlationId = null;
+        // Старт аудита
+        try {
+            correlationId = await auditClient.start('SUMD_AUTH', initiator, { username, realm: realms });
+        } catch (auditStartError) {
+            tslgLogger.error('Ошибка старта аудита (getToken)', 'AuditStartError', auditStartError);
         }
-    )
-    .then(d => d.json())
-    .then(d => {
-        if (d.access_token) {
-            // Успешная аутентификация
-            auditClient.send('SUMD_AUTH', 'SUCCESS', {
-                username: keycloakUser,
-                realm: realms,
-                client_id: keycloakClient
-            }).catch(err => tslgLogger.error('Ошибка отправки в Аудит сообщения об успешной аутентификации', 'Ошибка Аудита', {
-                username: keycloakUser,
-                realm: realms,
-                client_id: keycloakClient,
-                error: err.message
-            }));
-            return d.access_token;
-        } else {
-            // Ошибка аутентификации
-            auditClient.send('SUMD_AUTH', 'FAILURE', {
-                username: keycloakUser,
-                realm: realms,
-                client_id: keycloakClient,
-                error: d.error || 'Unknown error'
-            }).catch(err => tslgLogger.error('Ошибка отправки в Аудит сообщения об ошибке аутентификации', 'Ошибка Аудита', {
-                username: keycloakUser,
-                realm: realms,
-                client_id: keycloakClient,
-                error: err.message
-            }));
-            throw new Error(d.error || 'Unknown error');
-        }});
 
-    getTokenByUsername = (username, password) => fetch(
-        `${keycloakHost}auth/realms/${realms}/protocol/openid-connect/token`,
-        {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: qs.stringify({
-                grant_type: 'password',
-                client_id: keycloakClient,
-                username: username,
-                password: password
-            })
+        let data;
+        try {
+            const response = await fetch(
+                `${keycloakHost}auth/realms/${realms}/protocol/openid-connect/token`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: qs.stringify({
+                        grant_type: 'password',
+                        client_id: keycloakClient,
+                        username,
+                        password
+                    })
+                }
+            );
+            data = await response.json();
+        } catch (fetchError) {
+            // Ошибка сети или парсинга – отправляем failure и пробрасываем исключение
+            try {
+                await auditClient.failure('SUMD_AUTH', correlationId, fetchError, initiator, { username, realm: realms });
+            } catch (auditFailureError) {
+                tslgLogger.error('Ошибка отправки failure аудита (getToken)', 'AuditFailureError', auditFailureError);
+            }
+            throw fetchError;
         }
-    )
-    .then(d => d.json())
-    .then(d => {
-        if (d.access_token) {
-            // Успешная аутентификация
-            auditClient.send('SUMD_AUTH', 'SUCCESS', {
-                username: keycloakUser,
-                realm: realms,
-                client_id: keycloakClient
-            }).catch(err => tslgLogger.error('Ошибка отправки в Аудит сообщения об успешной аутентификации', 'Ошибка Аудита', {
-                username: keycloakUser,
-                realm: realms,
-                client_id: keycloakClient,
-                error: err.message
-            }));
-            return d.access_token;
+
+        if (data.access_token) {
+            // Успешная аутентификация – аудит success
+            try {
+                await auditClient.success('SUMD_AUTH', correlationId, initiator, { username, realm: realms });
+            } catch (auditSuccessError) {
+                tslgLogger.error('Ошибка отправки success аудита (getToken)', 'AuditSuccessError', auditSuccessError);
+            }
+            return data.access_token;
         } else {
-            // Ошибка аутентификации
-            auditClient.send('SUMD_AUTH', 'FAILURE', {
-                username: keycloakUser,
-                realm: realms,
-                client_id: keycloakClient,
-                error: d.error || 'Unknown error'
-            }).catch(err => tslgLogger.error('Ошибка отправки в Аудит сообщения об ошибке аутентификации', 'Ошибка Аудита', {
-                username: keycloakUser,
-                realm: realms,
-                client_id: keycloakClient,
-                error: err.message
-            }));
-            return d;
-        }});
+            // Ошибка аутентификации – аудит failure
+            const error = new Error(data.error || 'Unknown error');
+            try {
+                await auditClient.failure('SUMD_AUTH', correlationId, error, initiator, { username, realm: realms });
+            } catch (auditFailureError) {
+                tslgLogger.error('Ошибка отправки failure аудита (getToken)', 'AuditFailureError', auditFailureError);
+            }
+            throw error;
+        }
+    }
+
+    getTokenByUsername = async (username, password) => {
+        const initiator = {
+            sub: username,
+            channel: 'keycloak',
+            realm: realms,
+            method: 'authenticate'
+        };
+        let correlationId = null;
+        try {
+            correlationId = await auditClient.start('SUMD_AUTH', initiator, { username, realm: realms });
+        } catch (auditStartError) {
+            tslgLogger.error('Ошибка старта аудита (getTokenByUsername)', 'AuditStartError', auditStartError);
+        }
+
+        let data;
+        try {
+            const response = await fetch(
+                `${keycloakHost}auth/realms/${realms}/protocol/openid-connect/token`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: qs.stringify({
+                        grant_type: 'password',
+                        client_id: keycloakClient,
+                        username,
+                        password
+                    })
+                }
+            );
+            data = await response.json();
+        } catch (fetchError) {
+            try {
+                await auditClient.failure('SUMD_AUTH', correlationId, fetchError, initiator, { username, realm: realms });
+            } catch (auditFailureError) {
+                tslgLogger.error('Ошибка отправки failure аудита (getTokenByUsername)', 'AuditFailureError', auditFailureError);
+            }
+            throw fetchError;
+        }
+
+        if (data.access_token) {
+            try {
+                await auditClient.success('SUMD_AUTH', correlationId, initiator, { username, realm: realms });
+            } catch (auditSuccessError) {
+                tslgLogger.error('Ошибка отправки success аудита (getTokenByUsername)', 'AuditSuccessError', auditSuccessError);
+            }
+            return data.access_token;
+        } else {
+            const error = new Error(data.error || 'Unknown error');
+            try {
+                await auditClient.failure('SUMD_AUTH', correlationId, error, initiator, { username, realm: realms });
+            } catch (auditFailureError) {
+                tslgLogger.error('Ошибка отправки failure аудита (getTokenByUsername)', 'AuditFailureError', auditFailureError);
+            }
+            return data;
+        }
+    }
 
     getUsersByGroupSystem = name => this
         .getToken()
