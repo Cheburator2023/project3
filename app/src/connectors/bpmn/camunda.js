@@ -238,19 +238,17 @@ class Bpmn {
 
           // Успешный откат модели
           const modelId = data[0]?.processInstanceId;
-          auditClient.send('SUMD_ROLLBACKMODEL', 'SUCCESS', {
+          await auditClient.success('SUMD_ROLLBACKMODEL', correlationId, initiatorInfo, {
               processInstanceId: processInstanceId,
               targetActivityId: activityId,
               modelId: modelId
-          }).catch(err => console.error('Ошибка аудита', err));
-
+          });
           return this.modify(data, index + 1);
       } catch (error) {
-          // Отправляем FAILURE в случае ошибки
-          auditClient.send('SUMD_ROLLBACKMODEL', 'FAILURE', {
+          await auditClient.failure('SUMD_ROLLBACKMODEL', correlationId, error, initiatorInfo, {
               processInstanceId: data[0]?.processInstanceId,
               error: error.message
-          }).catch(err => console.error('Ошибка Аудита', err));
+          });
           throw error;
       }
   };
