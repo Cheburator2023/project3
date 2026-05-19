@@ -1,5 +1,13 @@
 # Semantic Versioning Changelog
 
+# [1.32.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.31.0...v1.32.0) (2026-05-19)
+
+
+### Features
+
+* Добавил поля ([3564ef5](https://git.sfera.inno.local:7999/SUMD/backend/commit/3564ef58e5d779bdc945f4f35c4025961b2cbf49))
+* Исправил аудит авторизации ([d4da187](https://git.sfera.inno.local:7999/SUMD/backend/commit/d4da187e29abed031f857b2190a8adf126734d70))
+
 # [1.31.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.30.0...v1.31.0) (2026-05-12)
 
 
