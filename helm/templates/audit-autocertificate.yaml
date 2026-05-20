@@ -1,0 +1,43 @@
+{{- if .Values.auditCertificate.enabled }}
+apiVersion: acm.clearwayintegration.com/v1beta1
+kind: AutoCertificate
+metadata:
+  name: {{ .Values.auditCertificate.name }}
+  namespace: {{ .Values.auditCertificate.namespace | default .Release.Namespace }}
+  labels:
+    {{- include "backend.labels" . | nindent 4 }}
+  {{- with .Values.auditCertificate.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  keySize: {{ .Values.auditCertificate.keySize }}
+  mergeTrustChain: {{ .Values.auditCertificate.mergeTrustChain }}
+  mergeTrustChainMode: {{ .Values.auditCertificate.mergeTrustChainMode }}
+  certificateSecret: {{ .Values.auditCertificate.certificateSecret }}
+  passwordSecret: {{ .Values.auditCertificate.passwordSecret }}
+  passwordKey: {{ .Values.auditCertificate.passwordKey }}
+  trustPasswordKey: {{ .Values.auditCertificate.trustPasswordKey }}
+  keyFile: {{ .Values.auditCertificate.keyFile }}
+  trustChainFile: {{ .Values.auditCertificate.trustChainFile }}
+  risCode: {{ .Values.auditCertificate.risCode }}
+  risId: {{ .Values.auditCertificate.risId | quote }}
+  apdCode: {{ required "auditCertificate.apdCode is required when auditCertificate.enabled=true" .Values.auditCertificate.apdCode | quote }}
+  appName: {{ required "auditCertificate.appName is required when auditCertificate.enabled=true" .Values.auditCertificate.appName | quote }}
+  dn: {{ required "auditCertificate.dn is required when auditCertificate.enabled=true" .Values.auditCertificate.dn | quote }}
+  renew: {{ .Values.auditCertificate.renew }}
+  mutableSecret: {{ .Values.auditCertificate.mutableSecret }}
+  rotation: {{ .Values.auditCertificate.rotation }}
+  watchSecret: {{ .Values.auditCertificate.watchSecret }}
+  reloadDeployment: {{ .Values.auditCertificate.reloadDeployment }}
+  deployment: {{ .Values.auditCertificate.deployment | default (include "backend.fullname" .) }}
+  workflow: {{ .Values.auditCertificate.workflow }}
+  {{- with .Values.auditCertificate.hosts }}
+  hosts:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.auditCertificate.extKeyUsages }}
+  extKeyUsages:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}

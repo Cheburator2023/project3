@@ -53,6 +53,9 @@ spec:
             - name: {{ $key }}
               value: {{ $val | quote }}
           {{- end }}
+          {{- with .Values.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
             - name: PGUSER
               valueFrom:
                 secretKeyRef:
@@ -130,12 +133,23 @@ spec:
           image: "{{ .Values.auditSidecar.image.repository }}:{{ .Values.auditSidecar.image.tag }}"
           {{- end }}
           imagePullPolicy: {{ .Values.auditSidecar.image.pullPolicy }}
-          {{- with .Values.auditSidecar.env }}
+          {{- with .Values.auditSidecar.ports }}
+          ports:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if or .Values.auditSidecar.env .Values.auditSidecar.extraEnv }}
           env:
-          {{- range $key, $val := . }}
+          {{- range $key, $val := .Values.auditSidecar.env }}
             - name: {{ $key }}
               value: {{ $val | quote }}
           {{- end }}
+          {{- with .Values.auditSidecar.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- end }}
+          {{- with .Values.auditSidecar.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
           {{- end }}
           {{- with .Values.auditSidecar.resources }}
           resources:
@@ -179,10 +193,15 @@ spec:
               mountPath: /opt/jaeger/cert/client-cert-key.pem
               subPath: "client-cert-key.pem"
         {{- end }}
-      {{- if .Values.tracing.enabled }}
+      {{- if or .Values.tracing.enabled .Values.extraVolumes }}
       volumes:
+        {{- if .Values.tracing.enabled }}
         - name: jaeger-agent-tls-secret
           secret:
             secretName: jaeger-agent-tls-secret
             defaultMode: 420
+        {{- end }}
+        {{- with .Values.extraVolumes }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
       {{- end }}
