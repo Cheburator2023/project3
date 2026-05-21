@@ -12,7 +12,6 @@ auditSidecar:
   enabled: false
   name: audit-proxy
   image:
-    repository: docker.repo-ci.sfera.inno.local/sumd-docker-lib/audit-proxy
     tag: v1.0.3
     pullPolicy: Always
   ports: []
