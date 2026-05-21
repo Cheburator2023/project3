@@ -1,3 +1,4 @@
+{{- $auditSidecarEnabled := eq (lower (toString .Values.auditSidecar.enabled)) "true" -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -50,8 +51,14 @@ spec:
                 fieldRef:
                   fieldPath: status.podIP
           {{- range $key, $val := .Values.env }}
+          {{- if not (and (hasPrefix "AUDIT_" $key) (not $auditSidecarEnabled)) }}
             - name: {{ $key }}
               value: {{ $val | quote }}
+          {{- end }}
+          {{- end }}
+          {{- if and (not $auditSidecarEnabled) (hasKey .Values.env "AUDIT_ENABLED") }}
+            - name: AUDIT_ENABLED
+              value: "false"
           {{- end }}
           {{- with .Values.extraEnv }}
             {{- toYaml . | nindent 12 }}
@@ -112,20 +119,25 @@ spec:
               protocol: TCP
             - containerPort: 4443
               protocol: TCP
-          # TODO: add healthchecks to the service if need.
-          # livenessProbe:
-          #   httpGet:
-          #     path: /
-          #     port: http
           readinessProbe:
             tcpSocket:
               port: 4000
             initialDelaySeconds: 10
             periodSeconds: 10
             timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          livenessProbe:
+            tcpSocket:
+              port: 4000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-        {{- if .Values.auditSidecar.enabled }}
+        {{- if $auditSidecarEnabled }}
         {{- $auditSidecarRepository := regexReplaceAll "/[^/]+$" .Values.image.repository (printf "/%s" .Values.auditSidecar.name) }}
         - name: {{ .Values.auditSidecar.name }}
           {{- if .Values.auditSidecar.image.digest }}
@@ -136,6 +148,14 @@ spec:
           imagePullPolicy: {{ .Values.auditSidecar.image.pullPolicy }}
           {{- with .Values.auditSidecar.ports }}
           ports:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.auditSidecar.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.auditSidecar.livenessProbe }}
+          livenessProbe:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           {{- if or .Values.auditSidecar.env .Values.auditSidecar.extraEnv }}
@@ -194,13 +214,16 @@ spec:
               mountPath: /opt/jaeger/cert/client-cert-key.pem
               subPath: "client-cert-key.pem"
         {{- end }}
-      {{- if or .Values.tracing.enabled .Values.extraVolumes }}
+      {{- if or .Values.tracing.enabled .Values.extraVolumes (and $auditSidecarEnabled .Values.auditSidecar.volumes) }}
       volumes:
         {{- if .Values.tracing.enabled }}
         - name: jaeger-agent-tls-secret
           secret:
             secretName: jaeger-agent-tls-secret
             defaultMode: 420
+        {{- end }}
+        {{- if and $auditSidecarEnabled .Values.auditSidecar.volumes }}
+          {{- toYaml .Values.auditSidecar.volumes | nindent 8 }}
         {{- end }}
         {{- with .Values.extraVolumes }}
           {{- toYaml . | nindent 8 }}

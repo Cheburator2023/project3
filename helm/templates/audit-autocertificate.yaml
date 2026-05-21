@@ -1,4 +1,4 @@
-{{- if .Values.auditCertificate.enabled }}
+{{- if and (eq (lower (toString .Values.auditSidecar.enabled)) "true") (eq (lower (toString .Values.auditCertificate.enabled)) "true") }}
 apiVersion: acm.clearwayintegration.com/v1beta1
 kind: AutoCertificate
 metadata:
