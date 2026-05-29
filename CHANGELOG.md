@@ -1,5 +1,28 @@
 # Semantic Versioning Changelog
 
+# [1.33.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.32.0...v1.33.0) (2026-05-29)
+
+
+### Bug Fixes
+
+* add-audit ([5c5d217](https://git.sfera.inno.local:7999/SUMD/backend/commit/5c5d217046d431aaf4f89ad54eb7e45d2a9c5a24))
+* fix-audit ([38f961c](https://git.sfera.inno.local:7999/SUMD/backend/commit/38f961ca0d08027fadfc168b0f26902fc3d965d5))
+* fix-helm ([6dfdf19](https://git.sfera.inno.local:7999/SUMD/backend/commit/6dfdf1921371f0576780fe9914132cb451bbd412))
+* fix-registry-audit ([94eec29](https://git.sfera.inno.local:7999/SUMD/backend/commit/94eec29c5db633eee9d1658a99e9eef921835d98))
+* refine model state resolver override status handling ([3a1fbd4](https://git.sfera.inno.local:7999/SUMD/backend/commit/3a1fbd43e4d0c2ac33920d99b71704228890f41a))
+* доработка скрипта заполнения ([506edda](https://git.sfera.inno.local:7999/SUMD/backend/commit/506edda287d4a4a909670fd66de0431e84587ca4))
+* доработка скрипта заполнения ([e8953b3](https://git.sfera.inno.local:7999/SUMD/backend/commit/e8953b3881b3d2b44fe1ba332e3395708ba7dc44))
+* исправление опечаток в этапах и статусах 2 ([048ab60](https://git.sfera.inno.local:7999/SUMD/backend/commit/048ab60ced94e09fbc5177be1246626fd444b450))
+
+
+### Features
+
+* add model state resolver ([1d2d0bb](https://git.sfera.inno.local:7999/SUMD/backend/commit/1d2d0bb2669698dadc6d06eb6c8a69bcfad90c8d))
+* исправление опечаток в этапах и статусах ([52ad777](https://git.sfera.inno.local:7999/SUMD/backend/commit/52ad7776f121de00ba2740508473b44213169b63))
+* маппинг этапов и статусов на таски камунды ([e9fcfc5](https://git.sfera.inno.local:7999/SUMD/backend/commit/e9fcfc5366c3b0a6105ad0879da2709a6f734fc5))
+* ограничение редактирования атрибутов ([8b48637](https://git.sfera.inno.local:7999/SUMD/backend/commit/8b486376f4c22955c071a26ac033cb434b802e16))
+* переработка скрипта по итогам тестирования ([7508619](https://git.sfera.inno.local:7999/SUMD/backend/commit/7508619111943e14f55cd271dac14035f1602665))
+
 # [1.32.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.31.0...v1.32.0) (2026-05-19)
 
 
