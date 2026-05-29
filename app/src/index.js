@@ -1,4 +1,4 @@
-require('dotenv').config({ path: '.env.prod' });
+require('dotenv').config();
 const logger = require('./utils/logger');
 
 const fs = require('fs');

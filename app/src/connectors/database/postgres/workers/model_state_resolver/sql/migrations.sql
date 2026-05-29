@@ -216,6 +216,10 @@ CREATE INDEX model_stage_override_model_id_idx
 CREATE INDEX model_stage_override_source_record_id_idx
     ON model_stage_override (source_record_id);
 
+CREATE UNIQUE INDEX model_stage_override_source_record_id_uq
+    ON model_stage_override (source_record_id)
+    WHERE source_record_id IS NOT NULL;
+
 
 CREATE TABLE model_status_override
 (
@@ -239,6 +243,10 @@ CREATE INDEX model_status_override_model_id_idx
 
 CREATE INDEX model_status_override_source_record_id_idx
     ON model_status_override (source_record_id);
+
+CREATE UNIQUE INDEX model_status_override_source_record_id_uq
+    ON model_status_override (source_record_id)
+    WHERE source_record_id IS NOT NULL;
 
 
 -- =========================================================

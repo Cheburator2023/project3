@@ -29,8 +29,8 @@ function createModelStateResolverWorker (database, opts = {}) {
 
   async function recomputeResolved (job, { connection }) {
     const modelId = job.modelId
-    const calculatedAt = new Date()
-    const jobLastEvent = normalizeLastEvent(job.lastEvent, { modelId })
+    const dbNow = await selectCurrentTimestamp(database, connection)
+    const jobLastEvent = normalizeLastEvent(job.lastEvent, { modelId, fallbackAt: dbNow })
 
     const validators = createValidators(opts)
 
@@ -55,11 +55,20 @@ function createModelStateResolverWorker (database, opts = {}) {
       order by id
     `, { model_id: modelId })
 
+    const statusOverridesBeforeClose = await selectRows(database, connection, `
+      select id, model_id, source_record_id, status, effective_from, effective_to, correction_reason, is_final_override, author
+      from model_status_override
+      where model_id = :model_id
+      order by id
+    `, { model_id: modelId })
+
     await closeNonFinalStatusOverrides({
       database,
       connection,
       modelId,
-      sourceRows: statusSources
+      sourceRows: statusSources,
+      overrideRows: statusOverridesBeforeClose,
+      triggerEvent: jobLastEvent
     })
 
     const statusOverrides = await selectRows(database, connection, `
@@ -117,7 +126,7 @@ function createModelStateResolverWorker (database, opts = {}) {
       rows: stageRows,
       entityName: 'stage',
       previousRows: previousStageRows,
-      calculatedAt,
+      calculatedAt: dbNow,
       jobLastEvent
     })
 
@@ -125,7 +134,7 @@ function createModelStateResolverWorker (database, opts = {}) {
       rows: statusRows,
       entityName: 'status',
       previousRows: previousStatusRows,
-      calculatedAt,
+      calculatedAt: dbNow,
       jobLastEvent
     })
 
@@ -163,7 +172,7 @@ function createModelStateResolverWorker (database, opts = {}) {
             :source_record_id,
             :override_record_id,
             :source_table,
-            :calculated_at,
+            current_timestamp(0),
             :last_event::jsonb
           )
         `,
@@ -193,7 +202,7 @@ function createModelStateResolverWorker (database, opts = {}) {
             :source_record_id,
             :override_record_id,
             :source_table,
-            :calculated_at,
+            current_timestamp(0),
             :last_event::jsonb
           )
         `,
@@ -213,6 +222,17 @@ function createModelStateResolverWorker (database, opts = {}) {
 async function selectRows (database, connection, sql, args) {
   const res = await database.executeWithConnection({ connection, sql, args })
   return res.rows ?? []
+}
+
+/**
+ * Возвращает текущее время Postgres в строковом SQL-формате `YYYY-MM-DD HH:mm:ss`.
+ */
+async function selectCurrentTimestamp (database, connection) {
+  const rows = await selectRows(database, connection, `
+    select to_char(current_timestamp(0), 'YYYY-MM-DD HH24:MI:SS') as current_ts
+  `)
+
+  return rows[0]?.CURRENT_TS ?? normalizeTimestamp(new Date())
 }
 
 /**
@@ -311,34 +331,44 @@ function attachMetadata ({ rows, entityName, previousRows, calculatedAt, jobLast
  * - `effective_to = effective_from` новой source-записи;
  * - `updated_at = current_timestamp(0)`.
  */
-async function closeNonFinalStatusOverrides ({ database, connection, modelId, sourceRows }) {
-  if (!sourceRows.length) return
+async function closeNonFinalStatusOverrides ({ database, connection, modelId, sourceRows, overrideRows, triggerEvent }) {
+  if (!sourceRows.length || !overrideRows.length) return
 
-  const overrides = await selectRows(database, connection, `
-    select id, effective_from, effective_to, is_final_override
-    from model_status_override
-    where model_id = :model_id
-      and effective_to = TO_TIMESTAMP('9999-12-31 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
-      and is_final_override = false
-    order by effective_from, id
-  `, { model_id: modelId })
+  if (triggerEvent.table !== 'model_status_source' || triggerEvent.op !== 'INSERT') {
+    return
+  }
 
-  if (!overrides.length) return
+  const insertedSourceId = normalizeNullableInteger(triggerEvent.row_id)
+  if (!insertedSourceId) return
 
-  const normalizedSources = sourceRows
-    .map((row) => ({
-      effectiveFrom: toDate(row.EFFECTIVE_FROM),
-      sqlEffectiveFrom: normalizeTimestamp(row.EFFECTIVE_FROM)
-    }))
-    .filter((row) => row.effectiveFrom)
-    .sort((left, right) => left.effectiveFrom - right.effectiveFrom)
+  const insertedSourceRow = sourceRows.find((row) => row.ID === insertedSourceId)
+  if (!insertedSourceRow) return
 
-  for (const overrideRow of overrides) {
+  const replacementBySourceId = new Map(
+    overrideRows
+      .filter((row) => normalizeNullableInteger(row.SOURCE_RECORD_ID))
+      .map((row) => [normalizeNullableInteger(row.SOURCE_RECORD_ID), row])
+  )
+
+  // Source-статус, уже вытесненный override с source_record_id,
+  // не должен закрывать standalone override.
+  if (replacementBySourceId.has(insertedSourceId)) {
+    return
+  }
+
+  const insertedSourceFrom = toDate(insertedSourceRow.EFFECTIVE_FROM)
+  if (!insertedSourceFrom) return
+
+  const standaloneOpenOverrides = overrideRows.filter((row) => (
+    !normalizeNullableInteger(row.SOURCE_RECORD_ID) &&
+    row.IS_FINAL_OVERRIDE === false &&
+    normalizeTimestamp(row.EFFECTIVE_TO) === OPEN_INTERVAL
+  ))
+
+  for (const overrideRow of standaloneOpenOverrides) {
     const overrideFrom = toDate(overrideRow.EFFECTIVE_FROM)
     if (!overrideFrom) continue
-
-    const nextSource = normalizedSources.find((sourceRow) => sourceRow.effectiveFrom > overrideFrom)
-    if (!nextSource) continue
+    if (insertedSourceFrom <= overrideFrom) continue
 
     await database.executeWithConnection({
       connection,
@@ -351,7 +381,7 @@ async function closeNonFinalStatusOverrides ({ database, connection, modelId, so
       `,
       args: {
         id: overrideRow.ID,
-        effective_to: nextSource.sqlEffectiveFrom
+        effective_to: normalizeTimestamp(insertedSourceRow.EFFECTIVE_FROM)
       }
     })
   }
@@ -488,7 +518,7 @@ function isSameBusinessRow (previousRow, row, entityName) {
 /**
  * Нормализует `last_event` к согласованному JSON-формату.
  */
-function normalizeLastEvent (lastEvent, { modelId }) {
+function normalizeLastEvent (lastEvent, { modelId, fallbackAt }) {
   const base = lastEvent && typeof lastEvent === 'object' && !Array.isArray(lastEvent)
     ? lastEvent
     : {}
@@ -496,7 +526,7 @@ function normalizeLastEvent (lastEvent, { modelId }) {
   return {
     table: typeof base.table === 'string' ? base.table : 'model_recalc_queue',
     op: typeof base.op === 'string' ? base.op : 'UPDATE',
-    at: normalizeEventTimestamp(base.at),
+    at: normalizeEventTimestamp(base.at, fallbackAt),
     row_id: normalizeNullableInteger(base.row_id ?? base.rowId ?? null),
     model_id: typeof base.model_id === 'string' ? base.model_id : modelId,
     source_system: typeof base.source_system === 'string' ? base.source_system : null
@@ -506,10 +536,10 @@ function normalizeLastEvent (lastEvent, { modelId }) {
 /**
  * Приводит значение времени события к строковому представлению.
  */
-function normalizeEventTimestamp (value) {
-  if (!value) return new Date().toISOString()
-  if (value instanceof Date) return value.toISOString()
-  return String(value)
+function normalizeEventTimestamp (value, fallbackAt) {
+  if (!value) return fallbackAt ?? normalizeTimestamp(new Date())
+  if (value instanceof Date) return fallbackAt ?? normalizeTimestamp(value)
+  return normalizeTimestamp(value)
 }
 
 /**
@@ -527,7 +557,7 @@ function normalizeNullableInteger (value) {
  */
 function normalizeTimestamp (value) {
   if (value instanceof Date) {
-    return toSqlTimestamp(value)
+    return toLocalSqlTimestamp(value)
   }
 
   if (typeof value === 'string') {
@@ -538,10 +568,18 @@ function normalizeTimestamp (value) {
 }
 
 /**
- * Преобразует Date в SQL-строку `YYYY-MM-DD HH:mm:ss`.
+ * Преобразует Date в локальную SQL-строку `YYYY-MM-DD HH:mm:ss`
+ * без перевода в UTC.
  */
-function toSqlTimestamp (value) {
-  return value.toISOString().slice(0, 19).replace('T', ' ')
+function toLocalSqlTimestamp (value) {
+  const year = value.getFullYear()
+  const month = String(value.getMonth() + 1).padStart(2, '0')
+  const day = String(value.getDate()).padStart(2, '0')
+  const hours = String(value.getHours()).padStart(2, '0')
+  const minutes = String(value.getMinutes()).padStart(2, '0')
+  const seconds = String(value.getSeconds()).padStart(2, '0')
+
+  return `${ year }-${ month }-${ day } ${ hours }:${ minutes }:${ seconds }`
 }
 
 /**
@@ -569,7 +607,6 @@ function toStageInsertArgs (row) {
     source_record_id: row.sourceRecordId,
     override_record_id: row.overrideRecordId,
     source_table: row.sourceTable,
-    calculated_at: row.calculatedAt,
     last_event: JSON.stringify(row.lastEvent)
   }
 }
@@ -587,7 +624,6 @@ function toStatusInsertArgs (row) {
     source_record_id: row.sourceRecordId,
     override_record_id: row.overrideRecordId,
     source_table: row.sourceTable,
-    calculated_at: row.calculatedAt,
     last_event: JSON.stringify(row.lastEvent)
   }
 }
