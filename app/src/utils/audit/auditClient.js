@@ -1,63 +1,116 @@
 const fetch = require('isomorphic-fetch');
+const { v4: uuidv4 } = require('uuid');
 
 /**
- * Клиент для отправки событий аудита в сайдкар.
- * Использует `fetch` для HTTP-запросов, асинхронен, не блокирует выполнение.
+ * Клиент для отправки событий аудита в сайдкар audit-sidecar
+ *
  */
 class AuditClient {
     /**
-     * @param {string} sidecarUrl - URL эндпоинта сайдкара (например, http://localhost:8081/api/v1/audit)
+     * @param {string} sidecarUrl - URL эндпоинта сайдкара (v2)
      * @param {number} timeout - таймаут запроса в миллисекундах
+     * @param {boolean} enabled - включена ли отправка аудита
      */
-    constructor(sidecarUrl, timeout = 5000) {
+    constructor(sidecarUrl, timeout = 5000, enabled = true) {
         this.sidecarUrl = sidecarUrl;
         this.timeout = timeout;
+        this.enabled = enabled;
     }
 
     /**
-     * Отправить событие аудита.
-     * @param {string} eventCode - код события (должен быть зарегистрирован в сайдкаре)
-     * @param {string} eventClass - класс события: 'START', 'SUCCESS', 'FAILURE'
-     * @param {Object} additionalFields - дополнительные поля, которые будут переданы в `additionalFields` запроса
-     * @param {string} [timestamp] - ISO-строка времени события (по умолчанию текущее)
-     * @returns {Promise<Object>} - ответ сайдкара
-     * @throws {Error} - если запрос не удался (может быть перехвачен вызывающим кодом)
+     * Отправляет событие START и возвращает correlationId.
+     * @param {string} eventCode
+     * @param {Object} initiatorInfo - { sub, realm, channel, url, method, sourceIp, ... }
+     * @param {Object} additionalFields
+     * @returns {Promise<string>} correlationId
      */
-    async send(eventCode, eventClass, additionalFields = {}, timestamp = new Date().toISOString()) {
+    async start(eventCode, initiatorInfo = {}, additionalFields = {}) {
+        if (!this.enabled) return null;
+        const correlationId = uuidv4();
         const payload = {
             eventCode,
-            eventClass,
-            timestamp,
+            eventClass: 'START',
+            correlationId,
+            timestamp: new Date().toISOString(),
+            initiator: initiatorInfo,
             additionalFields,
         };
+        await this._send(payload);
+        return correlationId;
+    }
 
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+    /**
+     * Отправляет событие SUCCESS.
+     * @param {string} eventCode
+     * @param {string} correlationId
+     * @param {Object} initiatorInfo
+     * @param {Object} additionalFields
+     */
+    async success(eventCode, correlationId, initiatorInfo = {}, additionalFields = {}) {
+        if (!this.enabled) return;
+        const payload = {
+            eventCode,
+            eventClass: 'SUCCESS',
+            correlationId,
+            timestamp: new Date().toISOString(),
+            initiator: initiatorInfo,
+            additionalFields,
+        };
+        await this._send(payload);
+    }
 
+    /**
+     * Отправляет событие FAILURE.
+     * @param {string} eventCode
+     * @param {string} correlationId
+     * @param {Error} error
+     * @param {Object} initiatorInfo
+     * @param {Object} additionalFields
+     */
+    async failure(eventCode, correlationId, error, initiatorInfo = {}, additionalFields = {}) {
+        if (!this.enabled) return;
+        const payload = {
+            eventCode,
+            eventClass: 'FAILURE',
+            correlationId,
+            timestamp: new Date().toISOString(),
+            initiator: initiatorInfo,
+            additionalFields: {
+                ...additionalFields,
+                errorMessage: error.message,
+                errorStack: error.stack,
+            },
+        };
+        await this._send(payload);
+    }
+
+    /**
+     * Внутренний метод отправки HTTP-запроса в сайдкар.
+     */
+    async _send(payload) {
+        const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error(`Audit sidecar timeout after ${this.timeout} ms`)), this.timeout)
+        );
+        const fetchPromise = fetch(this.sidecarUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        });
         try {
-            const response = await fetch(this.sidecarUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
-                signal: controller.signal,
-            });
-            clearTimeout(timeoutId);
-
+            const response = await Promise.race([fetchPromise, timeoutPromise]);
             if (!response.ok) {
                 const errorText = await response.text();
                 throw new Error(`Audit sidecar responded with ${response.status}: ${errorText}`);
             }
-
-            return await response.json();
+            console.debug(`[Audit] ${payload.eventClass}/${payload.eventCode} sent, correlationId=${payload.correlationId}`);
         } catch (error) {
-            console.error(`[AuditClient] Failed to send event ${eventCode}/${eventClass}:`, error.message);
-            throw error;
+            console.error(`[Audit] Failed to send ${payload.eventClass}/${payload.eventCode}:`, error.message);
         }
     }
 }
 
-// Создаём единственный экземпляр с настройками из окружения
-const sidecarUrl = process.env.AUDIT_SIDECAR_URL || 'http://localhost:8081/api/v1/audit';
+const sidecarUrl = process.env.AUDIT_SIDECAR_URL || 'http://localhost:8081/api/v2/audit';
 const timeout = parseInt(process.env.AUDIT_SIDECAR_TIMEOUT, 10) || 5000;
+const enabled = process.env.AUDIT_ENABLED !== 'false';
 
-module.exports = new AuditClient(sidecarUrl, timeout);
+module.exports = new AuditClient(sidecarUrl, timeout, enabled);

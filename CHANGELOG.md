@@ -1,5 +1,30 @@
 # Semantic Versioning Changelog
 
+# [1.32.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.31.0...v1.32.0) (2026-05-19)
+
+
+### Features
+
+* Добавил поля ([3564ef5](https://git.sfera.inno.local:7999/SUMD/backend/commit/3564ef58e5d779bdc945f4f35c4025961b2cbf49))
+* Исправил аудит авторизации ([d4da187](https://git.sfera.inno.local:7999/SUMD/backend/commit/d4da187e29abed031f857b2190a8adf126734d70))
+
+# [1.31.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.30.0...v1.31.0) (2026-05-12)
+
+
+### Features
+
+* Добавил генератор событий ([50af143](https://git.sfera.inno.local:7999/SUMD/backend/commit/50af1430bc9615d92d6cefbfe8611eeda81cd0b2))
+* Добавил отключение аудита ([ecb5798](https://git.sfera.inno.local:7999/SUMD/backend/commit/ecb5798a12fa5231b08d7bdd7db75308e47ff47d))
+* Добавил ретрай ([623e01b](https://git.sfera.inno.local:7999/SUMD/backend/commit/623e01bb74687afcec663df78767ada62bf1ebfe))
+* Убрал AbortController ([a18570e](https://git.sfera.inno.local:7999/SUMD/backend/commit/a18570e9e891fc0f663d51fbae4b6529585d807b))
+
+# [1.30.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.29.0...v1.30.0) (2026-05-04)
+
+
+### Features
+
+* ограничение редактирования атрибутов ([db8bf3c](https://git.sfera.inno.local:7999/SUMD/backend/commit/db8bf3cf318c758e9a39c1475b4ffbf2958b874e))
+
 # [1.29.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.28.4...v1.29.0) (2026-04-28)
 
 
