@@ -21,9 +21,7 @@ const sql = `
         bpmn_instance_id,
         parent_model_id,
         models_is_active_flg,
-        deployment_id,
-        model_status,
-        model_stage
+        deployment_id
     FROM
         models
     WHERE
@@ -32,6 +30,8 @@ const sql = `
   )
   SELECT
       model.*,
+      modelStatusHist.status AS MODEL_STATUS,
+      modelStageHist.active_stage AS MODEL_STAGE,
       automl.*,
       st.status,
       activeBpmnInstance.bpmn_instance_name,
@@ -41,6 +41,24 @@ const sql = `
       mt.mipm_value
   FROM
       model
+  LEFT JOIN (
+    SELECT DISTINCT ON (model_id)
+        model_id,
+        status
+    FROM model_status
+    WHERE effective_to = TO_TIMESTAMP('9999-12-31 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+    ORDER BY model_id, effective_from DESC
+  ) AS modelStatusHist
+      ON modelStatusHist.model_id = model.model_id
+  LEFT JOIN (
+    SELECT
+        model_id,
+        ARRAY_TO_STRING(ARRAY_AGG(stage ORDER BY effective_from DESC), ';') AS active_stage
+    FROM model_stage
+    WHERE effective_to = TO_TIMESTAMP('9999-12-31 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+    GROUP BY model_id
+  ) AS modelStageHist
+      ON modelStageHist.model_id = model.model_id
   LEFT JOIN
       (${automl}) automl
       ON automl.automl_model_id = model.model_id

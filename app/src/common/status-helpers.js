@@ -81,17 +81,87 @@ const acquireStageAndStatusFromCamunda = async (id, taskId, processDefinitionId,
 
   if (!modelStatus && !modelStage) {
     // Не получили из переменных, пробуем найти в маппинге по текущей activity (user task или external task)
-    const stageStatusMap = await context.db.task.getStatusStageMapByTask(taskId, processDefinitionId);
+    let stageStatusMap = await context.db.task.getStatusStageMapByTask(taskId, processDefinitionId);
 
-    if (stageStatusMap) {
-      modelStatus = stageStatusMap.MODEL_STATUS;
-      modelStage = stageStatusMap.MODEL_STAGE;
+    if (stageStatusMap.length > 1) {
+      // скорее всего есть дополнительные признаки, переменные по которым нужно выбрать точный вариант маппинга
+      const model_deployment_approving_flg = variables.model_deployment_approving_flg
+        ? variables.model_deployment_approving_flg 
+        : await context.bpmn.getTaskVar(id, 'model_deployment_approving_flg');
+      const pim_integration_flg = variables.pim_integration_flg 
+        ? variables.pim_integration_flg 
+        : await context.bpmn.getTaskVar(id, 'pim_integration_flg');
+
+      stageStatusMap = stageStatusMap.filter((item) => {
+        if (item.MODEL_DEPLOYMENT_APPROVING_FLG && item.MODEL_DEPLOYMENT_APPROVING_FLG !== model_deployment_approving_flg) {
+          return false;
+        }
+        if (item.PIM_INTEGRATION_FLG && item.PIM_INTEGRATION_FLG !== pim_integration_flg) {
+          return false;
+        }
+        return true;
+      });
+    }
+
+    if (stageStatusMap[0]) {
+      modelStatus = stageStatusMap[0].MODEL_STATUS;
+      modelStage = stageStatusMap[0].MODEL_STAGE;
     } else {
       console.log('Ошибка получения статуса/этапа из Камунды.')
     }
   }
 
+  // В схемах Камунды остались некорректные этапы и статусы, которые исправить невозможно, поэтому ловим и исправляем на лету
+  if (modelStage === 'Вывод из эксплуатации') {
+    modelStage = 'Вывод модели из эксплуатации';
+  } else if (modelStage === 'Разаработка модели') {
+    modelStage = 'Разработка модели';
+  }
+
+  if (modelStatus === 'Разработана в процессе \nвнедрения') {
+    modelStatus = 'Разработана в процессе внедрения';
+  } else if (modelStatus === 'Разаработка модели') {
+    modelStatus = 'В процессе разработки';
+  }
+
   return {modelStage: modelStage, modelStatus: modelStatus};
+}
+
+const camundaExternalTaskStatusDecorator = (callback, bpmn, db, changeStage = false) => {
+  return async (task, taskService) => {
+    await callback(task, taskService);
+
+    const variables = task.variables.getAll();
+
+    const { modelStage: modelStage, modelStatus: modelStatus } = await acquireStageAndStatusFromCamunda(
+      task.id,
+      task.activityId,
+      task.processDefinitionId,
+      variables,
+      {
+        bpmn: bpmn,
+        db: db,
+      },
+    );
+
+    if (changeStage && modelStage) {
+      await this.db.card.changeStage({
+        modelId: variables.model,
+        modelStage: modelStage,
+      });
+    }
+
+    if (modelStatus) {
+      await db.card.changeStatus({
+        modelId: variables.model,
+        modelStatus: modelStatus ? modelStatus : null,
+      });
+      // проставляем флаг активности если модель перешла в архив (для моделей со статусом из камунды)
+      if (modelStatus === 'Архив') {
+        await db.card.editActiveStatus({MODEL_ID: variables.model, MODELS_IS_ACTIVE_FLG: 0});
+      }
+    }
+  };
 }
 
 module.exports = {
@@ -99,4 +169,5 @@ module.exports = {
   hasSpecificArtefactValue,
   determineLifecycleStageToImplemented,
   acquireStageAndStatusFromCamunda,
+  camundaExternalTaskStatusDecorator,
 };

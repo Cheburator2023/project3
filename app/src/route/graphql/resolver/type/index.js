@@ -13,8 +13,7 @@ const {
 module.exports = {
   Card: {
     MODEL_ALIAS: (root) => `model${root.ROOT_MODEL_ID}-v${root.MODEL_VERSION}`,
-    STATUS: ({ STATUS, MODEL_STATUS }) =>
-      MODEL_STATUS ? MODEL_STATUS : getLastActiveStatus(STATUS),
+    STATUS: ({ STATUS, MODEL_STATUS }) => MODEL_STATUS ? MODEL_STATUS : getLastActiveStatus(STATUS),
     BUSINESS_STATUS: ({
       STATUS,
       BPMN_INSTANCE_NAME,

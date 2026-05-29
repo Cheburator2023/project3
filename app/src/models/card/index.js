@@ -506,8 +506,9 @@ class Card {
     const { rows: activeStatuses = [] } = await this.db.execute({
       sql: `
       SELECT id, status
-      FROM model_status
+      FROM model_status_source
       WHERE model_id = :model_id
+        AND source_system = 'Camunda'
         AND effective_to = TO_TIMESTAMP('9999-12-31 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
     `,
       args: { model_id: modelId },
@@ -525,7 +526,7 @@ class Card {
       for (const { ID } of activeStatuses) {
         await this.db.executeWithConnection({
           connection: trx,
-          sql: `UPDATE model_status SET effective_to = current_timestamp(0) WHERE id = :id`,
+          sql: `UPDATE model_status_source SET effective_to = current_timestamp(0) WHERE id = :id`,
           args: { id: ID },
         });
       }
@@ -534,8 +535,8 @@ class Card {
       await this.db.executeWithConnection({
         connection: trx,
         sql: `
-        INSERT INTO model_status (model_id, status, effective_from, effective_to)
-        VALUES (:model_id, :status, current_timestamp(0), TO_TIMESTAMP('9999-12-31 23:59:59', 'YYYY-MM-DD HH24:MI:SS'))
+        INSERT INTO model_status_source (model_id, status, effective_from, effective_to, source_system)
+        VALUES (:model_id, :status, current_timestamp(0), TO_TIMESTAMP('9999-12-31 23:59:59', 'YYYY-MM-DD HH24:MI:SS'), 'Camunda')
       `,
         args: { model_id: modelId, status: modelStatus },
       });
@@ -575,8 +576,6 @@ class Card {
       );
 
   changeStaticModelStage = ({ modelId, modelStage }) => {
-    console.log('changeStaticModelStage.modelId', modelId)
-    console.log('changeStaticModelStage.modelStage', modelStage)
     return this.db.execute({
       sql: sql.edit_stage,
       args: { model_id: modelId, model_stage: modelStage },
@@ -590,9 +589,6 @@ class Card {
     if (!modelStage) {
       return;
     }
-
-    console.log('addStaticModelStage.modelId', modelId)
-    console.log('addStaticModelStage.modelStage', modelStage)
 
     const connection = await this.db.beginTransation();
 
@@ -644,9 +640,6 @@ class Card {
     if (!modelStage) {
       return;
     }
-
-    console.log('removeStaticModelStage.modelId', modelId)
-    console.log('removeStaticModelStage.modelStage', modelStage)
 
     const connection = await this.db.beginTransation();
 
@@ -704,15 +697,12 @@ class Card {
       return;
     }
 
-    console.log('changeHistoricalModelStage.modelId', modelId)
-    console.log('changeHistoricalModelStage.modelStage', modelStage)
-    console.log('changeHistoricalModelStage.action', action)
-
     const { rows: activeStages = [] } = await this.db.execute({
       sql: `
       SELECT id, stage
-      FROM model_stage
+      FROM model_stage_source
       WHERE model_id = :model_id
+        AND source_system = 'Camunda'
         AND effective_to = TO_TIMESTAMP('9999-12-31 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
     `,
       args: { model_id: modelId },
@@ -731,8 +721,8 @@ class Card {
         await this.db.executeWithConnection({
           connection: trx,
           sql: `
-          INSERT INTO model_stage (model_id, stage, effective_from, effective_to)
-          VALUES (:model_id, :stage, current_timestamp(0), TO_TIMESTAMP('9999-12-31 23:59:59', 'YYYY-MM-DD HH24:MI:SS'))
+          INSERT INTO model_stage_source (model_id, stage, effective_from, effective_to, source_system)
+          VALUES (:model_id, :stage, current_timestamp(0), TO_TIMESTAMP('9999-12-31 23:59:59', 'YYYY-MM-DD HH24:MI:SS'), 'Camunda')
         `,
           args: { model_id: modelId, stage: stageName },
         });
@@ -751,7 +741,7 @@ class Card {
         for (const { ID } of toClose) {
           await this.db.executeWithConnection({
             connection: trx,
-            sql: `UPDATE model_stage SET effective_to = current_timestamp(0) WHERE id = :id`,
+            sql: `UPDATE model_stage_source SET effective_to = current_timestamp(0) WHERE id = :id`,
             args: { id: ID },
           });
         }
@@ -767,7 +757,7 @@ class Card {
         for (const { ID } of stagesToClose) {
           await this.db.executeWithConnection({
             connection: trx,
-            sql: `UPDATE model_stage SET effective_to = current_timestamp(0) WHERE id = :id`,
+            sql: `UPDATE model_stage_source SET effective_to = current_timestamp(0) WHERE id = :id`,
             args: { id: ID },
           });
         }
@@ -776,8 +766,8 @@ class Card {
           await this.db.executeWithConnection({
             connection: trx,
             sql: `
-            INSERT INTO model_stage (model_id, stage, effective_from, effective_to)
-            VALUES (:model_id, :stage, current_timestamp(0), TO_TIMESTAMP('9999-12-31 23:59:59', 'YYYY-MM-DD HH24:MI:SS'))
+            INSERT INTO model_stage_source (model_id, stage, effective_from, effective_to, source_system)
+            VALUES (:model_id, :stage, current_timestamp(0), TO_TIMESTAMP('9999-12-31 23:59:59', 'YYYY-MM-DD HH24:MI:SS'), 'Camunda')
           `,
             args: { model_id: modelId, stage: stageName },
           });

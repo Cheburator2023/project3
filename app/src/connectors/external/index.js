@@ -1,4 +1,5 @@
 const client = require("./connector");
+const {camundaExternalTaskStatusDecorator} = require("../../common/status-helpers");
 
 const Jira = require("./jira");
 const Teamcity = require("./teamcity");
@@ -19,29 +20,29 @@ module.exports = (db, integration, bpmn, common) => {
   // Teamcity Handler
   const teamcity = new Teamcity(db, integration);
   client.subscribe("teamcity", teamcity.main);
-  client.subscribe("publish", teamcity.publish);
+  client.subscribe("publish", camundaExternalTaskStatusDecorator(teamcity.publish, bpmn, db, true));
 
   // Kafka Handler
   const kafka = new Kafka(db, integration);
   client.subscribe("kafka_createNewModel", kafka.createNewModel);
   client.subscribe("kafka_archiveModel", kafka.archiveModel);
-  client.subscribe("kafka_createNewStrategy", kafka.kafka_createNewStrategy);
+  client.subscribe("kafka_createNewStrategy", camundaExternalTaskStatusDecorator(kafka.kafka_createNewStrategy, bpmn, db));
 
   // Mail Handler
   const mail = new Mail(db, integration);
-  client.subscribe("mail", mail.main);
+  client.subscribe("mail", camundaExternalTaskStatusDecorator(mail.main, bpmn, db));
 
   // Database Handler
   const database = new Database(db, integration);
-  client.subscribe("artefacts", database.artefacts);
+  client.subscribe("artefacts", camundaExternalTaskStatusDecorator(database.artefacts, bpmn, db));
 
   // Validation Handler
   const validation = new Validation(db, integration);
-  client.subscribe("validation", validation.validation);
+  client.subscribe("validation", camundaExternalTaskStatusDecorator(validation.validation, bpmn, db));
 
   // Git Handler
   const git = new Git(db, integration);
-  client.subscribe("firstValidationLinks", git.firstValidationLinks);
+  client.subscribe("firstValidationLinks", camundaExternalTaskStatusDecorator(git.firstValidationLinks, bpmn, db));
 
   // System Handler
   const system = new System(db, bpmn);
@@ -52,7 +53,7 @@ module.exports = (db, integration, bpmn, common) => {
   client.subscribe("bpmnStart", system.bpmnStart);
   client.subscribe("bpmnFinish", system.bpmnFinish);
   client.subscribe("bpmnStatus", system.bpmnStatus);
-  client.subscribe("putJobDue", system.putJobDue);
+  client.subscribe("putJobDue", camundaExternalTaskStatusDecorator(system.putJobDue, bpmn, db));
   client.subscribe("needModelOps", system.needModelOps);
 
   // AutoML Handler

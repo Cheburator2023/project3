@@ -1,7 +1,7 @@
 const moment = require("moment");
 const { Variables } = require("camunda-external-task-client-js");
 const { model_status } = require("../../../common/status-map");
-const { getLastActiveStatus } = require("../../../common/status-helpers");
+const { getLastActiveStatus, acquireStageAndStatusFromCamunda } = require("../../../common/status-helpers");
 const auditClient = require('../../../utils/audit/auditClient');
 const tslgLogger = require('../../../utils/logger');
 
@@ -127,14 +127,26 @@ class System {
         key: variables.key,
       });
       await taskService.complete(task);
+
+      const {modelStage: modelStage, modelStatus: modelStatus} = await acquireStageAndStatusFromCamunda(
+        task.id,
+        task.activityId,
+        task.processDefinitionId,
+        variables,
+        {
+          bpmn: this.bpmn,
+          db: this.db,
+        },
+      );
+
       await this.db.card.addStage({
         modelId: variables.model,
-        modelStage: variables.model_stage,
+        modelStage: modelStage,
       });
-      if ("model_status" in variables) {
+      if (modelStatus) {
         await this.db.card.changeStatus({
           modelId: variables.model,
-          modelStatus: variables.model_status ? variables.model_status : null,
+          modelStatus: modelStatus ? modelStatus : null,
         });
       }
     } catch (e) {
@@ -152,17 +164,29 @@ class System {
         key: variables.key,
       });
       await taskService.complete(task);
+
+      const {modelStage: modelStage, modelStatus: modelStatus} = await acquireStageAndStatusFromCamunda(
+        task.id,
+        task.activityId,
+        task.processDefinitionId,
+        variables,
+        {
+          bpmn: this.bpmn,
+          db: this.db,
+        },
+      );
+
       await this.db.card.removeStage({
         modelId: variables.model,
-        modelStage: variables.model_stage,
+        modelStage: modelStage,
       });
-      if ("model_status" in variables && variables.model_status) {
+      if (modelStatus) {
         await this.db.card.changeStatus({
           modelId: variables.model,
-          modelStatus: variables.model_status ? variables.model_status : null,
+          modelStatus: modelStatus ? modelStatus : null,
         });
         // проставляем флаг активности если модель перешла в архив (для моделей со статусом из камунды)
-        if (variables.model_status === 'Архив') {
+        if (modelStatus === 'Архив') {
           await this.db.card.editActiveStatus({MODEL_ID: variables.model, MODELS_IS_ACTIVE_FLG: 0});
         }
       } else {
