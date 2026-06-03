@@ -11,55 +11,54 @@ class System {
     this.db = db;
   }
 
-  endEvent = async ({ task, taskService }) => {
-    try {
-      console.log("Remove parallel call activity");
-      const instance = task.variables.get("instance");
-      const processInstances = await this.bpmn.processInstances();
-      const process = processInstances.find(
-        (i) =>
-          i.rootProcessInstanceId == instance &&
-          (i.processDefinitionKey == "monitoring" ||
-            i.processDefinitionKey == "validation")
-      );
-      console.log(JSON.stringify(process));
-      await this.bpmn.deleteProcess(process.id);
-    } catch (e) {
-      console.log(e);
-    }
-    await taskService.complete(task);
-    auditClient.send('SUMD_TASKCOMPLETE', 'SUCCESS', {
-        taskId: task.id,
-        taskName: 'endEvent',
-    }).catch(err => tslgLogger.error('Ошибка отправки аудита завершения задачи','AuditError', err));
-  };
+    endEvent = async ({task, taskService}) => {
+        let correlationId;
+        const initiator = {sub: 'system', channel: 'system', method: 'endEvent'};
+        try {
+            correlationId = await auditClient.start('SUMD_TASKCOMPLETE', initiator, {taskId: task.id});
+            console.log("Remove parallel call activity");
+            const instance = task.variables.get("instance");
+            const processInstances = await this.bpmn.processInstances();
+            const process = processInstances.find(
+                (i) =>
+                    i.rootProcessInstanceId == instance &&
+                    (i.processDefinitionKey == "monitoring" ||
+                        i.processDefinitionKey == "validation")
+            );
+            console.log(JSON.stringify(process));
+            await this.bpmn.deleteProcess(process.id);
+            await taskService.complete(task);
+            await auditClient.success('SUMD_TASKCOMPLETE', correlationId, initiator, {taskId: task.id});
+        } catch (error) {
+            await auditClient.failure('SUMD_TASKCOMPLETE', correlationId, error, initiator, {taskId: task.id});
+            tslgLogger.sys(error);
+        }
+    };
 
-  // Update model data in DB
-  updateModelInfo = async ({ task, taskService }) => {
-    try {
-      const { model, model_stage } = task.variables.getAll();
+    // Update model data in DB
+    updateModelInfo = async ({ task, taskService }) => {
+        let correlationId;
+        const initiator = { sub: 'system', channel: 'system', method: 'updateModelInfo' };
+        try {
+            const { model, model_stage } = task.variables.getAll();
+            correlationId = await auditClient.start('SUMD_CANCELMODEL', initiator, { modelId: model });
 
-      // Set model_is_active_flg to 0 in models table
-      await this.db.card.cancel({ model });
+            // Set model_is_active_flg to 0 in models table
+            await this.db.card.cancel({ model });
 
-      // Отправка аудита: отмена разработки
-      auditClient.send('SUMD_CANCELMODEL','SUCCESS', {
-          modelId: model,
-      }).catch(err => {
-          tslgLogger.error('Ошибка отправки аудита отмены разработки', 'AuditError', err);
-      });
+            // Replace all stages, including parallel ones, with the current stage
+            await this.db.card.changeStage({
+                modelId: model,
+                modelStage: model_stage ? model_stage : null,
+            });
 
-      // Replace all stages, including parallel ones, with the current stage
-      await this.db.card.changeStage({
-        modelId: model,
-        modelStage: model_stage ? model_stage : null,
-      });
-
-      await taskService.complete(task);
-    } catch (e) {
-      throw e;
-    }
-  };
+            await taskService.complete(task);
+            await auditClient.success('SUMD_CANCELMODEL', correlationId, initiator, { modelId: model });
+        } catch (error) {
+            await auditClient.failure('SUMD_CANCELMODEL', correlationId, e, initiator, { modelId: task.variables.get("model") });
+            tslgLogger.sys(error);
+        }
+    };
 
   // Validates the consistency of a model's state between the database and Camunda. Add result to process variables
   healthCheck = async ({ task, taskService }) => {
@@ -157,8 +156,11 @@ class System {
   bpmnFinish = async ({ task, taskService }) => {
     const variables = task.variables.getAll();
     console.sys("Завершение Бизнес процесса");
-    try {
-      await this.db.instance.finish({
+      let correlationId;
+      const initiator = { sub: 'system', channel: 'system', method: 'bpmnFinish' };
+      try {
+          correlationId = await auditClient.start('SUMD_TASKCOMPLETE', initiator, { modelId: variables.model });
+          await this.db.instance.finish({
         model: variables.model,
         instance: task.processInstanceId,
         key: variables.key,
@@ -196,19 +198,15 @@ class System {
           await this.db.card.editActiveStatus({MODEL_ID: variables.model, MODELS_IS_ACTIVE_FLG: 0});
         }
       }
-      auditClient.send('SUMD_TASKCOMPLETE', 'SUCCES', {
-          modelId: variables.model,
-          processInstanceId: task.processInstanceId,
-      }).catch(err => tslgLogger.error('Ошибка отправки аудита завершенния задачи','AuditError', err));
-    } catch (e) {
-        console.sys(e);
-        auditClient.send('SUMD_TASKCOMPLETE', 'FAILURE', {
-            modeldev_name,
-            error: error.message,
-            source: 'AutoML',
-        }).catch(err => tslgLogger.error('Ошибка отправки аудита ошибки завершения задачи', 'AuditError', err));
-    }
-  };
+          await auditClient.success('SUMD_TASKCOMPLETE', correlationId, initiator, { modelId: variables.model });
+      } catch (error) {
+          await auditClient.failure('SUMD_TASKCOMPLETE', correlationId, error, initiator, {
+              modelId: variables.model,
+              error: error.message
+          });
+          tslgLogger.sys(error);
+      }
+    };
 
   bpmnStatus = async ({ task, taskService }) => {
     const variables = task.variables.getAll();
