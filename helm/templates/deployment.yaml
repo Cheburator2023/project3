@@ -126,7 +126,7 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
         {{- if $auditSidecarEnabled }}
-        {{- $auditSidecarRepository := regexReplaceAll "/[^/]+$" .Values.image.repository (printf "/%s" .Values.auditSidecar.name) }}
+        {{- $auditSidecarRepository := default (regexReplaceAll "/[^/]+$" .Values.image.repository (printf "/%s" .Values.auditSidecar.name)) .Values.auditSidecar.image.repository }}
         - name: {{ .Values.auditSidecar.name }}
           image: "{{ $auditSidecarRepository }}:{{ .Values.auditSidecar.image.tag }}"
           imagePullPolicy: {{ .Values.auditSidecar.image.pullPolicy }}
