@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.34.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.33.1...v1.34.0) (2026-06-03)
+
+
+### Features
+
+* Поправил отправку сообщений согласно API ([6327f85](https://git.sfera.inno.local:7999/SUMD/backend/commit/6327f85bb8296cf11689e06cdacce37fce235078))
+
 ## [1.33.1](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.33.0...v1.33.1) (2026-06-03)
 
 
