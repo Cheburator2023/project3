@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.33.1](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.33.0...v1.33.1) (2026-06-03)
+
+
+### Bug Fixes
+
+* изменения истории статусов и этапов в транзакции ([0f64109](https://git.sfera.inno.local:7999/SUMD/backend/commit/0f641092db88e4fe1a1ef36df58d6b181e4f4aa0))
+
 # [1.33.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.32.0...v1.33.0) (2026-05-29)
 
 
