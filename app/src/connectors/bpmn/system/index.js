@@ -51,7 +51,7 @@ class System {
             await auditClient.success('SUMD_CANCELMODEL', correlationId, initiator, { modelId: model });
         } catch (error) {
             await auditClient.failure('SUMD_CANCELMODEL', correlationId, error, initiator, { modelId: task.variables.get("model") });
-            throw error;
+            tslgLogger.sys(error);
         }
     };
 
@@ -87,8 +87,11 @@ class System {
             }
             await auditClient.success('SUMD_TASKCOMPLETE', correlationId, initiator, { modelId: variables.model });
         } catch (error) {
-            await auditClient.failure('SUMD_TASKCOMPLETE', correlationId, error, initiator, { modelId: variables.model });
-            console.sys(error);
+            await auditClient.failure('SUMD_TASKCOMPLETE', correlationId, error, initiator, {
+                modelId: variables.model,
+                error: error.message
+            });
+            tslgLogger.sys(error);
         }
     };
 
