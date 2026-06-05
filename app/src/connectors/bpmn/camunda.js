@@ -185,11 +185,18 @@ class Bpmn {
       method: "POST",
     });
 
-  // Tree modification
-  modify = async (data, index = 0) => {
-      try {
-          // tree deep
-          if (index > data.length - 1) return true;
+    // Tree modification
+    modify = async (data, index = 0) => {
+        let correlationId;
+        const initiatorInfo = {
+            sub: 'system',
+            channel: 'bpmn',
+            method: 'modify',
+            url: '/bpmn/modify'
+        };
+        try {
+            // tree deep
+            if (index > data.length - 1) return true;
 
           const treeEl = data[index];
           const {processInstanceId, activityId, endTime} = treeEl;
@@ -211,13 +218,14 @@ class Bpmn {
               return this.modify(data, index + 1);
           }
 
-          // Get new Instance
-          const prevTreeEl = data[index - 1];
-          const newPrevActivity = await this.activity(prevTreeEl.processInstanceId);
-          const newInstance = newPrevActivity.filter(
-              (a) => a.activityId === prevTreeEl.activityId && !a.endTime
-          )[0];
-          const oldVars = await this.getVars(prevTreeEl.calledProcessInstanceId);
+            // Get new Instance
+            correlationId = await auditClient.start('SUMD_ROLLBACKMODEL', initiatorInfo, { processInstanceId, activityId });
+            const prevTreeEl = data[index - 1];
+            const newPrevActivity = await this.activity(prevTreeEl.processInstanceId);
+            const newInstance = newPrevActivity.filter(
+                (a) => a.activityId === prevTreeEl.activityId && !a.endTime
+            )[0];
+            const oldVars = await this.getVars(prevTreeEl.calledProcessInstanceId);
 
           (data[index].processInstanceId = newInstance.calledProcessInstanceId),
               await this.setVars(data[index].processInstanceId, oldVars);
