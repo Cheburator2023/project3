@@ -57,8 +57,21 @@ ALTER TABLE model_stage_source
     ADD CONSTRAINT model_stage_source_effective_chk
         CHECK (effective_from <= effective_to);
 
+DELETE
+FROM model_stage_source source
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM models m
+    WHERE m.model_id = source.model_id
+);
+
 CREATE INDEX model_stage_source_model_id_idx
     ON model_stage_source (model_id);
+
+ALTER TABLE model_stage_source
+    ADD CONSTRAINT model_stage_source_model_fk
+        FOREIGN KEY (model_id)
+            REFERENCES models (model_id);
 
 
 ALTER TABLE model_status_source
@@ -80,8 +93,41 @@ ALTER TABLE model_status_source
     ADD CONSTRAINT model_status_source_effective_chk
         CHECK (effective_from <= effective_to);
 
+DELETE
+FROM model_status_source source
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM models m
+    WHERE m.model_id = source.model_id
+);
+
+WITH ranked_open_statuses AS (
+    SELECT
+        id,
+        row_number() OVER (
+            PARTITION BY model_id
+            ORDER BY effective_from DESC, id DESC
+        ) AS row_num
+    FROM model_status_source
+    WHERE effective_to = TIMESTAMP '9999-12-31 23:59:59'
+)
+DELETE
+FROM model_status_source source
+USING ranked_open_statuses ranked
+WHERE source.id = ranked.id
+  AND ranked.row_num > 1;
+
 CREATE INDEX model_status_source_model_id_idx
     ON model_status_source (model_id);
+
+CREATE UNIQUE INDEX model_status_source_active_model_id_uq
+    ON model_status_source (model_id)
+    WHERE effective_to = TIMESTAMP '9999-12-31 23:59:59';
+
+ALTER TABLE model_status_source
+    ADD CONSTRAINT model_status_source_model_fk
+        FOREIGN KEY (model_id)
+            REFERENCES models (model_id);
 
 
 -- =========================================================
@@ -206,6 +252,9 @@ CREATE TABLE model_stage_override
     author            varchar(4000) NULL,
     created_at        timestamp     NOT NULL,
     updated_at        timestamp     NOT NULL,
+    CONSTRAINT model_stage_override_model_fk
+        FOREIGN KEY (model_id)
+            REFERENCES models (model_id),
     CONSTRAINT model_stage_override_effective_chk
         CHECK (effective_from <= effective_to)
 );
@@ -234,6 +283,9 @@ CREATE TABLE model_status_override
     author            varchar(4000) NULL,
     created_at        timestamp     NOT NULL,
     updated_at        timestamp     NOT NULL,
+    CONSTRAINT model_status_override_model_fk
+        FOREIGN KEY (model_id)
+            REFERENCES models (model_id),
     CONSTRAINT model_status_override_effective_chk
         CHECK (effective_from <= effective_to)
 );
@@ -265,6 +317,9 @@ CREATE TABLE model_stage
     source_table       varchar(255)  NOT NULL,
     calculated_at      timestamp     NOT NULL,
     last_event         jsonb         NULL,
+    CONSTRAINT model_stage_model_fk
+        FOREIGN KEY (model_id)
+            REFERENCES models (model_id),
     CONSTRAINT model_stage_effective_chk
         CHECK (effective_from <= effective_to),
     CONSTRAINT model_stage_source_table_chk
@@ -293,6 +348,9 @@ CREATE TABLE model_status
     source_table       varchar(255)  NOT NULL,
     calculated_at      timestamp     NOT NULL,
     last_event         jsonb         NULL,
+    CONSTRAINT model_status_model_fk
+        FOREIGN KEY (model_id)
+            REFERENCES models (model_id),
     CONSTRAINT model_status_effective_chk
         CHECK (effective_from <= effective_to),
     CONSTRAINT model_status_source_table_chk
