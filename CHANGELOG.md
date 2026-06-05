@@ -1,5 +1,13 @@
 # Semantic Versioning Changelog
 
+## [1.34.1](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.34.0...v1.34.1) (2026-06-05)
+
+
+### Bug Fixes
+
+* update-sidecar ([bd7d656](https://git.sfera.inno.local:7999/SUMD/backend/commit/bd7d656036325d08a4cfa1ada635b35e3d3e10ce))
+* механизм этапов и статусов ([581a0e4](https://git.sfera.inno.local:7999/SUMD/backend/commit/581a0e4bb89eb2794f58e39a670a9a1f1296c8c7))
+
 # [1.34.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.33.1...v1.34.0) (2026-06-03)
 
 
