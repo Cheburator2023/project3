@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.34.2](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.34.1...v1.34.2) (2026-06-05)
+
+
+### Bug Fixes
+
+* add model fks and deduplicate statuses before unique index ([05af3a8](https://git.sfera.inno.local:7999/SUMD/backend/commit/05af3a8bc34428f12d25f84a7b6a39f6b4b1403a))
+
 ## [1.34.1](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.34.0...v1.34.1) (2026-06-05)
 
 
