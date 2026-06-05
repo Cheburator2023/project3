@@ -506,14 +506,20 @@ class Card {
     const trx = await this.db.beginTransation();
 
     try {
-      const { rows: activeStatuses = [] } = await this.db.execute({
+      await this.db.executeWithConnection({
+        connection: trx,
+        sql: sql.selectModelForUpdate,
+        args: { model_id: modelId },
+      });
+
+      const { rows: activeStatuses = [] } = await this.db.executeWithConnection({
+        connection: trx,
         sql: `
         SELECT id, status
         FROM model_status_source
         WHERE model_id = :model_id
           AND source_system = 'Camunda'
           AND effective_to = TO_TIMESTAMP('9999-12-31 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
-          FOR NO KEY UPDATE
       `,
         args: { model_id: modelId },
       });
@@ -704,14 +710,20 @@ class Card {
     const trx = await this.db.beginTransation();
 
     try {
-      const { rows: activeStages = [] } = await this.db.execute({
+      await this.db.executeWithConnection({
+        connection: trx,
+        sql: sql.selectModelForUpdate,
+        args: { model_id: modelId },
+      });
+
+      const { rows: activeStages = [] } = await this.db.executeWithConnection({
+        connection: trx,
         sql: `
         SELECT id, stage
         FROM model_stage_source
         WHERE model_id = :model_id
           AND source_system = 'Camunda'
           AND effective_to = TO_TIMESTAMP('9999-12-31 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
-          FOR NO KEY UPDATE
       `,
         args: { model_id: modelId },
       });

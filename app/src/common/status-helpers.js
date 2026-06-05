@@ -118,8 +118,8 @@ const acquireStageAndStatusFromCamunda = async (id, taskId, processDefinitionId,
     modelStage = 'Разработка модели';
   }
 
-  if (modelStatus === 'Разработана в процессе \nвнедрения') {
-    modelStatus = 'Разработана в процессе внедрения';
+  if (modelStatus === 'Разработана, в процессе \nвнедрения') {
+    modelStatus = 'Разработана, в процессе внедрения';
   } else if (modelStatus === 'Разаработка модели') {
     modelStatus = 'В процессе разработки';
   }
