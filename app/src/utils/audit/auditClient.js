@@ -111,6 +111,6 @@ class AuditClient {
 
 const sidecarUrl = process.env.AUDIT_SIDECAR_URL || 'http://localhost:8081/api/v2/audit';
 const timeout = parseInt(process.env.AUDIT_SIDECAR_TIMEOUT, 10) || 5000;
-const enabled = process.env.AUDIT_ENABLED !== 'false';
+const enabled = process.env.AUDIT_ENABLED !== 'true';
 
 module.exports = new AuditClient(sidecarUrl, timeout, enabled);
