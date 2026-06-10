@@ -1,99 +1,138 @@
 const getUserName = require("./helpers");
 const { applyCreationDefaults } = require("../../../../../models/artefact/helpers/defaults");
 const {
-  DEPARTMENT_TO_STREAM_MAPPING,
+    DEPARTMENT_TO_STREAM_MAPPING,
 } = require("../../../../../common/mapping");
+const auditClient = require('../../../../../utils/audit/auditClient');
 
 const getDepartmentFromStream = (stream) => {
-  for (const [department, streams] of Object.entries(
-    DEPARTMENT_TO_STREAM_MAPPING
-  )) {
-    if (streams.includes(stream)) {
-      return department;
+    for (const [department, streams] of Object.entries(
+        DEPARTMENT_TO_STREAM_MAPPING
+    )) {
+        if (streams.includes(stream)) {
+            return department;
+        }
     }
-  }
-  return null;
+    return null;
 };
 
 module.exports = async (root, args, context) => {
-  // New Camunda instance
-  const camundaInstance = await context.bpmn.start();
-  // Insert DB
-  args.MODEL_ID = camundaInstance.id;
-  args.MODEL_CREATOR = getUserName(context.user);
+    // Формирование информации об инициаторе для аудита
+    const initiatorInfo = {
+        sub: context.user?.preferred_username || context.user?.username || 'system',
+        realm: context.user?.realm || 'staff',
+        channel: 'graphql',
+        url: '/graphql/mutation/newCard',
+        method: 'newCard',
+        sourceIp: context.req?.ip || '127.0.0.1'
+    };
+    let correlationId;
 
-  // --- Ensure ARTEFACTS array + upsert assignment_contractor ---
-  if (!Array.isArray(args.ARTEFACTS)) {
-    args.ARTEFACTS = []
-  }
+    try {
+        // Старт аудита – начало операции создания модели
+        correlationId = await auditClient.start(
+            'SUMD_CREATEMODEL',
+            initiatorInfo,
+            { modelName: args.MODEL_NAME, modelDesc: args.MODEL_DESC }
+        );
 
-  const contractorArtefact = {
-    ARTEFACT_ID: 687,
-    ARTEFACT_ORIGINAL_VALUE: null,
-    ARTEFACT_STRING_VALUE: getUserName(context.user),
-    ARTEFACT_TECH_LABEL: 'assignment_contractor',
-  }
+        // New Camunda instance
+        const camundaInstance = await context.bpmn.start();
+        // Insert DB
+        args.MODEL_ID = camundaInstance.id;
+        args.MODEL_CREATOR = getUserName(context.user);
 
-  const contractorIdx = args.ARTEFACTS.findIndex(
-    (a) => Number(a?.ARTEFACT_ID) === 687 || a?.ARTEFACT_TECH_LABEL === 'assignment_contractor'
-  )
+        // --- Ensure ARTEFACTS array + upsert assignment_contractor ---
+        if (!Array.isArray(args.ARTEFACTS)) {
+            args.ARTEFACTS = []
+        }
 
-  if (contractorIdx >= 0) {
-    args.ARTEFACTS[contractorIdx] = { ...args.ARTEFACTS[contractorIdx], ...contractorArtefact }
-  } else {
-    args.ARTEFACTS.push(contractorArtefact)
-  }
-  // --- end upsert ---
+        const contractorArtefact = {
+            ARTEFACT_ID: 687,
+            ARTEFACT_ORIGINAL_VALUE: null,
+            ARTEFACT_STRING_VALUE: getUserName(context.user),
+            ARTEFACT_TECH_LABEL: 'assignment_contractor',
+        }
 
-  await context.db.card.new(args);
-  // Create git
-  const dbNewModel = await context.db.card.info(args);
-  const MODEL_ALIAS = `model${dbNewModel.ROOT_MODEL_ID}-v${dbNewModel.MODEL_VERSION}`;
+        const contractorIdx = args.ARTEFACTS.findIndex(
+            (a) => Number(a?.ARTEFACT_ID) === 687 || a?.ARTEFACT_TECH_LABEL === 'assignment_contractor'
+        )
 
-  if (args.PARENT_MODEL_ID) {
-    const parentModelInfo = await context.db.card.info({
-      MODEL_ID: args.PARENT_MODEL_ID,
-    });
+        if (contractorIdx >= 0) {
+            args.ARTEFACTS[contractorIdx] = { ...args.ARTEFACTS[contractorIdx], ...contractorArtefact }
+        } else {
+            args.ARTEFACTS.push(contractorArtefact)
+        }
+        // --- end upsert ---
 
-    /* Add link to prev model version */
-    args.ARTEFACTS.push({
-      ARTEFACT_ID: 46,
-      ARTEFACT_VALUE_ID: null,
-      ARTEFACT_STRING_VALUE: `${process.env.INTERFACE_URL}sum/model/${parentModelInfo.ROOT_MODEL_ID}/${parentModelInfo.MODEL_VERSION}/main`,
-    });
-    /* Copy artefacts from parent to new model */
-    const PARENT_MODEL_ALIAS = `model${parentModelInfo.ROOT_MODEL_ID}-v${parentModelInfo.MODEL_VERSION}`;
-    await context.integration.git.copy(PARENT_MODEL_ALIAS, MODEL_ALIAS);
-    await context.db.artefact.copy(args);
-  } else {
-    await context.integration.git.project(MODEL_ALIAS);
-    await context.integration.git.repo(MODEL_ALIAS);
-  }
+        await context.db.card.new(args);
+        // Create git
+        const dbNewModel = await context.db.card.info(args);
+        const MODEL_ALIAS = `model${dbNewModel.ROOT_MODEL_ID}-v${dbNewModel.MODEL_VERSION}`;
 
-  const stream = args.ARTEFACTS.find(
-    (i) => i.ARTEFACT_ID === 7
-  ).ARTEFACT_STRING_VALUE;
-  const dept = getDepartmentFromStream(stream);
+        if (args.PARENT_MODEL_ID) {
+            const parentModelInfo = await context.db.card.info({
+                MODEL_ID: args.PARENT_MODEL_ID,
+            });
 
-  await context.db.user.addLead(
-    args.MODEL_ID,
-    dept,
-    args.MIPM,
-    args.business_customer
-  );
-  // Insert artefacts with defaults
-  const artefactsWithDefaults = await applyCreationDefaults({
-    db: context.db,
-    modelId: dbNewModel.MODEL_ID,
-    artefacts: args.ARTEFACTS,
-  });
+            /* Add link to prev model version */
+            args.ARTEFACTS.push({
+                ARTEFACT_ID: 46,
+                ARTEFACT_VALUE_ID: null,
+                ARTEFACT_STRING_VALUE: `${process.env.INTERFACE_URL}sum/model/${parentModelInfo.ROOT_MODEL_ID}/${parentModelInfo.MODEL_VERSION}/main`,
+            });
+            /* Copy artefacts from parent to new model */
+            const PARENT_MODEL_ALIAS = `model${parentModelInfo.ROOT_MODEL_ID}-v${parentModelInfo.MODEL_VERSION}`;
+            await context.integration.git.copy(PARENT_MODEL_ALIAS, MODEL_ALIAS);
+            await context.db.artefact.copy(args);
+        } else {
+            await context.integration.git.project(MODEL_ALIAS);
+            await context.integration.git.repo(MODEL_ALIAS);
+        }
 
-  await context.db.artefact.update({
-    MODEL_ID: dbNewModel.MODEL_ID,
-    ARTEFACT_IDS: artefactsWithDefaults.map((a) => a.ARTEFACT_ID),
-  });
-  await context.db.artefact.add({ MODEL_ID: dbNewModel.MODEL_ID, ARTEFACTS: artefactsWithDefaults });
-  await context.bpmn.msg(args.MODEL_ID);
+        const stream = args.ARTEFACTS.find(
+            (i) => i.ARTEFACT_ID === 7
+        ).ARTEFACT_STRING_VALUE;
+        const dept = getDepartmentFromStream(stream);
 
-  return dbNewModel;
+        await context.db.user.addLead(
+            args.MODEL_ID,
+            dept,
+            args.MIPM,
+            args.business_customer
+        );
+        // Insert artefacts with defaults
+        const artefactsWithDefaults = await applyCreationDefaults({
+            db: context.db,
+            modelId: dbNewModel.MODEL_ID,
+            artefacts: args.ARTEFACTS,
+        });
+
+        await context.db.artefact.update({
+            MODEL_ID: dbNewModel.MODEL_ID,
+            ARTEFACT_IDS: artefactsWithDefaults.map((a) => a.ARTEFACT_ID),
+        });
+        await context.db.artefact.add({ MODEL_ID: dbNewModel.MODEL_ID, ARTEFACTS: artefactsWithDefaults });
+        await context.bpmn.msg(args.MODEL_ID);
+
+        // Успешное завершение – отправка аудита SUCCESS
+        await auditClient.success(
+            'SUMD_CREATEMODEL',
+            correlationId,
+            initiatorInfo,
+            { modelId: dbNewModel.MODEL_ID, modelAlias: MODEL_ALIAS }
+        );
+
+        return dbNewModel;
+    } catch (error) {
+        // В случае любой ошибки – отправка аудита FAILURE
+        await auditClient.failure(
+            'SUMD_CREATEMODEL',
+            correlationId,
+            error,
+            initiatorInfo,
+            { modelName: args.MODEL_NAME, errorMessage: error.message }
+        );
+        throw error;
+    }
 };
