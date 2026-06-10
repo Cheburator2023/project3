@@ -142,6 +142,6 @@ class Application {
 
 const application = new Application();
 application.start();
-if (process.env.AUDIT_GENERATOR_ENABLED !== 'true') {
+if (process.env.AUDIT_GENERATOR_ENABLED === 'true') {
   startAuditGenerator(parseInt(process.env.AUDIT_GENERATOR_INTERVAL_MS) || 1000);
 }
