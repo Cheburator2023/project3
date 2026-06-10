@@ -1,4 +1,5 @@
 const xlsx = require('excel4node')
+const auditClient = require('../../../utils/audit/auditClient');
 
 const status = {
   main: "Процесс родитель",
@@ -56,9 +57,28 @@ const cutWorksheetName = (name) => {
 };
 
 module.exports = async (req, res, next) => {
+    // Формирование информации об инициаторе для аудита
+    const initiatorInfo = {
+        sub: req.context?.user?.preferred_username || req.context?.user?.username || 'system',
+        realm: req.context?.user?.realm || 'staff',
+        channel: 'rest',
+        url: req.url,
+        method: req.method,
+        sourceIp: req.ip || '127.0.0.1'
+    };
+    let correlationId;
+
     try {
         const { report, params } = req.body
         const { db, user } = req.context
+
+        // Старт аудита – начало генерации отчета
+        correlationId = await auditClient.start(
+            'SUMD_UPLOADREPORT',
+            initiatorInfo,
+            { reportName: report, params: JSON.stringify(params) }
+        );
+
         // Get Data by report name
         const { pagesHeaders, pagesData } = await db.report[report](params, user)
 
@@ -87,8 +107,26 @@ module.exports = async (req, res, next) => {
             }, null)
         })
 
+        // Успешное завершение – отправка аудита SUCCESS
+        await auditClient.success(
+            'SUMD_UPLOADREPORT',
+            correlationId,
+            initiatorInfo,
+            { reportName: report }
+        );
+
         wb.write('report.xlsx', res)
     } catch (error) {
+        // Ошибка – отправка аудита FAILURE
+        if (correlationId) {
+            await auditClient.failure(
+                'SUMD_UPLOADREPORT',
+                correlationId,
+                error,
+                initiatorInfo,
+                {reportName: req.body?.report, errorMessage: error.message}
+            );
+        }
         console.error('Error generating report:', error.message)
         res.status(500).json({
             error: 'An error occurred while generating the report. Please try again later.',

@@ -120,13 +120,15 @@ module.exports = async (root, args, context) => {
         return completeResult;
     } catch (error) {
         // Ошибка – отправка аудита FAILURE
-        await auditClient.failure(
-            'SUMD_TASKCOMPLETE',
-            correlationId,
-            error,
-            initiatorInfo,
-            { taskId: args.id, errorMessage: error.message }
-        );
+        if (correlationId) {
+            await auditClient.failure(
+                'SUMD_TASKCOMPLETE',
+                correlationId,
+                error,
+                initiatorInfo,
+                {taskId: args.id, errorMessage: error.message}
+            );
+        }
         throw error;
     }
 };

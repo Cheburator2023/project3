@@ -65,13 +65,15 @@ module.exports = async (root, args, context) => {
         return instance;
     } catch (error) {
         // Ошибка – отправка аудита FAILURE
-        await auditClient.failure(
-            'SUMD_CANCELMODEL',
-            correlationId,
-            error,
-            initiatorInfo,
-            { modelId: args.MODEL_ID, errorMessage: error.message }
-        );
+        if (correlationId) {
+            await auditClient.failure(
+                'SUMD_CANCELMODEL',
+                correlationId,
+                error,
+                initiatorInfo,
+                {modelId: args.MODEL_ID, errorMessage: error.message}
+            );
+        }
         console.error(error);
         throw new Error(
             "An error occurred while processing the cancel instance. Please try again."

@@ -125,14 +125,16 @@ module.exports = async (root, args, context) => {
 
         return dbNewModel;
     } catch (error) {
-        // В случае любой ошибки – отправка аудита FAILURE
-        await auditClient.failure(
-            'SUMD_CREATEMODEL',
-            correlationId,
-            error,
-            initiatorInfo,
-            { modelName: args.MODEL_NAME, errorMessage: error.message }
-        );
+        // Ошибка – отправка аудита FAILURE
+        if (correlationId) {
+            await auditClient.failure(
+                'SUMD_CREATEMODEL',
+                correlationId,
+                error,
+                initiatorInfo,
+                {modelName: args.MODEL_NAME, errorMessage: error.message}
+            );
+        }
         throw error;
     }
 };
