@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.35.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.34.2...v1.35.0) (2026-06-08)
+
+
+### Features
+
+* Аудит и генератор событий по дефолту выключены ([42c3b07](https://git.sfera.inno.local:7999/SUMD/backend/commit/42c3b07d60eb2063c463560008981933d1ba0d71))
+
 ## [1.34.2](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.34.1...v1.34.2) (2026-06-05)
 
 
