@@ -1,5 +1,16 @@
 # Semantic Versioning Changelog
 
+# [1.37.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.36.0...v1.37.0) (2026-06-11)
+
+
+### Features
+
+* Добавил аудит в cancelModel.js и removeModel.js ([906001f](https://git.sfera.inno.local:7999/SUMD/backend/commit/906001fc3ee50fbaa31399af77331c9139b2ab37))
+* Добавил аудит в new.js ([a8b94f4](https://git.sfera.inno.local:7999/SUMD/backend/commit/a8b94f4446510f23ce07adee07f8e079ebb90247))
+* Добавил аудит для complete.js ([5aa0ae6](https://git.sfera.inno.local:7999/SUMD/backend/commit/5aa0ae6479c6e87c7749f8192b9e123c9946fbd1))
+* Добавил аудит для report ([2ece4aa](https://git.sfera.inno.local:7999/SUMD/backend/commit/2ece4aa7bbc58067723eb73c9d27f97f8356d0cf))
+* Удалил генератор событий аудита ([92c9fc0](https://git.sfera.inno.local:7999/SUMD/backend/commit/92c9fc02ed63a7bd64c7e78e4298c297892c01d0))
+
 # [1.36.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.35.0...v1.36.0) (2026-06-10)
 
 
