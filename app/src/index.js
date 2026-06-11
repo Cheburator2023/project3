@@ -1,7 +1,5 @@
 require('dotenv').config();
 const logger = require('./utils/logger');
-const { startAuditGenerator } = require('./utils/audit/auditGenerator');
-
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
@@ -142,6 +140,3 @@ class Application {
 
 const application = new Application();
 application.start();
-if (process.env.AUDIT_GENERATOR_ENABLED === 'true') {
-  startAuditGenerator(parseInt(process.env.AUDIT_GENERATOR_INTERVAL_MS) || 1000);
-}
