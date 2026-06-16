@@ -11,6 +11,11 @@ class System {
         this.db = db;
     }
 
+    static consoleDebug(...args) {
+        const consoleToUse = console.original?.log || console.log;
+        consoleToUse('[DEBUG}', ...args);
+    }
+
     endEvent = async ({ task, taskService }) => {
         let correlationId;
         const initiator = { sub: 'system', channel: 'bpmn', method: 'endEvent' };
@@ -51,7 +56,12 @@ class System {
             await auditClient.success('SUMD_CANCELMODEL', correlationId, initiator, { modelId: model });
         } catch (error) {
             await auditClient.failure('SUMD_CANCELMODEL', correlationId, error, initiator, { modelId: task.variables.get("model") });
-            tslgLogger.sys(error);
+            if (process.env.NODE_ENV !== 'production') {
+                consoleDebug(`Ошибка отправки сообщения в Аудит: ${error.msg}`, {
+                    system: 'BPMN',
+                    error: error.message
+                });
+            }
         }
     };
 
@@ -91,7 +101,12 @@ class System {
                 modelId: variables.model,
                 error: error.message
             });
-            tslgLogger.sys(error);
+            if (process.env.NODE_ENV !== 'production') {
+                consoleDebug(`Ошибка отправки сообщения в Аудит: ${error.msg}`, {
+                    system: 'BPMN',
+                    error: error.message
+                });
+            }
         }
     };
 
