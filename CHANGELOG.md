@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.38.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.37.0...v1.38.0) (2026-06-16)
+
+
+### Features
+
+* Добавил аудит для авторизации ([bdafd75](https://git.sfera.inno.local:7999/SUMD/backend/commit/bdafd75ad9cbce97e2d498a1a489c6999ca4c09a))
+
 # [1.37.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.36.0...v1.37.0) (2026-06-11)
 
 
