@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.38.1](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.38.0...v1.38.1) (2026-07-03)
+
+
+### Bug Fixes
+
+* update confirmed flag on usage confirmation save ([82d7922](https://git.sfera.inno.local:7999/SUMD/backend/commit/82d7922559ff9c6e1c30b40d2e22b525a5957136))
+
 # [1.38.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.37.0...v1.38.0) (2026-06-16)
 
 
