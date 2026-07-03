@@ -22,7 +22,8 @@ ON CONFLICT (model_id, quarter, confirmation_year)
                                               THEN EXCLUDED.artifact_link
                                           ELSE model_usage_confirm.artifact_link
     END,
-                  confirmation_date = COALESCE(EXCLUDED.confirmation_date, model_usage_confirm.confirmation_date)
+                  confirmation_date = COALESCE(EXCLUDED.confirmation_date, model_usage_confirm.confirmation_date),
+                  confirmed         = EXCLUDED.confirmed
 RETURNING model_id, confirmation_year, quarter, artifact_link, confirmed;
 `
 
