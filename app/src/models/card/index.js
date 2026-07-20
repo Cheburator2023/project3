@@ -560,6 +560,7 @@ class Card {
 
   changeStage = ({ modelId, modelStage }) =>
     this.changeStaticModelStage({ modelId, modelStage })
+      .then(() => this.closeStageOverrides(modelId)) // вызываем закрытие корректировок при движении модели по БП (закрытии userTask)
       .then(() => this.changeHistoricalModelStage({
           modelId,
           modelStage,
@@ -569,6 +570,13 @@ class Card {
 
   addStage = ({ modelId, modelStage }) =>
     this.addStaticModelStage({ modelId, modelStage })
+      .then(() => {
+        // ВАЖНО! Если инициирован Вывод или Отмена, корректировка должна быть закрыта только в случае успешного Вывода или Отмены
+        if (modelStage !== 'Вывод модели из эксплуатации' && modelStage !== 'Отмена разработки') {
+          return this.closeStageOverrides(modelId); // вызываем закрытие корректировок при движении модели по БП (закрытии userTask)
+        }
+        return Promise.resolve();
+      })
       .then(() => this.changeHistoricalModelStage({
           modelId,
           modelStage,
@@ -949,6 +957,32 @@ class Card {
     } else {
       console.debug('Got response from repo: ', status);
       throw new Error(`Failed to get repo status by model ${modelId}. Boolean value expected, got ${status?.model_repo_is_created}`);
+    }
+  };
+
+  closeStageOverrides = async (modelId) => {
+    if (!modelId) {
+      throw new Error('modelId is required to close stage overrides');
+    }
+
+    try {
+      const resultOverrides = await this.db.execute({
+        sql: sql.closeStageOverrides,
+        args: { model_id: modelId },
+      });
+
+      const resultSource = await this.db.execute({
+        sql: sql.closeSourceStagesByOverrides,
+        args: { model_id: modelId },
+      });
+
+      // Логируем количество закрытых записей 
+      console.log(`[closeStageOverrides] Closed ${resultOverrides.rowCount} stage override(s) for model ${modelId}. 
+        ${resultSource.rowCount} source rows closed`);
+
+      return resultOverrides.rowCount;
+    } catch (err) {
+      throw new Error(`Failed to close stage overrides for model ${modelId}: ${err.message}`);
     }
   };
 }
