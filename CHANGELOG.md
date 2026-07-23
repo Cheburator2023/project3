@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.39.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.38.1...v1.39.0) (2026-07-23)
+
+
+### Features
+
+* закрытие корректировок этапов ([4731d38](https://git.sfera.inno.local:7999/SUMD/backend/commit/4731d384a39dcbdb1feb78519da0ab3063d6af0d))
+
 ## [1.38.1](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.38.0...v1.38.1) (2026-07-03)
 
 
