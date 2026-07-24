@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.40.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.39.0...v1.40.0) (2026-07-24)
+
+
+### Features
+
+* скрыть атрибуты рс с вкладки артефакты карточки модели ([e597336](https://git.sfera.inno.local:7999/SUMD/backend/commit/e59733647e39066fac823785f9813d89e8974323))
+
 # [1.39.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.38.1...v1.39.0) (2026-07-23)
 
 
