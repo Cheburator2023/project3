@@ -27,7 +27,7 @@ class Card {
       return [];
     }
 
-    if (userGroups.includes("ds")) {
+    if (userGroups.includes("ds") || userGroups.includes("/ds")) {
       return userGroups.flatMap(
         (group) => DEPARTMENT_TO_STREAM_MAPPING[group] || group
       );
