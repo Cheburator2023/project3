@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.41.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.40.0...v1.41.0) (2026-08-18)
+
+
+### Features
+
+* закрытие корректировок статусов при движении модели по БП ([89a6e5b](https://git.sfera.inno.local:7999/SUMD/backend/commit/89a6e5bae5765dff90f623243195e4751a49041d))
+
 # [1.40.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.39.0...v1.40.0) (2026-07-24)
 
 
