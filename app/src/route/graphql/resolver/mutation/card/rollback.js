@@ -19,6 +19,10 @@ const MODEL_STAGES_FROM_TRANSITION_PROCESS = [
 
 const BPMN_INTERMEDIATE_TIMER_ACTIVITY_TYPE_NAME = "intermediateTimer";
 
+const TASK_IDS_NOT_TO_CLEAR_ARTEFACTS = [
+  "psevdotask",
+];
+
 /**
  * Retrieves the first active task for a given model, excluding tasks with specific IDs.
  *
@@ -58,8 +62,6 @@ const getActiveTaskAfterRollback = async (MODEL_ID, context) => {
       await context.bpmn.tasksByModel(MODEL_ID)
     ).filter(({ taskDefinitionKey }) => !TASK_IDS_NOT_TO_COUNT.includes(taskDefinitionKey));
 
-    console.log('Got active tasks from Camunda', activeTasks);
-
     if (!activeTasks.length) {
       return null;
     }
@@ -76,25 +78,33 @@ const getActiveTaskAfterRollback = async (MODEL_ID, context) => {
 
 // TODO: refactor this function
 const deleteRolledBackProcessInstances = async ({
-  taskRolledBackTo,
+  processInstanceId,
   modelId,
   context,
+  connection,
 }) => {
   try {
+    const processInstance = await context.bpmn.historyProcessInstanceById(processInstanceId);
+    if (!processInstance.length) throw new Error(`Process instance ${processInstanceId} not found`);
+    const definition = await context.bpmn.definition(processInstance[0].processDefinitionId);
+    if (!definition) throw new Error(`Definition for ${processInstance.processDefinitionId} not found`);
+    const bpmnProcess = await context.db.instance.getBpmnProcessByKey(definition.key);
+    if (!bpmnProcess) throw new Error(`BPMN process with key ${definition.key} not found`);
+
     // 1. Get all process instances that should be deleted after rollback
     const processInstancesIdsToDelete = (
       await context.db.instance.getInstancesByModelId(modelId)
     )
       .filter(
         ({ BPMN_KEY_ID }) =>
-          BPMN_KEY_ID > taskRolledBackTo.BPMN_KEY_ID &&
+          BPMN_KEY_ID > bpmnProcess.BPMN_KEY_ID &&
           !BPMN_KEYS_NOT_TO_COUNT.includes(BPMN_KEY_ID)
       )
       .map(({ BPMN_INSTANCE_ID }) => BPMN_INSTANCE_ID);
 
     if (processInstancesIdsToDelete.length) {
       // 2. Delete process instances from database
-      await context.db.instance.deleteBpmnInstance(processInstancesIdsToDelete);
+      await context.db.instance.deleteBpmnInstance(processInstancesIdsToDelete, connection);
     }
   } catch (e) {
     throw new Error(`Error on deleteRolledBackProcessInstances, ${e.message}`);
@@ -106,11 +116,12 @@ const removeArtefactValues = async ({
   modelId,
   deploymentId,
   context,
+  connection,
 }) => {
   try {
       const operationsLogQueryResult = await context.db.task.getTasksOperationsLogsByModelOrdered(modelId);
 
-      let completedTasksList = [];
+      let completedTasksList = TASK_IDS_NOT_TO_CLEAR_ARTEFACTS;
       let rolledBackTasksList = [];
 
       // Собираем список user task со статусом complete
@@ -129,7 +140,7 @@ const removeArtefactValues = async ({
 
       // Получаем список всех откаченных тасок
       const rolledBackIndex = completedTasksList.findIndex(
-        (el) => el === taskRolledBackTo.taskDefinitionKey
+        (el) => el === taskRolledBackTo
       );
 
       if (rolledBackIndex >= 0) {
@@ -145,7 +156,7 @@ const removeArtefactValues = async ({
       const artefactIds = artefacts.map((e) => e.ARTEFACT_ID);
 
       // Удаление текущего значения
-      await context.db.artefact.expireRealizationsByIdsAndModel({artefactIds, modelId});
+      await context.db.artefact.expireRealizationsByIdsAndModel({artefactIds, modelId}, connection);
 
       // Добавляем новые записи со значением null и текущим пользователем
       await context.db.artefact.addNullable({
@@ -156,7 +167,7 @@ const removeArtefactValues = async ({
             CREATOR: getUserName(context.user),
           }
         })
-      });
+      }, connection);
 
   } catch (e) {
     throw new Error(`Error on removeArtefactValues, ${e.message}`);
@@ -234,28 +245,19 @@ const getModelInfo = async (activity, context) => {
  * @param {Object} context - The context object providing access to BPMN and database operations.
  * @throws {Error} Throws an error if updating the model state or stage fails.
  */
-const updateModelState = async (task, context) => {
+const updateModelState = async (activityInstanceId, modelId, context, connection) => {
   try {
-    const newModelStatus = await context.bpmn.getTaskVar(
-      task.id,
-      "model_status"
-    );
-    const newModelStage = await context.bpmn.getTaskVar(task.id, "model_stage");
+    const vars = await context.bpmn.historyVariableInstancesByActivity([activityInstanceId]);
+    if (!vars) throw new Error(`Variables for activity instance ${activityInstanceId} not found`);
 
-    console.log(
-      "Update model status and stage:",
-      newModelStatus,
-      newModelStage
-    );
+    const newModelStatus = vars.find(item => item.name === 'model_status');
+    const newModelStage = vars.find(item => item.name === 'model_stage');
 
-    await context.db.card.changeStatus({
-      modelId: task.MODEL_ID,
-      modelStatus: newModelStatus || null,
-    });
-    await context.db.card.changeStage({
-      modelId: task.MODEL_ID,
-      modelStage: newModelStage || null,
-    });
+    await context.db.card.rollbackStageAndStatus({
+      modelId: modelId, 
+      modelStatus: newModelStatus?.value || null, 
+      modelStage: newModelStage?.value || null
+    }, connection);
   } catch (e) {
     throw new Error(`UpdateModelState error: ${e.message}`);
   }
@@ -333,49 +335,80 @@ module.exports = async (root, { activity }, context) => {
       }
     }
 
-    // 0. Modify process instance to rollback
-    return context.bpmn.modify(activity).then(async (data) => {
-      const activeTaskAfterRollback = await getActiveTaskAfterRollback(MODEL_ID, context);
+    const targetUserTask = activity.find(item => item.activityType === 'userTask');
 
-      if (!activeTaskAfterRollback) {
-        throw new Error(
-          `After a rollback, updates cannot be executed because the variable "activeTaskAfterRollback" is not defined.`
-        );
-      }
+    if (!targetUserTask) {
+      throw new Error(
+        `Cannot rollback to non-user task.`
+      );
+    }
 
+    const connection = await context.db.card.getConnectionWithTransaction();
+
+    try {
       // 1. Update model stage and status
-      await updateModelState(activeTaskAfterRollback, context);
+      await updateModelState(targetUserTask.id, MODEL_ID, context, connection);
 
       // 2. Delete rolled back process instances
       await deleteRolledBackProcessInstances({
-        taskRolledBackTo: activeTaskAfterRollback,
+        processInstanceId: targetUserTask.processInstanceId,
         modelId: MODEL_ID,
         context,
+        connection,
       });
 
       // 2.5 Set artefacts from rolled back tasks to null
       await removeArtefactValues({
-        taskRolledBackTo: activeTaskAfterRollback,
+        taskRolledBackTo: targetUserTask.activityId,
         modelId: MODEL_ID,
         deploymentId: DEPLOYMENT_ID,
         context,
+        connection,
       });
 
-      // 3. Send email
+      // 3. Send email (не влияет на транзакцию — асинхронно, не блокирует)
       // await sendEmails(modelInfo, taskRolledBackTo, context);
 
       // 4. Add "roll back" log to tasks operations
       await context.db.task.addOperationLog({
         MODEL_ID,
-        TASK_ID: activeTaskAfterRollback.taskDefinitionKey,
+        TASK_ID: targetUserTask.activityId,
         OPERATION: "rollback",
         USER_NAME: getUserName(context.user),
         TASK_ID_ROLLED_BACK_FROM:
           activeTaskBeforeRollback?.taskDefinitionKey || "",
-      });
+      }, connection);
 
-      return data;
-    });
+      // 5. Modify process instance to rollback — выполняется внутри транзакции
+      const modifyResult = await context.bpmn.modify(activity);
+
+      const activeTaskAfterRollback = await getActiveTaskAfterRollback(MODEL_ID, context);
+
+      if (!activeTaskAfterRollback) {
+        throw new Error(
+          `Cannot determine active task after model rollback.`
+        );
+      }
+
+      await context.db.card.commitTransaction(connection);
+
+      return modifyResult;
+    } catch (err) {
+      try {
+        const activeTaskAfterRollback = await getActiveTaskAfterRollback(MODEL_ID, context);
+
+        if (activeTaskAfterRollback && activeTaskAfterRollback.taskDefinitionKey === targetUserTask.activityId) {
+          console.error(err);
+          await context.db.card.commitTransaction(connection);
+          return true;
+        }
+      } catch (e) {
+        await context.db.card.rollbackTransaction(connection);
+      }
+
+      await context.db.card.rollbackTransaction(connection);
+      throw err;
+    }
   } catch (e) {
     if (!(e instanceof Error)) {
       e = new Error(e);

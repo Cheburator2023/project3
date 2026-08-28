@@ -90,8 +90,8 @@ class System {
                     await this.db.card.editActiveStatus({ MODEL_ID: variables.model, MODELS_IS_ACTIVE_FLG: 0 });
                 }
             } else {
-                const model = await this.db.card.getCurrentModelStatus(variables.model);
-                if (model.artefacts_model_status && model.artefacts_model_status.split(';').includes('Архив')) {
+                const modelStatuses = await this.db.card.getCurrentModelStatus(variables.model);
+                if (modelStatuses.artefacts_model_status && modelStatuses.artefacts_model_status.split(';').includes('Архив')) {
                     await this.db.card.editActiveStatus({ MODEL_ID: variables.model, MODELS_IS_ACTIVE_FLG: 0 });
                 }
             }

@@ -222,8 +222,6 @@ class Task {
         })
         .then((data) => data.rows);
 
-      console.log("Camunda tasks:", tasks, "DB tasks:", instances);
-
       const instancesWithCamundaTaskInfo = instances.map((inst) => {
         const taskBpmn = tasks.find(
           (task) =>
@@ -239,11 +237,6 @@ class Task {
         }
         return inst;
       });
-
-      console.log(
-        "instancesWithCamundaTaskInfo: ",
-        instancesWithCamundaTaskInfo
-      );
 
       return instancesWithCamundaTaskInfo;
     } catch (e) {
@@ -310,8 +303,12 @@ class Task {
     OPERATION,
     USER_NAME,
     TASK_ID_ROLLED_BACK_FROM: ROLLED_BACK_FROM = null,
-  }) =>
-    await this.db.execute({
+  }, connection = null) => {
+
+    const execFn = connection ? this.db.executeWithConnection : this.db.execute;
+    
+    return await execFn.call(this.db, {
+      connection: connection,
       sql: sql.addOperationLog,
       args: {
         MODEL_ID,
@@ -321,6 +318,7 @@ class Task {
         ROLLED_BACK_FROM,
       },
     });
+  }
 
   // Complete
   complete = async ({ id, ARTEFACTS, MODEL_ID, TASK_ID }, user) => {

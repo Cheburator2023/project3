@@ -31,7 +31,7 @@ class System {
             await auditClient.success('SUMD_TASKCOMPLETE', correlationId, initiator, {taskId: task.id});
         } catch (error) {
             await auditClient.failure('SUMD_TASKCOMPLETE', correlationId, error, initiator, {taskId: task.id});
-            tslgLogger.sys(error);
+            tslgLogger.error(error.message, 'Ошибка', error);
         }
     };
 
@@ -56,7 +56,7 @@ class System {
             await auditClient.success('SUMD_CANCELMODEL', correlationId, initiator, { modelId: model });
         } catch (error) {
             await auditClient.failure('SUMD_CANCELMODEL', correlationId, e, initiator, { modelId: task.variables.get("model") });
-            tslgLogger.sys(error);
+            tslgLogger.error(error.message, 'Ошибка', error);
         }
     };
 
@@ -149,7 +149,7 @@ class System {
         });
       }
     } catch (e) {
-      console.sys(e);
+      tslgLogger.error(e.message, 'Ошибка', e);
     }
   };
 
@@ -192,9 +192,9 @@ class System {
           await this.db.card.editActiveStatus({MODEL_ID: variables.model, MODELS_IS_ACTIVE_FLG: 0});
         }
       } else {
-        const model = await this.db.card.getCurrentModelStatus(model);
+        const modelStatuses = await this.db.card.getCurrentModelStatus(variables.model);
         // проставляем флаг активности если модель перешла в архив (для моделей со статусом по артефактам)
-        if (model.artefacts_model_status && model.artefacts_model_status.split(';').includes('Архив')) {
+        if (modelStatuses.artefacts_model_status && modelStatuses.artefacts_model_status.split(';').includes('Архив')) {
           await this.db.card.editActiveStatus({MODEL_ID: variables.model, MODELS_IS_ACTIVE_FLG: 0});
         }
       }
@@ -204,7 +204,7 @@ class System {
               modelId: variables.model,
               error: error.message
           });
-          tslgLogger.sys(error);
+          tslgLogger.error(error.message, 'Ошибка', error);
       }
     };
 
@@ -220,7 +220,7 @@ class System {
       }
       await taskService.complete(task);
     } catch (e) {
-      console.sys(e);
+      tslgLogger.error(e.message, 'Ошибка', e);
     }
   };
 
@@ -237,7 +237,7 @@ class System {
         );
       await taskService.complete(task);
     } catch (e) {
-      console.sys(e);
+      tslgLogger.error(e.message, 'Ошибка', e);
     }
   };
 
@@ -268,7 +268,7 @@ class System {
       });
       await taskService.complete(task, processVariables);
     } catch (e) {
-      console.sys(e);
+      tslgLogger.error(e.message, 'Ошибка', e);
     }
   };
 }

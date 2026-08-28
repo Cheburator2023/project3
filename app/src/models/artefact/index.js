@@ -70,13 +70,18 @@ class Artefact {
       })
       : true;
 
-  addNullable = ({ MODEL_ID, ARTEFACTS }) =>
-    ARTEFACTS.length > 0
-      ? this.db.executeMany({
+  addNullable = ({ MODEL_ID, ARTEFACTS }, connection = null) => {
+    const execFn = connection ? this.db.executeManyWithConnection : this.db.executeMany;
+
+    return ARTEFACTS.length > 0
+      ? execFn.call(this.db, {
+        connection: connection,
         sql: sql.new,
         args: ARTEFACTS.map(dbVar(MODEL_ID)),
       })
       : true;
+  }
+    
 
   techAdd = (ARTEFACTS) =>
     ARTEFACTS.length > 0
@@ -198,14 +203,18 @@ class Artefact {
         }
       }).then((d) => d.rows);
 
-  expireRealizationsByIdsAndModel = ({artefactIds, modelId}) => 
-    this.db.execute({
+  expireRealizationsByIdsAndModel = ({artefactIds, modelId}, connection = null) => {
+    const execFn = connection ? this.db.executeWithConnection : this.db.execute;
+
+    return execFn.call(this.db, {
+      connection: connection,
       sql: sql.expireRealizationsByIdsAndModel,
       args: {
         artefact_ids: artefactIds,
         model_id: modelId
       }
     });
+  }
 }
 
 module.exports = Artefact;

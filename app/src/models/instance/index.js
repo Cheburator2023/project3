@@ -41,13 +41,17 @@ class Instance {
       args: { model, key }
     })
 
-  deleteBpmnInstance = (bpmnIds) => this.db
-    .execute({
+  deleteBpmnInstance = (bpmnIds, connection) => {
+    const execFn = connection ? this.db.executeWithConnection : this.db.execute;
+    
+    return execFn.call(this.db, {
+      connection: connection,
       sql: sql.deleteBpmnInstance,
       args: {
         bpmnIds,
       }
     })
+  }
 
   new = ({ model, instance, key }) => this.db
     .execute({

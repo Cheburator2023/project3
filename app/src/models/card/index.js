@@ -504,26 +504,12 @@ class Card {
       return
     }
 
-    const trx = await this.db.beginTransation();
+    const trx = await this.db.beginTransaction();
 
     try {
-      await this.db.executeWithConnection({
-        connection: trx,
-        sql: sql.selectModelForUpdate,
-        args: { model_id: modelId },
-      });
+      await this.lockModelForUpdate(modelId, trx);
 
-      const { rows: activeStatuses = [] } = await this.db.executeWithConnection({
-        connection: trx,
-        sql: `
-        SELECT id, status
-        FROM model_status_source
-        WHERE model_id = :model_id
-          AND source_system = 'Camunda'
-          AND effective_to = TO_TIMESTAMP('9999-12-31 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
-      `,
-        args: { model_id: modelId },
-      });
+      const activeStatuses = await this.getActiveStatuses(modelId, trx);
 
       if (
         activeStatuses.length &&
@@ -533,24 +519,7 @@ class Card {
         return;
       }
 
-      // Завершаем активные статусы
-      for (const { ID } of activeStatuses) {
-        await this.db.executeWithConnection({
-          connection: trx,
-          sql: `UPDATE model_status_source SET effective_to = current_timestamp(0) WHERE id = :id`,
-          args: { id: ID },
-        });
-      }
-
-      // Вставляем новый статус
-      await this.db.executeWithConnection({
-        connection: trx,
-        sql: `
-        INSERT INTO model_status_source (model_id, status, effective_from, effective_to, source_system)
-        VALUES (:model_id, :status, current_timestamp(0), TO_TIMESTAMP('9999-12-31 23:59:59', 'YYYY-MM-DD HH24:MI:SS'), 'Camunda')
-      `,
-        args: { model_id: modelId, status: modelStatus },
-      });
+      await this.doChangeStatus(modelId, modelStatus, activeStatuses, trx);
 
       await this.db.commitTransaction(trx);
     } catch (err) {
@@ -558,6 +527,42 @@ class Card {
       throw err;
     }
   };
+
+  getActiveStatuses = async (modelId, connection) => {
+    const { rows: activeStatuses = [] } = await this.db.executeWithConnection({
+      connection: connection,
+      sql: `
+      SELECT id, status
+      FROM model_status_source
+      WHERE model_id = :model_id
+        AND source_system = 'Camunda'
+        AND effective_to = TO_TIMESTAMP('9999-12-31 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+    `,
+      args: { model_id: modelId },
+    });
+    return activeStatuses;
+  }
+
+  doChangeStatus = async (modelId, modelStatus, activeStatuses, connection) => {
+    // Завершаем активные статусы
+    for (const { ID } of activeStatuses) {
+      await this.db.executeWithConnection({
+        connection: connection,
+        sql: `UPDATE model_status_source SET effective_to = current_timestamp(0) WHERE id = :id`,
+        args: { id: ID },
+      });
+    }
+
+    // Вставляем новый статус
+    await this.db.executeWithConnection({
+      connection: connection,
+      sql: `
+        INSERT INTO model_status_source (model_id, status, effective_from, effective_to, source_system)
+        VALUES (:model_id, :status, current_timestamp(0), TO_TIMESTAMP('9999-12-31 23:59:59', 'YYYY-MM-DD HH24:MI:SS'), 'Camunda')
+      `,
+      args: { model_id: modelId, status: modelStatus },
+    });
+  }
 
   changeStage = ({ modelId, modelStage }) =>
     this.changeStaticModelStage({ modelId, modelStage })
@@ -609,7 +614,7 @@ class Card {
       return;
     }
 
-    const connection = await this.db.beginTransation();
+    const connection = await this.db.beginTransaction();
 
     try {
       const model = await this.db
@@ -660,7 +665,7 @@ class Card {
       return;
     }
 
-    const connection = await this.db.beginTransation();
+    const connection = await this.db.beginTransaction();
 
     try {
       const model = await this.db
@@ -716,26 +721,12 @@ class Card {
       return;
     }
     
-    const trx = await this.db.beginTransation();
+    const trx = await this.db.beginTransaction();
 
     try {
-      await this.db.executeWithConnection({
-        connection: trx,
-        sql: sql.selectModelForUpdate,
-        args: { model_id: modelId },
-      });
+      await this.lockModelForUpdate(modelId, trx);
 
-      const { rows: activeStages = [] } = await this.db.executeWithConnection({
-        connection: trx,
-        sql: `
-        SELECT id, stage
-        FROM model_stage_source
-        WHERE model_id = :model_id
-          AND source_system = 'Camunda'
-          AND effective_to = TO_TIMESTAMP('9999-12-31 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
-      `,
-        args: { model_id: modelId },
-      });
+      const activeStages = await this.getActiveStages(modelId, trx);
 
       if (action === 'add') {
         const exists = activeStages.some(({ STAGE }) => STAGE === stageName);
@@ -777,27 +768,7 @@ class Card {
       }
 
       if (action === 'change') {
-        const keepStage = activeStages.find(({ STAGE }) => STAGE === stageName);
-        const stagesToClose = activeStages.filter(({ STAGE }) => STAGE !== stageName);
-
-        for (const { ID } of stagesToClose) {
-          await this.db.executeWithConnection({
-            connection: trx,
-            sql: `UPDATE model_stage_source SET effective_to = current_timestamp(0) WHERE id = :id`,
-            args: { id: ID },
-          });
-        }
-
-        if (!keepStage) {
-          await this.db.executeWithConnection({
-            connection: trx,
-            sql: `
-            INSERT INTO model_stage_source (model_id, stage, effective_from, effective_to, source_system)
-            VALUES (:model_id, :stage, current_timestamp(0), TO_TIMESTAMP('9999-12-31 23:59:59', 'YYYY-MM-DD HH24:MI:SS'), 'Camunda')
-          `,
-            args: { model_id: modelId, stage: stageName },
-          });
-        }
+        await this.doChangeStage(modelId, stageName, activeStages, trx);
 
         await this.db.commitTransaction(trx);
         return;
@@ -811,6 +782,53 @@ class Card {
       throw err;
     }
   };
+
+  lockModelForUpdate = async (modelId, connection) => {
+    await this.db.executeWithConnection({
+      connection: connection,
+      sql: sql.selectModelForUpdate,
+      args: { model_id: modelId },
+    });
+  }
+
+  getActiveStages = async (modelId, connection) => {
+    const { rows: activeStages = [] } = await this.db.executeWithConnection({
+        connection: connection,
+        sql: `
+        SELECT id, stage
+        FROM model_stage_source
+        WHERE model_id = :model_id
+          AND source_system = 'Camunda'
+          AND effective_to = TO_TIMESTAMP('9999-12-31 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+      `,
+        args: { model_id: modelId },
+      });
+    return activeStages;
+  }
+
+  doChangeStage = async (modelId, stageName, activeStages, connection) => {
+    const keepStage = activeStages.find(({ STAGE }) => STAGE === stageName);
+    const stagesToClose = activeStages.filter(({ STAGE }) => STAGE !== stageName);
+
+    for (const { ID } of stagesToClose) {
+      await this.db.executeWithConnection({
+        connection: connection,
+        sql: `UPDATE model_stage_source SET effective_to = current_timestamp(0) WHERE id = :id`,
+        args: { id: ID },
+      });
+    }
+
+    if (!keepStage) {
+      await this.db.executeWithConnection({
+        connection: connection,
+        sql: `
+        INSERT INTO model_stage_source (model_id, stage, effective_from, effective_to, source_system)
+        VALUES (:model_id, :stage, current_timestamp(0), TO_TIMESTAMP('9999-12-31 23:59:59', 'YYYY-MM-DD HH24:MI:SS'), 'Camunda')
+      `,
+        args: { model_id: modelId, stage: stageName },
+      });
+    }
+  }
 
   /**
    * Validates the consistency of a model's state between the database and Camunda.
@@ -961,18 +979,22 @@ class Card {
     }
   };
 
-  closeStageOverrides = async (modelId) => {
+  closeStageOverrides = async (modelId, connection = null) => {
     if (!modelId) {
       throw new Error('modelId is required to close stage overrides');
     }
 
+    const execFn = connection ? this.db.executeWithConnection : this.db.execute;
+
     try {
-      const resultOverrides = await this.db.execute({
+      const resultOverrides = await execFn.call(this.db, {
+        connection: connection,
         sql: sql.closeStageOverrides,
         args: { model_id: modelId },
       });
 
-      const resultSource = await this.db.execute({
+      const resultSource = await execFn.call(this.db, {
+        connection: connection,
         sql: sql.closeSourceStagesByOverrides,
         args: { model_id: modelId },
       });
@@ -987,18 +1009,22 @@ class Card {
     }
   };
 
-  closeStatusOverrides = async (modelId) => {
+  closeStatusOverrides = async (modelId, connection = null) => {
     if (!modelId) {
       throw new Error('modelId is required to close status overrides');
     }
 
+    const execFn = connection ? this.db.executeWithConnection : this.db.execute;
+
     try {
-      const resultOverrides = await this.db.execute({
+      const resultOverrides = await execFn.call(this.db, {
+        connection: connection,
         sql: sql.closeStatusOverrides,
         args: { model_id: modelId },
       });
 
-      const resultSource = await this.db.execute({
+      const resultSource = await execFn.call(this.db, {
+        connection: connection,
         sql: sql.closeSourceStatusesByOverrides,
         args: { model_id: modelId },
       });
@@ -1011,6 +1037,41 @@ class Card {
       throw new Error(`Failed to close status overrides for model ${modelId}: ${err.message}`);
     }
   };
+
+  rollbackStageAndStatus = async ({ modelId, modelStage, modelStatus }, connection) => {
+    if (!modelId) {
+      throw new Error('modelId is required');
+    }
+
+    if (!connection) {
+      throw new Error('Connection is required for rollbackStageAndStatus');
+    }
+
+    await this.lockModelForUpdate(modelId, connection);
+
+    // Change historic stage
+    const activeStages = await this.getActiveStages(modelId, connection);
+    await this.doChangeStage(modelId, modelStage, activeStages, connection);
+
+    // Close stage overrides
+    await this.closeStageOverrides(modelId, connection);
+
+    // Change historic status
+    const activeStatuses = await this.getActiveStatuses(modelId, connection);
+    await this.doChangeStatus(modelId, modelStatus, activeStatuses, connection);
+
+    // Close status overrides
+    await this.closeStatusOverrides(modelId, connection);
+  }
+
+  getConnectionWithTransaction = () => 
+    this.db.beginTransaction();
+
+  commitTransaction = (connection) => 
+    this.db.commitTransaction(connection);
+
+  rollbackTransaction = (connection) => 
+    this.db.rollbackTransaction(connection);
 }
 
 module.exports = Card;
