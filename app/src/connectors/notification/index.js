@@ -1,7 +1,7 @@
 const scheduler = require('node-schedule');
 const rule = new scheduler.RecurrenceRule();
 const tslgLogger = require('../../utils/logger');
-const { runWithRootSpan } = require('../../utils/tracingContext');
+const { runWithRootSpan, getTracingIds} = require('../../utils/tracingContext');
 
 // your timezone
 rule.tz = 'Europe/Moscow';
@@ -111,6 +111,11 @@ module.exports = async (db, bpmn, integration) => {
 
     return scheduler.scheduleJob(rule, async function () {
         await runWithRootSpan('notification', async () => {
+            const traceIds = getTracingIds();
+            tslgLogger.info(
+                `Notification task started with traceId=${traceIds.traceId}, spanId=${traceIds.spanId}`,
+                'NotificationScheduler'
+            );
             try {
                 tslgLogger.sys('Запуск рассылки уведомлений лидам о неразобранных задачах');
 

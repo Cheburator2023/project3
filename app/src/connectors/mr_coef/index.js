@@ -1,7 +1,7 @@
 const scheduler = require('node-schedule');
 const rule = new scheduler.RecurrenceRule();
 const tslgLogger = require('../../utils/logger');
-const { runWithRootSpan } = require('../../utils/tracingContext');
+const { runWithRootSpan, getTracingIds} = require('../../utils/tracingContext');
 
 const sql1 = require('./sql1');
 const sql2 = require('./sql2');
@@ -19,6 +19,8 @@ rule.dayOfWeek = new scheduler.Range(0, 5);
 
 module.exports = async (db) => scheduler.scheduleJob(rule, async function () {
   await runWithRootSpan('mr_coef_calculation', async () => {
+    const traceIds = getTracingIds();
+    tslgLogger.info(`MR coefficient calculation started with traceId=${traceIds.traceId}, spanId=${traceIds.spanId}`, 'MrCoefScheduler');
     tslgLogger.sys('Перерасчет коэффициента MR.');
 
     try {

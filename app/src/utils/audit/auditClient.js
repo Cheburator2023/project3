@@ -1,6 +1,7 @@
 const fetch = require('isomorphic-fetch');
 const { v4: uuidv4 } = require('uuid');
 const { getTracingIds } = require('../tracingContext');
+const tslgLogger = require('../logger');
 
 /**
  * Клиент для отправки событий аудита в сайдкар audit-sidecar
@@ -29,6 +30,10 @@ class AuditClient {
         if (!this.enabled) return null;
         const correlationId = uuidv4();
         const tracingIds = getTracingIds();
+        tslgLogger.info(
+            `Audit START ${eventCode}, traceId=${tracingIds.traceId}, spanId=${tracingIds.spanId}`,
+            'AuditClient'
+        );
         const payload = {
             eventCode,
             eventClass: 'START',
@@ -55,6 +60,10 @@ class AuditClient {
     async success(eventCode, correlationId, initiatorInfo = {}, additionalFields = {}) {
         if (!this.enabled) return;
         const tracingIds = getTracingIds();
+        tslgLogger.info(
+            `Audit SUCCESS ${eventCode}, traceId=${tracingIds.traceId}, spanId=${tracingIds.spanId}`,
+            'AuditClient'
+        );
         const payload = {
             eventCode,
             eventClass: 'SUCCESS',
@@ -81,6 +90,10 @@ class AuditClient {
     async failure(eventCode, correlationId, error, initiatorInfo = {}, additionalFields = {}) {
         if (!this.enabled) return;
         const tracingIds = getTracingIds();
+        tslgLogger.info(
+            `Audit FAILURE ${eventCode}, traceId=${tracingIds.traceId}, spanId=${tracingIds.spanId}`,
+            'AuditClient'
+        );
         const payload = {
             eventCode,
             eventClass: 'FAILURE',
