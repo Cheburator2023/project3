@@ -1,4 +1,4 @@
-const fetch = require('isomorphic-fetch')
+const {tracedFetch} = require("../../../utils/httpClient");
 const tslgLogger = require('../../../utils/logger');
 
 const teamcityHost = process.env.TEAMCITY_API
@@ -17,7 +17,8 @@ module.exports = ({
     const headers = {}
     headers['Content-Type'] = 'application/json'
 
-    return fetch(
+    // Используем tracedFetch вместо fetch
+    return tracedFetch(
         `${teamcityHost}${path}`,
         {
             method: body ? 'POST' : method,

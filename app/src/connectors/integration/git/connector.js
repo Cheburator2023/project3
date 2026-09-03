@@ -1,4 +1,4 @@
-const fetch = require('isomorphic-fetch')
+const {tracedFetch} = require("../../../utils/httpClient");
 const tslgLogger = require('../../../utils/logger');
 
 const gitHost = process.env.GIT_API
@@ -20,7 +20,8 @@ module.exports = ({
     if (!file)
         headers['Content-Type'] = 'application/json'
 
-    return fetch(
+    // Используем tracedFetch вместо fetch
+    return tracedFetch(
         `${gitHost}${path}`,
         {
             method: body ? 'POST' : method,

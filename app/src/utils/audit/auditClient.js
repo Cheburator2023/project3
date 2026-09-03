@@ -1,5 +1,6 @@
 const fetch = require('isomorphic-fetch');
 const { v4: uuidv4 } = require('uuid');
+const { getTracingIds } = require('../tracingContext');
 
 /**
  * Клиент для отправки событий аудита в сайдкар audit-sidecar
@@ -27,13 +28,18 @@ class AuditClient {
     async start(eventCode, initiatorInfo = {}, additionalFields = {}) {
         if (!this.enabled) return null;
         const correlationId = uuidv4();
+        const tracingIds = getTracingIds();
         const payload = {
             eventCode,
             eventClass: 'START',
             correlationId,
             timestamp: new Date().toISOString(),
             initiator: initiatorInfo,
-            additionalFields,
+            additionalFields: {
+                ...additionalFields,
+                traceId: tracingIds.traceId,
+                spanId: tracingIds.spanId,
+            },
         };
         await this._send(payload);
         return correlationId;
@@ -48,13 +54,18 @@ class AuditClient {
      */
     async success(eventCode, correlationId, initiatorInfo = {}, additionalFields = {}) {
         if (!this.enabled) return;
+        const tracingIds = getTracingIds();
         const payload = {
             eventCode,
             eventClass: 'SUCCESS',
             correlationId,
             timestamp: new Date().toISOString(),
             initiator: initiatorInfo,
-            additionalFields,
+            additionalFields: {
+                ...additionalFields,
+                traceId: tracingIds.traceId,
+                spanId: tracingIds.spanId,
+            },
         };
         await this._send(payload);
     }
@@ -69,6 +80,7 @@ class AuditClient {
      */
     async failure(eventCode, correlationId, error, initiatorInfo = {}, additionalFields = {}) {
         if (!this.enabled) return;
+        const tracingIds = getTracingIds();
         const payload = {
             eventCode,
             eventClass: 'FAILURE',
@@ -77,6 +89,8 @@ class AuditClient {
             initiator: initiatorInfo,
             additionalFields: {
                 ...additionalFields,
+                traceId: tracingIds.traceId,
+                spanId: tracingIds.spanId,
                 errorMessage: error.message,
                 errorStack: error.stack,
             },

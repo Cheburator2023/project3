@@ -2,6 +2,7 @@ const net = require('net');
 const { v4: uuidv4 } = require('uuid');
 const os = require('os');
 const LoggerInterface = require('./LoggerInterface');
+const { getTracingLogFields } = require('../tracingContext');
 
 /**
  * TSLG логгер для production
@@ -226,6 +227,9 @@ class TSLGLogger extends LoggerInterface {
     createLogEntry(level, message, event, error, additionalData) {
         const timestamp = new Date();
 
+        // Получаем поля трассировки
+        const tracingFields = getTracingLogFields();
+
         const logEntry = {
             "@timestamp": timestamp.getTime() / 1000,
             "level": level.toLowerCase(),
@@ -247,6 +251,9 @@ class TSLGLogger extends LoggerInterface {
             "tslgClientVersion": this.config.tslgClientVersion,
             "eventOutcome": event,
             "risCode": this.config.risCode,
+            // Добавляем поля трассировки
+            "dt.trace_id": tracingFields['dt.trace_id'] || undefined,
+            "dt.span_id": tracingFields['dt.span_id'] || undefined,
             ...this.sanitizeData(additionalData)
         };
 

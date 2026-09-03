@@ -1,5 +1,6 @@
 const os = require('os');
 const { v4: uuidv4 } = require('uuid');
+const { getTracingLogFields } = require('../utils/tracingContext');
 
 module.exports =
     ({ user, host, date, requestId, parentId }) =>
@@ -14,6 +15,7 @@ module.exports =
 
             const timestamp = new Date();
             const logId = eventId || uuidv4();
+            const tracingFields = getTracingLogFields();
 
             const logData = {
                 "@timestamp": timestamp.getTime() / 1000,
@@ -42,7 +44,10 @@ module.exports =
                 "tslgClientVersion": "1.0.0",
                 "eventOutcome": event,
                 "sourceUser": user ? user.username : 'System',
-                "sourceUserId": user ? user.id : 'System'
+                "sourceUserId": user ? user.id : 'System',
+                // Добавляем поля трассировки
+                "dt.trace_id": tracingFields['dt.trace_id'] || undefined,
+                "dt.span_id": tracingFields['dt.span_id'] || undefined,
             };
 
             console.siem(JSON.stringify(logData));

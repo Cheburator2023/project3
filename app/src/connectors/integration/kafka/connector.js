@@ -1,4 +1,4 @@
-const fetch = require('isomorphic-fetch')
+const {tracedFetch} = require("../../../utils/httpClient");
 const tslgLogger = require('../../../utils/logger');
 
 const kafkaHost = process.env.KAFKA_API
@@ -22,7 +22,8 @@ module.exports = ({
     const headers = {}
     headers['Content-Type'] = 'application/json'
 
-    return fetch(
+    // Используем tracedFetch вместо fetch
+    return tracedFetch(
         `${kafkaHost}${path}`,
         {
             method: body ? 'POST' : method,

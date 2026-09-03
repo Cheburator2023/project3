@@ -1,4 +1,4 @@
-const fetch = require('isomorphic-fetch')
+const { tracedFetch } = require('../../utils/httpClient')
 const tslgLogger = require('../../utils/logger')
 
 const host = process.env.BPMN_API || 'http://104.208.164.58:8888/engine-rest'
@@ -35,7 +35,8 @@ const connector = ({ path, method = 'GET', body }, context = {}) => {
     }
     const url = `${host}${path}`
 
-    return fetch(url, params)
+    // Используем tracedFetch вместо fetch
+    return tracedFetch(url, params)
         .then(data => {
             const { status, statusText } = data
 
