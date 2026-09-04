@@ -29,7 +29,7 @@ class AuditClient {
     async start(eventCode, initiatorInfo = {}, additionalFields = {}) {
         if (!this.enabled) return null;
         const correlationId = uuidv4();
-        const tracingIds = getTracingIds();
+        const tracingIds = getTracingIds() || { traceId: null, spanId: null };
         tslgLogger.info(
             `Audit START ${eventCode}, traceId=${tracingIds.traceId}, spanId=${tracingIds.spanId}`,
             'AuditClient'
@@ -59,7 +59,7 @@ class AuditClient {
      */
     async success(eventCode, correlationId, initiatorInfo = {}, additionalFields = {}) {
         if (!this.enabled) return;
-        const tracingIds = getTracingIds();
+        const tracingIds = getTracingIds() || { traceId: null, spanId: null };
         tslgLogger.info(
             `Audit SUCCESS ${eventCode}, traceId=${tracingIds.traceId}, spanId=${tracingIds.spanId}`,
             'AuditClient'
@@ -89,7 +89,7 @@ class AuditClient {
      */
     async failure(eventCode, correlationId, error, initiatorInfo = {}, additionalFields = {}) {
         if (!this.enabled) return;
-        const tracingIds = getTracingIds();
+        const tracingIds = getTracingIds() || { traceId: null, spanId: null };
         tslgLogger.info(
             `Audit FAILURE ${eventCode}, traceId=${tracingIds.traceId}, spanId=${tracingIds.spanId}`,
             'AuditClient'
@@ -104,8 +104,8 @@ class AuditClient {
                 ...additionalFields,
                 traceId: tracingIds.traceId,
                 spanId: tracingIds.spanId,
-                errorMessage: error.message,
-                errorStack: error.stack,
+                errorMessage: error?.message || String(error),
+                errorStack: error?.stack || null,
             },
         };
         await this._send(payload);

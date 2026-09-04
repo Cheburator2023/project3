@@ -9,18 +9,28 @@ const TRACING_CONTEXT = 'TracingContext';
  *   - spanId: строка (16 шестнадцатеричных символов) или null
  */
 function getTracingIds() {
-    const currentContext = context.active();
-    const currentSpan = trace.getSpan(currentContext);
-    if (!currentSpan) {
-        tslgLogger.info('No active span, tracing IDs are null', TRACING_CONTEXT);
+    try {
+        const currentContext = context.active();
+        const currentSpan = trace.getSpan(currentContext);
+        if (!currentSpan) {
+            tslgLogger.info('No active span, tracing IDs are null', TRACING_CONTEXT);
+            return { traceId: null, spanId: null };
+        }
+        const spanContext = currentSpan.spanContext();
+        if (!spanContext) {
+            tslgLogger.info('Span context is null, tracing IDs are null', TRACING_CONTEXT);
+            return { traceId: null, spanId: null };
+        }
+        const result = {
+            traceId: spanContext.traceId || null,
+            spanId: spanContext.spanId || null,
+        };
+        tslgLogger.info(`Retrieved traceId=${result.traceId}, spanId=${result.spanId}`, TRACING_CONTEXT);
+        return result;
+    } catch (error) {
+        tslgLogger.error('Error retrieving tracing IDs', TRACING_CONTEXT, error);
         return { traceId: null, spanId: null };
     }
-    const spanContext = currentSpan.spanContext();
-    const result = {
-        traceId: spanContext.traceId,
-        spanId: spanContext.spanId,
-    };
-    tslgLogger.info(`Retrieved traceId=${result.traceId}, spanId=${result.spanId}`, TRACING_CONTEXT);
 }
 
 /**
@@ -49,7 +59,7 @@ async function runWithRootSpan(spanName, fn) {
         try {
             const result = await fn();
             span.setStatus({ code: SpanStatusCode.OK });
-            tslgLogger.info(`Root span ${spanName} completed succsessfully`, TRACING_CONTEXT);
+            tslgLogger.info(`Root span ${spanName} completed successfully`, TRACING_CONTEXT);
             return result;
         } catch (err) {
             span.setStatus({ code: SpanStatusCode.ERROR, message: err.message });
@@ -87,7 +97,7 @@ function getDynatraceHeader() {
     const currentCtx = context.active();
     const header = currentCtx.getValue(Symbol.for('x-dynatrace')) || null;
     if (header) {
-        tslgLogger.info(`Retrived x-dynatrace header from context: ${header}`, TRACING_CONTEXT);
+        tslgLogger.info(`Retrieved x-dynatrace header from context: ${header}`, TRACING_CONTEXT);
     } else {
         tslgLogger.info('No x-dynatrace header in context', TRACING_CONTEXT);
     }
@@ -101,23 +111,26 @@ function getDynatraceHeader() {
  */
 function getOutgoingTraceHeaders() {
     const headers = {};
-    // Стандартный заголовок для W3C Trace Context (добавляется автоматически HttpInstrumentation,
-    // но мы добавим вручную для надёжности)
-    const currentSpan = trace.getSpan(context.active());
-    if (currentSpan) {
-        const spanContext = currentSpan.spanContext();
-        if (spanContext.traceId && spanContext.spanId) {
-            // Формируем traceparent согласно спецификации W3C
-            const traceparent = `00-${spanContext.traceId}-${spanContext.spanId}-01`;
-            headers['traceparent'] = traceparent;
-            tslgLogger.info(`Generated traceparent: ${headers['traceparent']}`, TRACING_CONTEXT);
+    try {
+        // Стандартный заголовок для W3C Trace Context (добавляется автоматически HttpInstrumentation,
+        // но мы добавим вручную для надёжности)
+        const currentSpan = trace.getSpan(context.active());
+        if (currentSpan) {
+            const spanContext = currentSpan.spanContext();
+            if (spanContext && spanContext.traceId && spanContext.spanId) {
+                // Формируем traceparent согласно спецификации W3C
+                headers['traceparent'] = `00-${spanContext.traceId}-${spanContext.spanId}-01`;
+                tslgLogger.info(`Generated traceparent: ${headers['traceparent']}`, TRACING_CONTEXT);
+            }
         }
-    }
-    // Проприетарный заголовок Ключ-Астром
-    const dynatraceHeader = getDynatraceHeader();
-    if (dynatraceHeader) {
-        headers['x-dynatrace'] = dynatraceHeader;
-        tslgLogger.info(`Adding x-dynatrace to outgoing headers: ${dynatraceHeader}`, TRACING_CONTEXT);
+        // Проприетарный заголовок Ключ-Астром
+        const dynatraceHeader = getDynatraceHeader();
+        if (dynatraceHeader) {
+            headers['x-dynatrace'] = dynatraceHeader;
+            tslgLogger.info(`Adding x-dynatrace to outgoing headers: ${dynatraceHeader}`, TRACING_CONTEXT);
+        }
+    } catch (error) {
+        tslgLogger.error('Error generating outgoing trace headers', TRACING_CONTEXT, error);
     }
     if (Object.keys(headers).length === 0) {
         tslgLogger.info('No outgoing trace headers generated', TRACING_CONTEXT);

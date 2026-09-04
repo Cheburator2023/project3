@@ -153,59 +153,87 @@ class System {
     }
   };
 
-  bpmnFinish = async ({ task, taskService }) => {
-    const variables = task.variables.getAll();
-    console.sys("Завершение Бизнес процесса");
-      let correlationId;
-      const initiator = { sub: 'system', channel: 'system', method: 'bpmnFinish' };
-      try {
-          correlationId = await auditClient.start('SUMD_TASKCOMPLETE', initiator, { modelId: variables.model });
-          await this.db.instance.finish({
-        model: variables.model,
-        instance: task.processInstanceId,
-        key: variables.key,
-      });
-      await taskService.complete(task);
+    /**
+     * Завершает бизнес-процесс в Camunda, обновляет статус и этап модели в БД,
+     * отправляет аудит. Обрабатывает ошибки и гарантирует наличие traceId/spanId.
+     */
+    bpmnFinish = async ({ task, taskService }) => {
+        const variables = task.variables.getAll();
+        console.sys("Завершение Бизнес процесса");
+        let correlationId;
+        const initiator = { sub: 'system', channel: 'system', method: 'bpmnFinish' };
 
-      const {modelStage: modelStage, modelStatus: modelStatus} = await acquireStageAndStatusFromCamunda(
-        task.id,
-        task.activityId,
-        task.processDefinitionId,
-        variables,
-        {
-          bpmn: this.bpmn,
-          db: this.db,
-        },
-      );
+        try {
+            // Явно извлекаем modelId с проверкой на undefined
+            const modelId = variables?.model;
+            if (!modelId) {
+                throw new Error('Model ID is missing in task variables');
+            }
 
-      await this.db.card.removeStage({
-        modelId: variables.model,
-        modelStage: modelStage,
-      });
-      if (modelStatus) {
-        await this.db.card.changeStatus({
-          modelId: variables.model,
-          modelStatus: modelStatus ? modelStatus : null,
-        });
-        // проставляем флаг активности если модель перешла в архив (для моделей со статусом из камунды)
-        if (modelStatus === 'Архив') {
-          await this.db.card.editActiveStatus({MODEL_ID: variables.model, MODELS_IS_ACTIVE_FLG: 0});
+            // Старт аудита с передачей modelId
+            correlationId = await auditClient.start('SUMD_TASKCOMPLETE', initiator, { modelId });
+
+            // Завершаем инстанс в БД
+            await this.db.instance.finish({
+                model: modelId,
+                instance: task.processInstanceId,
+                key: variables.key,
+            });
+
+            // Завершаем задачу в Camunda
+            await taskService.complete(task);
+
+            // Получаем статус и этап из Camunda (или маппинга)
+            const { modelStage, modelStatus } = await acquireStageAndStatusFromCamunda(
+                task.id,
+                task.activityId,
+                task.processDefinitionId,
+                variables,
+                {
+                    bpmn: this.bpmn,
+                    db: this.db,
+                },
+            );
+
+            // Обновляем этап модели (удаляем завершённый этап)
+            if (modelStage) {
+                await this.db.card.removeStage({
+                    modelId: modelId,
+                    modelStage: modelStage,
+                });
+            }
+
+            // Обновляем статус модели
+            if (modelStatus) {
+                await this.db.card.changeStatus({
+                    modelId: modelId,
+                    modelStatus: modelStatus,
+                });
+                // проставляем флаг активности если модель перешла в архив (для моделей со статусом из камунды)
+                if (modelStatus === 'Архив') {
+                    await this.db.card.editActiveStatus({ MODEL_ID: modelId, MODELS_IS_ACTIVE_FLG: 0 });
+                }
+            } else {
+                // Если статус не получен из Camunda, проверяем артефакты
+                const currentModelStatus = await this.db.card.getCurrentModelStatus(modelId);
+                if (currentModelStatus?.artefacts_model_status?.split(';').includes('Архив')) {
+                    await this.db.card.editActiveStatus({ MODEL_ID: modelId, MODELS_IS_ACTIVE_FLG: 0 });
+                }
+            }
+
+            // Успешное завершение – аудит SUCCESS
+            await auditClient.success('SUMD_TASKCOMPLETE', correlationId, initiator, { modelId });
+
+        } catch (error) {
+            // Обработка ошибки: отправка FAILURE с fallback-значением modelId
+            const modelId = variables?.model || 'unknown';
+            await auditClient.failure('SUMD_TASKCOMPLETE', correlationId, error, initiator, {
+                modelId,
+                error: error.message,
+            });
+            tslgLogger.error('Error in bpmnFinish', 'SystemError', error);
+            // Ошибка НЕ пробрасывается дальше, чтобы external task не зависал
         }
-      } else {
-        const model = await this.db.card.getCurrentModelStatus(model);
-        // проставляем флаг активности если модель перешла в архив (для моделей со статусом по артефактам)
-        if (model.artefacts_model_status && model.artefacts_model_status.split(';').includes('Архив')) {
-          await this.db.card.editActiveStatus({MODEL_ID: variables.model, MODELS_IS_ACTIVE_FLG: 0});
-        }
-      }
-          await auditClient.success('SUMD_TASKCOMPLETE', correlationId, initiator, { modelId: variables.model });
-      } catch (error) {
-          await auditClient.failure('SUMD_TASKCOMPLETE', correlationId, error, initiator, {
-              modelId: variables.model,
-              error: error.message
-          });
-          tslgLogger.sys(error);
-      }
     };
 
   bpmnStatus = async ({ task, taskService }) => {
