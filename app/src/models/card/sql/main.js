@@ -102,7 +102,28 @@ const sql = `
           ON av.artefact_id = ar.artefact_id
               AND av.artefact_value_id = ar.artefact_value_id
               AND av.artefact_value = ANY (:groups::text[])
-  )) OR ( :is_bc_flg = '0' AND :is_ds_flg = '0' )
+  ))
+  -- PRJ-COMMON-26, 45.3: «Бизнес-партнер стрима» (mipm_stream) —
+  -- видимость по «Стрим-исполнитель» (артефакт 7), аналогично :is_ds_flg
+  OR ( :is_mipm_stream_flg = '1' AND m.model_id IN (
+      SELECT DISTINCT
+          m_tmp.model_id
+      FROM
+          models m_tmp
+      INNER JOIN
+          artefact_realizations ar
+          ON m_tmp.model_id = ar.model_id
+              AND ar.artefact_id = 7
+              AND ar.effective_to = to_timestamp('9999-12-3123:59:59', 'YYYY-MM-DDHH24:MI:SS')
+      INNER JOIN
+          artefacts a
+          ON ar.artefact_id = a.artefact_id
+      INNER JOIN
+          artefact_values av
+          ON av.artefact_id = ar.artefact_id
+              AND av.artefact_value_id = ar.artefact_value_id
+              AND av.artefact_value = ANY (:groups::text[])
+  )) OR ( :is_bc_flg = '0' AND :is_ds_flg = '0' AND :is_mipm_stream_flg = '0' )
   GROUP BY
       m.model_id,
       m.root_model_id,

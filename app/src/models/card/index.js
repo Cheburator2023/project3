@@ -8,7 +8,10 @@ const {
   formatCustomerDeptInfo,
 } = require("./helpers/businessCustomerDepartamentFormatter");
 const { getArguments, groupResponse } = require("./helpers/classificator");
-const { DEPARTMENT_TO_STREAM_MAPPING } = require("../../common/mapping");
+const {
+  DEPARTMENT_TO_STREAM_MAPPING,
+  mapMipmStreamGroups,
+} = require("../../common/mapping");
 const { v4: uuidv4 } = require('uuid');
 const { SYNC_CONFIG } = require("../../common/sumrmConfig");
 const { mergeArtefacts } = require("./helpers/artefactMerger");
@@ -35,6 +38,12 @@ class Card {
 
     if (userGroups.includes("business_customer")) {
       return mapBusinessCustomerDepartments(userGroups);
+    }
+
+    // PRJ-COMMON-26, 45.3: «Бизнес-партнер стрима» (mipm_stream) —
+    // видимость моделей по AD-группам *_mipm_* → «Стрим-исполнитель»
+    if (userGroups.includes("mipm_stream")) {
+      return mapMipmStreamGroups(userGroups);
     }
 
     return userGroups;
@@ -167,6 +176,7 @@ class Card {
       groups: groupsAfterMapping,
       is_ds_flg: user.groups.includes("ds") ? "1" : "0",
       is_bc_flg: user.groups.includes("business_customer") ? "1" : "0",
+      is_mipm_stream_flg: user.groups.includes("mipm_stream") ? "1" : "0",
     };
 
     return this.db
@@ -211,6 +221,7 @@ class Card {
       groups: groupsAfterMapping,
       is_ds_flg: user.groups.includes("ds") ? "1" : "0",
       is_bc_flg: user.groups.includes("business_customer") ? "1" : "0",
+      is_mipm_stream_flg: user.groups.includes("mipm_stream") ? "1" : "0",
     };
 
     const model = await this.db.execute({ sql: sql.one, args }).then((data) => {
