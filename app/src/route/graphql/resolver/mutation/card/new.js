@@ -1,4 +1,7 @@
 const getUserName = require("./helpers");
+const {
+  isBusinessPartner,
+} = require('../../../../../utils/permissions/businessPartnerRestrictions');
 const { applyCreationDefaults } = require("../../../../../models/artefact/helpers/defaults");
 const {
     DEPARTMENT_TO_STREAM_MAPPING,
@@ -29,6 +32,11 @@ module.exports = async (root, args, context) => {
     let correlationId;
 
     try {
+        // PRJ-COMMON-26: Бизнес-партнеру (mipm/mipm_lead) недоступно создание модели
+        if (isBusinessPartner(context.user)) {
+            return null;
+        }
+
         // Старт аудита – начало операции создания модели
         correlationId = await auditClient.start(
             'SUMD_CREATEMODEL',

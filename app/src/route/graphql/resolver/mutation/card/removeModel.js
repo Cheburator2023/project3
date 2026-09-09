@@ -1,4 +1,5 @@
-const availableGroups = ["ds", "ds_lead", "mipm"];
+// PRJ-COMMON-26: mipm/mipm_lead (Бизнес-партнер) лишены возможности вывода модели из эксплуатации
+const availableGroups = ["ds", "ds_lead"];
 const removalInstanceKey = "model_state_transition";
 const auditClient = require('../../../../../utils/audit/auditClient');
 

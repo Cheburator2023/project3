@@ -1,0 +1,60 @@
+/**
+ * PRJ-COMMON-26, задача №3: сокращение полномочий Бизнес-партнера (mipm, mipm_lead)
+ * в карточке модели СУМ.
+ *
+ * Список artefact_tech_label (словарь sumd.artefacts), недоступных для
+ * редактирования ролям mipm/mipm_lead:
+ *   - вкладка «Основная информация»;
+ *   - вкладка «Артефакты».
+ */
+const RESTRICTED_MIPM_ARTEFACT_LABELS = [
+  'model_desc', // Описание модели
+  'model_algorithm', // Тип алгоритма
+  'product_name', // Продукт и область применения модели
+  'developing_model_reason', // Основание для разработки модели
+  'model_type', // Тип/классификация Модели
+  'model_is_used', // Действующая модель/модуль
+  'implementation_decision', // Реквизиты решения о внедрении
+  'model_epic_12', // Этап 12
+  'model_epic_12_date', // Дата решения для эпика 12
+  'rfd', // RFD
+  'model_id', // Идентификатор модели в JIRA
+  'implementation_segment', // Сегмент применения Модели/РС/Алгоритма
+  'significance_validity', // Уровень значимости Модели/РС
+  'group_company', // Компания группы
+  'responsible_for_significance_validity', // Кем определен уровень значимости Модели/РС
+  'dev_model_status_flg', // Модель давно разработана / работает в промышленном контуре
+];
+
+/**
+ * Группы, на которые распространяются ограничения Бизнес-партнера:
+ */
+const BUSINESS_PARTNER_GROUPS = ['mipm', 'mipm_lead', 'mipm_stream'];
+
+/**
+ * Пользователь является Бизнес-партнером (mipm/mipm_lead).
+ *
+ * @param {Object} user - объект текущего пользователя
+ * @returns {boolean}
+ */
+const isBusinessPartner = (user) =>
+  Array.isArray(user && user.groups) &&
+  user.groups.some((group) => BUSINESS_PARTNER_GROUPS.includes(group));
+
+/**
+ * Запрещён ли артефакт для редактирования пользователю с ролью БП.
+ *
+ * @param {Object} user - объект текущего пользователя
+ * @param {string|undefined} artefactTechLabel - tech_label артефакта
+ * @returns {boolean}
+ */
+const isRestrictedForBusinessPartner = (user, artefactTechLabel) =>
+  isBusinessPartner(user) &&
+  RESTRICTED_MIPM_ARTEFACT_LABELS.includes(artefactTechLabel);
+
+module.exports = {
+  RESTRICTED_MIPM_ARTEFACT_LABELS,
+  BUSINESS_PARTNER_GROUPS,
+  isBusinessPartner,
+  isRestrictedForBusinessPartner,
+};

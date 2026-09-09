@@ -15,6 +15,13 @@ module.exports = async (root, args, context) => {
     )
         return true
 
+    // PRJ-COMMON-26, 45.3: «Бизнес-партнер стрима» (mipm_stream) НЕ может добавлять
+    // пользователей ни в одну группу на вкладке «Ответственные»
+    const assignerGroups = context.user && context.user.groups;
+    if (Array.isArray(assignerGroups) && assignerGroups.includes('mipm_stream')) {
+        return false;
+    }
+
     return context.db.user
         .addUser(args, context.user)
         .then(d => {
