@@ -16,6 +16,6 @@ const sql = `
         :ROLLED_BACK_FROM,
         (SELECT CURRENT_TIMESTAMP)
     )
-`;
+`
 
-module.exports = sql;
+module.exports = sql
