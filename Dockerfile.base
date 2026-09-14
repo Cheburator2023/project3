@@ -1,0 +1,12 @@
+### build commands
+# docker login -u vtbXXXXXXXXX@corp.dev.vtb docker.repo-ci.sfera.inno.local/sumd-docker-lib
+# docker buildx build --platform=linux/amd64 . -f ./Dockerfile.base -t docker.repo-ci.sfera.inno.local/sumd-docker-lib/ubi8-sum-backend:v2.0.0 --progress=plain --no-cache
+# docker push docker.repo-ci.sfera.inno.local/sumd-docker-lib/ubi8-sum-backend:v2.0.0
+
+FROM docker.repo-ci.sfera.inno.local/sumd-docker-lib/ubi8-base-backend:v1.0.1
+
+WORKDIR /app
+COPY app/package.json /app/package.json
+
+RUN npm config set audit false && \
+    npm i --only-production
