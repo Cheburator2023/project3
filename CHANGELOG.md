@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.41.1](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.41.0...v1.41.1) (2026-09-11)
+
+
+### Bug Fixes
+
+* typo fix ([3a6cd2a](https://git.sfera.inno.local:7999/SUMD/backend/commit/3a6cd2ae85198a13c9fce8e7a47a2c36f364d4cd))
+
 # [1.41.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.40.0...v1.41.0) (2026-08-18)
 
 
