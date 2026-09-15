@@ -1,34 +1,53 @@
 const { context, trace, SpanStatusCode } = require('@opentelemetry/api');
-const tslgLogger = require('./logger');
-const TRACING_CONTEXT = 'TracingContext';
+
+/**
+ * Флаг для отладочного вывода в tracingContext.
+ * Включается через переменную окружения DEBUG_TRACING=true.
+ * Вывод идёт напрямую в stdout, минуя логгер, чтобы не создавать циклическую зависимость.
+ */
+const DEBUG_TRACING = process.env.DEBUG_TRACING === 'true';
+
+/**
+ * Прямой вывод отладочного сообщения в stdout, минуя логгер.
+ * Используется только внутри tracingContext для предотвращения рекурсии.
+ */
+function debugLog(message) {
+    if (DEBUG_TRACING) {
+        process.stdout.write(`[TracingContext][DEBUG] ${message}\n`);
+    }
+}
 
 /**
  * Получает текущий trace_id и span_id из активного контекста OpenTelemetry.
  * Возвращает объект с полями:
  *   - traceId: строка (32 шестнадцатеричных символа) или null
  *   - spanId: строка (16 шестнадцатеричных символов) или null
+ *
+ * ВАЖНО: функция НЕ должна использовать логгер, так как вызывается из
+ * TSLGLogger.createLogEntry() -> getTracingLogFields() -> getTracingIds().
+ * Использование логгера здесь приводило бы к бесконечной рекурсии.
  */
 function getTracingIds() {
     try {
         const currentContext = context.active();
         const currentSpan = trace.getSpan(currentContext);
         if (!currentSpan) {
-            tslgLogger.info('No active span, tracing IDs are null', TRACING_CONTEXT);
+            debugLog('No active span, tracing IDs are null');
             return { traceId: null, spanId: null };
         }
         const spanContext = currentSpan.spanContext();
         if (!spanContext) {
-            tslgLogger.info('Span context is null, tracing IDs are null', TRACING_CONTEXT);
+            debugLog('Span context is null, tracing IDs are null');
             return { traceId: null, spanId: null };
         }
         const result = {
             traceId: spanContext.traceId || null,
             spanId: spanContext.spanId || null,
         };
-        tslgLogger.info(`Retrieved traceId=${result.traceId}, spanId=${result.spanId}`, TRACING_CONTEXT);
+        debugLog(`Retrieved traceId=${result.traceId}, spanId=${result.spanId}`);
         return result;
     } catch (error) {
-        tslgLogger.error('Error retrieving tracing IDs', TRACING_CONTEXT, error);
+        debugLog(`Error retrieving tracing IDs: ${error.message}`);
         return { traceId: null, spanId: null };
     }
 }
@@ -53,18 +72,18 @@ function getTracingLogFields() {
  * @returns {Promise<any>} результат fn
  */
 async function runWithRootSpan(spanName, fn) {
-    tslgLogger.info(`Starting root span for background task: ${spanName}`, TRACING_CONTEXT);
+    debugLog(`Starting root span for background task: ${spanName}`);
     const tracer = trace.getTracer('sum-background');
     return tracer.startActiveSpan(spanName, async (span) => {
         try {
             const result = await fn();
             span.setStatus({ code: SpanStatusCode.OK });
-            tslgLogger.info(`Root span ${spanName} completed successfully`, TRACING_CONTEXT);
+            debugLog(`Root span ${spanName} completed successfully`);
             return result;
         } catch (err) {
             span.setStatus({ code: SpanStatusCode.ERROR, message: err.message });
             span.recordException(err);
-            tslgLogger.error(`Root span ${spanName} failed`, TRACING_CONTEXT, err);
+            debugLog(`Root span ${spanName} failed: ${err.message}`);
             throw err;
         } finally {
             span.end();
@@ -79,14 +98,14 @@ async function runWithRootSpan(spanName, fn) {
  */
 function setDynatraceHeader(headerValue) {
     if (!headerValue) {
-        tslgLogger.info('No x-dynatrace header to set', TRACING_CONTEXT);
+        debugLog('No x-dynatrace header to set');
         return;
     }
     const currentCtx = context.active();
     // Сохраняем как пользовательский атрибут контекста
     const newCtx = currentCtx.setValue(Symbol.for('x-dynatrace'), headerValue);
     context.with(newCtx, () => {});
-    tslgLogger.info(`x-dynatrace header set in context: ${headerValue}`, TRACING_CONTEXT);
+    debugLog(`x-dynatrace header set in context: ${headerValue}`);
 }
 
 /**
@@ -97,9 +116,9 @@ function getDynatraceHeader() {
     const currentCtx = context.active();
     const header = currentCtx.getValue(Symbol.for('x-dynatrace')) || null;
     if (header) {
-        tslgLogger.info(`Retrieved x-dynatrace header from context: ${header}`, TRACING_CONTEXT);
+        debugLog(`Retrieved x-dynatrace header from context: ${header}`);
     } else {
-        tslgLogger.info('No x-dynatrace header in context', TRACING_CONTEXT);
+        debugLog('No x-dynatrace header in context');
     }
     return header;
 }
@@ -120,20 +139,20 @@ function getOutgoingTraceHeaders() {
             if (spanContext && spanContext.traceId && spanContext.spanId) {
                 // Формируем traceparent согласно спецификации W3C
                 headers['traceparent'] = `00-${spanContext.traceId}-${spanContext.spanId}-01`;
-                tslgLogger.info(`Generated traceparent: ${headers['traceparent']}`, TRACING_CONTEXT);
+                debugLog(`Generated traceparent: ${headers['traceparent']}`);
             }
         }
         // Проприетарный заголовок Ключ-Астром
         const dynatraceHeader = getDynatraceHeader();
         if (dynatraceHeader) {
             headers['x-dynatrace'] = dynatraceHeader;
-            tslgLogger.info(`Adding x-dynatrace to outgoing headers: ${dynatraceHeader}`, TRACING_CONTEXT);
+            debugLog(`Adding x-dynatrace to outgoing headers: ${dynatraceHeader}`);
         }
     } catch (error) {
-        tslgLogger.error('Error generating outgoing trace headers', TRACING_CONTEXT, error);
+        debugLog(`Error generating outgoing trace headers: ${error.message}`);
     }
     if (Object.keys(headers).length === 0) {
-        tslgLogger.info('No outgoing trace headers generated', TRACING_CONTEXT);
+        debugLog('No outgoing trace headers generated');
     }
     return headers;
 }
