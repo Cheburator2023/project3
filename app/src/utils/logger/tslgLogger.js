@@ -2,6 +2,7 @@ const net = require('net');
 const { v4: uuidv4 } = require('uuid');
 const os = require('os');
 const LoggerInterface = require('./LoggerInterface');
+const { getTracingLogFields } = require('../tracingContext');
 
 /**
  * TSLG логгер для production
@@ -21,11 +22,19 @@ class TSLGLogger extends LoggerInterface {
         this.config = this.mergeWithDefaults(config);
         this.metrics = this.initializeMetrics();
 
+        // Используем истинный нативный console, если ConsoleOverride уже применён.
+        // ConsoleOverride сохраняет оригинальные методы в console.original.
+        // Это предотвращает двойное прохождение логов через переопределённый console
+        // и любые побочные эффекты (в т.ч. потенциальную рекурсию).
+        const nativeConsole = (typeof console !== 'undefined' && console.original) || console;
         this.originalConsole = {
-            log: console.log,
-            error: console.error,
-            warn: console.warn,
-            info: console.info
+            log: nativeConsole.log.bind(nativeConsole),
+            error: nativeConsole.error.bind(nativeConsole),
+            warn: nativeConsole.warn.bind(nativeConsole),
+            info: nativeConsole.info.bind(nativeConsole),
+            debug: nativeConsole.debug
+                ? nativeConsole.debug.bind(nativeConsole)
+                : nativeConsole.log.bind(nativeConsole),
         };
 
         this.initializeBuffer();
@@ -226,6 +235,9 @@ class TSLGLogger extends LoggerInterface {
     createLogEntry(level, message, event, error, additionalData) {
         const timestamp = new Date();
 
+        // Получаем поля трассировки
+        const tracingFields = getTracingLogFields();
+
         const logEntry = {
             "@timestamp": timestamp.getTime() / 1000,
             "level": level.toLowerCase(),
@@ -247,6 +259,9 @@ class TSLGLogger extends LoggerInterface {
             "tslgClientVersion": this.config.tslgClientVersion,
             "eventOutcome": event,
             "risCode": this.config.risCode,
+            // Добавляем поля трассировки
+            "dt.trace_id": tracingFields['dt.trace_id'] || undefined,
+            "dt.span_id": tracingFields['dt.span_id'] || undefined,
             ...this.sanitizeData(additionalData)
         };
 
@@ -327,6 +342,10 @@ class TSLGLogger extends LoggerInterface {
         } else {
             this.originalConsole.log(logMessage);
         }
+    }
+
+    debug(message, event = 'Отладка', additionalData = {}) {
+        this.log('debug', message, event, null, additionalData);
     }
 
     info(message, event = 'Информация', additionalData = {}) {

@@ -7,11 +7,6 @@ class Git {
         this.integration = integration
     }
 
-    static consoleDebug(...args) {
-        const consoleToUse = console.original?.log || console.log;
-        consoleToUse('[DEBUG}', ...args);
-    }
-
     firstValidationLinks = async ({ task, taskService }) => {
         const variables = task.variables.getAll();
 
@@ -68,7 +63,7 @@ class Git {
                     taskId: task.id,
                     error: error.message
                 };
-                Git.consoleDebug(debugMessage, debugData);
+                tslgLogger.debug(debugMessage, 'Отладка', debugData);
             }
             throw error;
         }

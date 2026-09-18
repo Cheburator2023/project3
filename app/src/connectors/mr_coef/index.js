@@ -1,6 +1,7 @@
 const scheduler = require('node-schedule');
 const rule = new scheduler.RecurrenceRule();
 const tslgLogger = require('../../utils/logger');
+const { runWithRootSpan, getTracingIds} = require('../../utils/tracingContext');
 
 const sql1 = require('./sql1');
 const sql2 = require('./sql2');
@@ -17,36 +18,40 @@ rule.second = 00;
 rule.dayOfWeek = new scheduler.Range(0, 5);
 
 module.exports = async (db) => scheduler.scheduleJob(rule, async function () {
-  tslgLogger.sys('Перерасчет коэффициента MR.');
+  await runWithRootSpan('mr_coef_calculation', async () => {
+    const traceIds = getTracingIds();
+    tslgLogger.info(`MR coefficient calculation started with traceId=${traceIds.traceId}, spanId=${traceIds.spanId}`, 'MrCoefScheduler');
+    tslgLogger.sys('Перерасчет коэффициента MR.');
 
-  try {
-    const result = await db.execute({
-      sql: sql1,
-      args: {},
-    }).then(data => {
-      tslgLogger.info('Шаг 1 перерасчета коэффициента MR выполнен успешно', 'ПерерасчетMR', {
-        rowsAffected: data?.rowCount || 0
-      });
-
-      const status = true;
-
-      if (status) {
-        return db.execute({
-          sql: sql2,
-          args: {},
+    try {
+      const result = await db.execute({
+        sql: sql1,
+        args: {},
+      }).then(data => {
+        tslgLogger.info('Шаг 1 перерасчета коэффициента MR выполнен успешно', 'ПерерасчетMR', {
+          rowsAffected: data?.rowCount || 0
         });
-      }
 
-      throw new Error('Ошибка шага 1.');
-    }).then(data => {
-      tslgLogger.info('Шаг 2 перерасчета коэффициента MR выполнен успешно', 'ПерерасчетMR', {
-        rowsAffected: data?.rowCount || 0
+        const status = true;
+
+        if (status) {
+          return db.execute({
+            sql: sql2,
+            args: {},
+          });
+        }
+
+        throw new Error('Ошибка шага 1.');
+      }).then(data => {
+        tslgLogger.info('Шаг 2 перерасчета коэффициента MR выполнен успешно', 'ПерерасчетMR', {
+          rowsAffected: data?.rowCount || 0
+        });
+        return 'success';
       });
-      return 'success';
-    });
 
-    tslgLogger.sys(`Перерасчет коэффициента MR завершен. Статус: ${result}.`);
-  } catch (e) {
-    tslgLogger.error('Ошибка перерасчета коэффициента MR', 'ОшибкаПерерасчетаMR', e);
-  }
+      tslgLogger.sys(`Перерасчет коэффициента MR завершен. Статус: ${result}.`);
+    } catch (e) {
+      tslgLogger.error('Ошибка перерасчета коэффициента MR', 'ОшибкаПерерасчетаMR', e);
+    }
+  });
 });

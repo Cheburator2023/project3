@@ -7,11 +7,6 @@ class Mail {
     this.integration = integration;
   }
 
-    static consoleDebug(...args) {
-        const consoleToUse = console.original?.log || console.log;
-        consoleToUse('[DEBUG}', ...args);
-    }
-
   main = async ({ task, taskService }) => {
     const variables = task.variables.getAll();
     const template_name = variables.template_name;
@@ -185,7 +180,7 @@ class Mail {
           taskId: task.id,
           error: error.message
         };
-        Mail.consoleDebug(debugMessage, debugData);
+        tslgLogger.debug(debugMessage, 'Отладка', debugData);
       }
     }
   };

@@ -6,6 +6,8 @@ const https = require('https');
 const http = require('http');
 
 const server = require('./server');
+const {initTracing} = require("./utils/opentelemetry/opentelemetry");
+initTracing();
 
 class Application {
   constructor() {

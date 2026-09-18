@@ -1,5 +1,7 @@
 const fetch = require('isomorphic-fetch');
 const { v4: uuidv4 } = require('uuid');
+const { getTracingIds } = require('../tracingContext');
+const tslgLogger = require('../logger');
 
 /**
  * Клиент для отправки событий аудита в сайдкар audit-sidecar
@@ -27,13 +29,18 @@ class AuditClient {
     async start(eventCode, initiatorInfo = {}, additionalFields = {}) {
         if (!this.enabled) return null;
         const correlationId = uuidv4();
+        const tracingIds = getTracingIds() || { traceId: null, spanId: null };
         const payload = {
             eventCode,
             eventClass: 'START',
             correlationId,
             timestamp: new Date().toISOString(),
             initiator: initiatorInfo,
-            additionalFields,
+            additionalFields: {
+                ...additionalFields,
+                traceId: tracingIds.traceId,
+                spanId: tracingIds.spanId,
+            },
         };
         await this._send(payload);
         return correlationId;
@@ -48,13 +55,18 @@ class AuditClient {
      */
     async success(eventCode, correlationId, initiatorInfo = {}, additionalFields = {}) {
         if (!this.enabled) return;
+        const tracingIds = getTracingIds() || { traceId: null, spanId: null };
         const payload = {
             eventCode,
             eventClass: 'SUCCESS',
             correlationId,
             timestamp: new Date().toISOString(),
             initiator: initiatorInfo,
-            additionalFields,
+            additionalFields: {
+                ...additionalFields,
+                traceId: tracingIds.traceId,
+                spanId: tracingIds.spanId,
+            },
         };
         await this._send(payload);
     }
@@ -69,6 +81,7 @@ class AuditClient {
      */
     async failure(eventCode, correlationId, error, initiatorInfo = {}, additionalFields = {}) {
         if (!this.enabled) return;
+        const tracingIds = getTracingIds() || { traceId: null, spanId: null };
         const payload = {
             eventCode,
             eventClass: 'FAILURE',
@@ -77,8 +90,10 @@ class AuditClient {
             initiator: initiatorInfo,
             additionalFields: {
                 ...additionalFields,
-                errorMessage: error.message,
-                errorStack: error.stack,
+                traceId: tracingIds.traceId,
+                spanId: tracingIds.spanId,
+                errorMessage: error?.message || String(error),
+                errorStack: error?.stack || null,
             },
         };
         await this._send(payload);
@@ -88,9 +103,13 @@ class AuditClient {
      * Внутренний метод отправки HTTP-запроса в сайдкар.
      */
     async _send(payload) {
-        const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error(`Audit sidecar timeout after ${this.timeout} ms`)), this.timeout)
-        );
+        let timeoutHandle;
+        const timeoutPromise = new Promise((_, reject) => {
+            timeoutHandle = setTimeout(
+                () => reject(new Error(`Audit sidecar timeout after ${this.timeout} ms`)),
+                this.timeout
+            );
+        });
         const fetchPromise = fetch(this.sidecarUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -102,9 +121,29 @@ class AuditClient {
                 const errorText = await response.text();
                 throw new Error(`Audit sidecar responded with ${response.status}: ${errorText}`);
             }
-            console.debug(`[Audit] ${payload.eventClass}/${payload.eventCode} sent, correlationId=${payload.correlationId}`);
+            tslgLogger.debug(
+                `[Audit] ${payload.eventClass}/${payload.eventCode} sent, correlationId=${payload.correlationId}`,
+                'AuditClient',
+                {
+                    eventCode: payload.eventCode,
+                    eventClass: payload.eventClass,
+                    correlationId: payload.correlationId,
+                }
+            );
         } catch (error) {
-            console.error(`[Audit] Failed to send ${payload.eventClass}/${payload.eventCode}:`, error.message);
+            tslgLogger.debug(
+                `[Audit] Failed to send ${payload.eventClass}/${payload.eventCode}`,
+                'AuditClient',
+                {
+                    eventCode: payload.eventCode,
+                    eventClass: payload.eventClass,
+                    correlationId: payload.correlationId,
+                }
+            );
+        } finally {
+            if (timeoutHandle) {
+                clearTimeout(timeoutHandle);
+            }
         }
     }
 }
