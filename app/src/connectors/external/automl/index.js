@@ -9,11 +9,6 @@ class AutoMl {
     this.bpmn = bpmn;
   }
 
-    static consoleDebug(...args) {
-        const consoleToUse = console.original?.log || console.log;
-        consoleToUse('[DEBUG}', ...args);
-    }
-
   createModel = async ({ task, taskService }) => {
     const vars = task.variables.getAll();
 
@@ -171,7 +166,7 @@ class AutoMl {
                 modelId: model,
                 taskId: task.id
             };
-            AutoMl.consoleDebug(debugMessage, debugData);
+            tslgLogger.debug(debugMessage, 'Отладка', debugData);
         }
       throw error;
     }

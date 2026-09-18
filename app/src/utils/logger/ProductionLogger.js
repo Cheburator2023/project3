@@ -87,6 +87,10 @@ class ProductionLogger extends LoggerInterface {
         }
     }
 
+    debug(message, event = 'Отладка', additionalData = {}) {
+        this.log('debug', message, event, null, additionalData);
+    }
+
     info(message, event = 'Информация', additionalData = {}) {
         this.log('info', message, event, null, additionalData);
     }

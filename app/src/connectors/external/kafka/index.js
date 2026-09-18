@@ -6,12 +6,6 @@ class Kafka {
     this.db = db;
     this.integration = integration;
   }
-
-    static consoleDebug(...args) {
-        const consoleToUse = console.original?.log || console.log;
-        consoleToUse('[DEBUG}', ...args);
-    }
-
   kafka_createNewStrategy = async ({ task, taskService }) => {
     const variables = task.variables.getAll();
 
@@ -68,7 +62,7 @@ class Kafka {
                 taskId: task.id,
                 error: error.message
             };
-            Kafka.consoleDebug(debugMessage, debugData);
+            tslgLogger.debug(debugMessage, 'Отладка', debugData);
         }
         await auditClient.failure('SUMD_CREATEMODEL', correlationId, error, initiator, { modelId: variables.model });
         throw error;
@@ -131,7 +125,7 @@ class Kafka {
                 taskId: task.id,
                 error: error.message
             };
-            Kafka.consoleDebug(debugMessage, debugData);
+            tslgLogger.debug(debugMessage, 'Отладка', debugData);
         }
       await auditClient.failure('SUMD_CREATEMODEL', correlationId, error, initiator, { modelId: variables.model });
       throw error;

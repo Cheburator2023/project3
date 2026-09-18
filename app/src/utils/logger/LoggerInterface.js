@@ -6,6 +6,10 @@ class LoggerInterface {
         throw new Error('Method not implemented');
     }
 
+    debug(message, event = 'Отладка', additionalData = {}) {
+        throw new Error('Method not implemented');
+    }
+
     info(message, event = 'Информация', additionalData = {}) {
         throw new Error('Method not implemented');
     }

@@ -30,10 +30,6 @@ class AuditClient {
         if (!this.enabled) return null;
         const correlationId = uuidv4();
         const tracingIds = getTracingIds() || { traceId: null, spanId: null };
-        tslgLogger.info(
-            `Audit START ${eventCode}, traceId=${tracingIds.traceId}, spanId=${tracingIds.spanId}`,
-            'AuditClient'
-        );
         const payload = {
             eventCode,
             eventClass: 'START',
@@ -60,10 +56,6 @@ class AuditClient {
     async success(eventCode, correlationId, initiatorInfo = {}, additionalFields = {}) {
         if (!this.enabled) return;
         const tracingIds = getTracingIds() || { traceId: null, spanId: null };
-        tslgLogger.info(
-            `Audit SUCCESS ${eventCode}, traceId=${tracingIds.traceId}, spanId=${tracingIds.spanId}`,
-            'AuditClient'
-        );
         const payload = {
             eventCode,
             eventClass: 'SUCCESS',
@@ -90,10 +82,6 @@ class AuditClient {
     async failure(eventCode, correlationId, error, initiatorInfo = {}, additionalFields = {}) {
         if (!this.enabled) return;
         const tracingIds = getTracingIds() || { traceId: null, spanId: null };
-        tslgLogger.info(
-            `Audit FAILURE ${eventCode}, traceId=${tracingIds.traceId}, spanId=${tracingIds.spanId}`,
-            'AuditClient'
-        );
         const payload = {
             eventCode,
             eventClass: 'FAILURE',
@@ -115,9 +103,13 @@ class AuditClient {
      * Внутренний метод отправки HTTP-запроса в сайдкар.
      */
     async _send(payload) {
-        const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error(`Audit sidecar timeout after ${this.timeout} ms`)), this.timeout)
-        );
+        let timeoutHandle;
+        const timeoutPromise = new Promise((_, reject) => {
+            timeoutHandle = setTimeout(
+                () => reject(new Error(`Audit sidecar timeout after ${this.timeout} ms`)),
+                this.timeout
+            );
+        });
         const fetchPromise = fetch(this.sidecarUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -129,9 +121,30 @@ class AuditClient {
                 const errorText = await response.text();
                 throw new Error(`Audit sidecar responded with ${response.status}: ${errorText}`);
             }
-            console.debug(`[Audit] ${payload.eventClass}/${payload.eventCode} sent, correlationId=${payload.correlationId}`);
+            tslgLogger.debug(
+                `[Audit] ${payload.eventClass}/${payload.eventCode} sent, correlationId=${payload.correlationId}`,
+                'AuditClient',
+                {
+                    eventCode: payload.eventCode,
+                    eventClass: payload.eventClass,
+                    correlationId: payload.correlationId,
+                }
+            );
         } catch (error) {
-            console.error(`[Audit] Failed to send ${payload.eventClass}/${payload.eventCode}:`, error.message);
+            tslgLogger.error(
+                `[Audit] Failed to send ${payload.eventClass}/${payload.eventCode}`,
+                'AuditClient',
+                error,
+                {
+                    eventCode: payload.eventCode,
+                    eventClass: payload.eventClass,
+                    correlationId: payload.correlationId,
+                }
+            );
+        } finally {
+            if (timeoutHandle) {
+                clearTimeout(timeoutHandle);
+            }
         }
     }
 }
