@@ -131,10 +131,9 @@ class AuditClient {
                 }
             );
         } catch (error) {
-            tslgLogger.error(
+            tslgLogger.debug(
                 `[Audit] Failed to send ${payload.eventClass}/${payload.eventCode}`,
                 'AuditClient',
-                error,
                 {
                     eventCode: payload.eventCode,
                     eventClass: payload.eventClass,
