@@ -1,6 +1,7 @@
 const session = require('express-session');
 const Keycloak = require('keycloak-connect');
 const auditClient = require('../../utils/audit/auditClient');
+const AuditInitiatorHelper = require('../../utils/audit/auditInitiatorHelper');
 const tslgLogger = require('../../utils/logger');
 
 
@@ -76,15 +77,15 @@ module.exports = {
             // Помечаем токен как обработанный
             sentAuditCache.set(jti, Date.now());
 
-            // Формирование информации об инициаторе
-            const initiatorInfo = {
-                sub: req.context.user.preferred_username || req.context.user.username || 'system',
-                realm: context.realm || 'staff',
-                channel: 'http',
-                url: req.url,
-                method: req.method,
-                sourceIp: req.ip || '127.0.0.1'
-            };
+            // Формирование информации об инициаторе через единый хелпер
+            const initiatorInfo = AuditInitiatorHelper.build(
+                { user: req.context.user, req },
+                {
+                    channel: 'http',
+                    url: req.url,
+                    method: req.method,
+                }
+            );
 
             let correlationId;
             try {
@@ -102,7 +103,7 @@ module.exports = {
             } catch (error) {
                 // Ошибка аудита не должна блокировать основной запрос
                 if (process.env.NODE_ENV !== 'production') {
-                    tslgLogger.debug(`Ошибка отправки сообщения в Аудит: ${error.msg}`, {
+                    tslgLogger.debug(`Ошибка отправки сообщения в Аудит: ${error.message}`, {
                         system: 'AUDIT',
                         error: error.message
                     });

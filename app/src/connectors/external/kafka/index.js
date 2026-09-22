@@ -1,5 +1,6 @@
 const tslgLogger = require('../../../utils/logger');
 const auditClient = require('../../../utils/audit/auditClient');
+const AuditInitiatorHelper = require('../../../utils/audit/auditInitiatorHelper');
 
 class Kafka {
   constructor(db, integration) {
@@ -9,8 +10,12 @@ class Kafka {
   kafka_createNewStrategy = async ({ task, taskService }) => {
     const variables = task.variables.getAll();
 
-      const initiator = { sub: 'kafka', channel: 'kafka', method: 'kafka_createNewStrategy' };
-      let correlationId;
+    const initiator = AuditInitiatorHelper.build({}, {
+      channel: 'kafka',
+      sub: 'kafka',
+      method: 'kafka_createNewStrategy',
+    });
+    let correlationId;
 
     tslgLogger.info(`Создание новой стратегии через Kafka`, 'СозданиеСтратегииKafka', {
       modelId: variables.model,
@@ -71,7 +76,11 @@ class Kafka {
 
   createNewModel = async ({ task, taskService }) => {
     const variables = task.variables.getAll();
-    const initiator = { sub: 'kafka', channel: 'kafka', method: 'createNewModel' };
+    const initiator = AuditInitiatorHelper.build({}, {
+      channel: 'kafka',
+      sub: 'kafka',
+      method: 'createNewModel',
+    });
     let correlationId;
 
     tslgLogger.info(`Создание новой модели через Kafka`, 'СозданиеМоделиKafka', {
@@ -134,7 +143,11 @@ class Kafka {
 
   archiveModel = async ({ task, taskService }) => {
     const variables = task.variables.getAll();
-    const initiator = { sub: 'kafka', channel: 'kafka', method: 'archiveModel' };
+    const initiator = AuditInitiatorHelper.build({}, {
+      channel: 'kafka',
+      sub: 'kafka',
+      method: 'archiveModel',
+    });
     let correlationId;
 
     tslgLogger.info(`Архивация модели через Kafka`, 'АрхивацияМоделиKafka', {

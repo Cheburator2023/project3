@@ -1,17 +1,15 @@
 const availableGroups = ["ds", "ds_lead", "mipm"];
 const cancelInstanceKey = "model_state_transition";
 const auditClient = require('../../../../../utils/audit/auditClient');
+const AuditInitiatorHelper = require('../../../../../utils/audit/auditInitiatorHelper');
 
 module.exports = async (root, args, context) => {
     // Формирование информации об инициаторе для аудита
-    const initiatorInfo = {
-        sub: context.user?.preferred_username || context.user?.username || 'system',
-        realm: context.user?.realm || 'staff',
+    const initiatorInfo = AuditInitiatorHelper.build(context, {
         channel: 'graphql',
         url: '/graphql/mutation/cancelModel',
         method: 'cancelModel',
-        sourceIp: context.req?.ip || '127.0.0.1'
-    };
+    });
     let correlationId;
 
     try {

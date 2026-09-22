@@ -1,5 +1,6 @@
 const xlsx = require('excel4node')
 const auditClient = require('../../../utils/audit/auditClient');
+const AuditInitiatorHelper = require('../../../utils/audit/auditInitiatorHelper');
 
 const status = {
   main: "Процесс родитель",
@@ -58,14 +59,14 @@ const cutWorksheetName = (name) => {
 
 module.exports = async (req, res, next) => {
     // Формирование информации об инициаторе для аудита
-    const initiatorInfo = {
-        sub: req.context?.user?.preferred_username || req.context?.user?.username || 'system',
-        realm: req.context?.user?.realm || 'staff',
-        channel: 'rest',
-        url: req.url,
-        method: req.method,
-        sourceIp: req.ip || '127.0.0.1'
-    };
+    const initiatorInfo = AuditInitiatorHelper.build(
+        req.context,
+        {
+            channel: 'rest',
+            url: req.url,
+            method: req.method,
+        }
+    );
     let correlationId;
 
     try {

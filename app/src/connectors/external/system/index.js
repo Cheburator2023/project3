@@ -3,6 +3,7 @@ const { Variables } = require("camunda-external-task-client-js");
 const { model_status } = require("../../../common/status-map");
 const { getLastActiveStatus, acquireStageAndStatusFromCamunda } = require("../../../common/status-helpers");
 const auditClient = require('../../../utils/audit/auditClient');
+const AuditInitiatorHelper = require('../../../utils/audit/auditInitiatorHelper');
 const tslgLogger = require('../../../utils/logger');
 
 class System {
@@ -13,7 +14,11 @@ class System {
 
     endEvent = async ({task, taskService}) => {
         let correlationId;
-        const initiator = {sub: 'system', channel: 'system', method: 'endEvent'};
+        const initiator = AuditInitiatorHelper.build({}, {
+            channel: 'system',
+            sub: 'system',
+            method: 'endEvent',
+        });
         try {
             correlationId = await auditClient.start('SUMD_TASKCOMPLETE', initiator, {taskId: task.id});
             console.log("Remove parallel call activity");
@@ -38,7 +43,11 @@ class System {
     // Update model data in DB
     updateModelInfo = async ({ task, taskService }) => {
         let correlationId;
-        const initiator = { sub: 'system', channel: 'system', method: 'updateModelInfo' };
+        const initiator = AuditInitiatorHelper.build({}, {
+            channel: 'system',
+            sub: 'system',
+            method: 'updateModelInfo',
+        });
         try {
             const { model, model_stage } = task.variables.getAll();
             correlationId = await auditClient.start('SUMD_CANCELMODEL', initiator, { modelId: model });
@@ -55,7 +64,7 @@ class System {
             await taskService.complete(task);
             await auditClient.success('SUMD_CANCELMODEL', correlationId, initiator, { modelId: model });
         } catch (error) {
-            await auditClient.failure('SUMD_CANCELMODEL', correlationId, e, initiator, { modelId: task.variables.get("model") });
+            await auditClient.failure('SUMD_CANCELMODEL', correlationId, error, initiator, { modelId: task.variables.get("model") });
             tslgLogger.sys(error);
         }
     };
@@ -161,7 +170,11 @@ class System {
         const variables = task.variables.getAll();
         console.sys("Завершение Бизнес процесса");
         let correlationId;
-        const initiator = { sub: 'system', channel: 'system', method: 'bpmnFinish' };
+        const initiator = AuditInitiatorHelper.build({}, {
+            channel: 'system',
+            sub: 'system',
+            method: 'bpmnFinish',
+        });
 
         try {
             // Явно извлекаем modelId с проверкой на undefined

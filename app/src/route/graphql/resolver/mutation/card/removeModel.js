@@ -1,20 +1,18 @@
 const availableGroups = ["ds", "ds_lead", "mipm"];
 const removalInstanceKey = "model_state_transition";
 const auditClient = require('../../../../../utils/audit/auditClient');
+const AuditInitiatorHelper = require('../../../../../utils/audit/auditInitiatorHelper');
 
 const checkRoleModel = (userGroups) =>
     availableGroups.some((groupName) => userGroups.includes(groupName));
 
 module.exports = async (root, args, context) => {
     // Формирование информации об инициаторе для аудита
-    const initiatorInfo = {
-        sub: context.user?.preferred_username || context.user?.username || 'system',
-        realm: context.user?.realm || 'staff',
+    const initiatorInfo = AuditInitiatorHelper.build(context, {
         channel: 'graphql',
         url: '/graphql/mutation/removeModel',
         method: 'removeModel',
-        sourceIp: context.req?.ip || '127.0.0.1'
-    };
+    });
     let correlationId;
 
     try {

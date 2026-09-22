@@ -1,6 +1,7 @@
 const fetch = require('isomorphic-fetch')
 const { Variables } = require("camunda-external-task-client-js");
 const auditClient = require('../../../utils/audit/auditClient');
+const AuditInitiatorHelper = require('../../../utils/audit/auditInitiatorHelper');
 const tslgLogger = require("../../../utils/logger");
 
 const host = "http://oraca.eastus2.cloudapp.azure.com:5000/"
@@ -13,7 +14,11 @@ class Validation {
 
     validation = async ({ task, taskService }) => {
         const variables = task.variables.getAll();
-        const initiator = { sub: 'validation', channel: 'validation', method: 'validation' };
+        const initiator = AuditInitiatorHelper.build({}, {
+            channel: 'validation',
+            sub: 'validation',
+            method: 'validation',
+        });
         let correlationId;
         try {
             correlationId = await auditClient.start('SUMD_UPLOADREPORT', initiator, { modelId: variables.model });
@@ -68,10 +73,10 @@ class Validation {
 
             // Отправка аудита: выгрузка отчета (SUCCESS)
             await auditClient.success('SUMD_UPLOADREPORT', correlationId, initiator, { modelId: variables.model, alias });
-        } catch (e) {
+        } catch (error) {
             // Отправка аудита: выгрузка отчета (FAILURE)
-            await auditClient.failure('SUMD_UPLOADREPORT', correlationId, e, initiator, { modelId: variables.model });
-            tslgLogger.error('Ошибка отправки аудита выгрузки отчета', 'AuditError', err);
+            await auditClient.failure('SUMD_UPLOADREPORT', correlationId, error, initiator, { modelId: variables.model });
+            tslgLogger.error('Ошибка отправки аудита выгрузки отчета', 'AuditError', error);
         }
     }
 

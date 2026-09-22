@@ -1,6 +1,7 @@
 const { Variables } = require('camunda-external-task-client-js');
 const tslgLogger = require('../../../utils/logger');
 const auditClient = require('../../../utils/audit/auditClient');
+const AuditInitiatorHelper = require('../../../utils/audit/auditInitiatorHelper');
 
 class AutoMl {
   constructor(db, integration, bpmn) {
@@ -16,15 +17,15 @@ class AutoMl {
     const MODEL_DESC = 'AutoML';
     const { modeldev_name } = vars;
 
-      const initiatorInfo = {
-          sub: vars.userSub || 'system',
-          realm: vars.userRealm || 'staff',
-          channel: vars.userChannel || 'internal',
-          url: 'AutoMl/createModel',
-          method: 'CREATE_MODEL',
-          sourceIp: vars.clientIp || '127.0.0.1'
-      };
-      let correlationId;
+        const initiatorInfo = AuditInitiatorHelper.build({}, {
+            channel: vars.userChannel || 'internal',
+            url: 'AutoMl/createModel',
+            method: 'CREATE_MODEL',
+            sourceIp: vars.clientIp || '127.0.0.1',
+            sub: vars.userSub || 'system',
+            realm: vars.userRealm || 'staff',
+        });
+        let correlationId;
 
     tslgLogger.info(`Импорт модели из системы AutoML. ${modeldev_name}`, 'ИмпортAutoML');
 
@@ -159,18 +160,18 @@ class AutoMl {
         taskId: task.id
       });
 
-    } catch (error) {
-        if (process.env.NODE_ENV !== 'production') {
-            const debugMessage = `Ошибка добавления артефактов к модели: ${model} - ${err.message}`;
-            const debugData = {
-                modelId: model,
-                taskId: task.id
-            };
-            tslgLogger.debug(debugMessage, 'Отладка', debugData);
+        } catch (error) {
+            if (process.env.NODE_ENV !== 'production') {
+                const debugMessage = `Ошибка добавления артефактов к модели: ${model} - ${error.message}`;
+                const debugData = {
+                    modelId: model,
+                    taskId: task.id
+                };
+                tslgLogger.debug(debugMessage, 'Отладка', debugData);
+            }
+            throw error;
         }
-      throw error;
-    }
-  };
+    };
 }
 
 module.exports = AutoMl;

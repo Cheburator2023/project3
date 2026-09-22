@@ -39,6 +39,10 @@ module.exports = (db, common) => (req, res, next) => {
   req.context.integration = integration;
   req.context.common = common;
 
+  // Сохраняем ссылку на HTTP-запрос для AuditInitiatorHelper
+  // (используется для извлечения IP, URL, метода операции)
+  req.context.req = req;
+
   res.setHeader('X-Request-ID', requestId);
 
   next();
