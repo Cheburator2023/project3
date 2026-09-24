@@ -20,6 +20,39 @@
  * Параметр options.channel сохраняется для обратной совместимости, но
  * НЕ используется для записи в initiator_channel — только для логирования.
  */
+
+/**
+ * Известные роли ролевой модели СУМ.
+ * Используются как приоритетный источник staff_roleId при отсутствии
+ * корректных данных из РМ. Составлено по HELP.md (раздел «Интеграция с
+ * ролевой моделью») и фактическому реестру ролей Keycloak СУМ.
+ */
+const KNOWN_ROLES = new Set([
+    // Управление моделями / DS
+    'ds',
+    'ds_lead',
+    'ds_editor',
+    'de',
+    'de_lead',
+    'mipm',
+    'mipm_lead',
+    'modelops',
+    'modelops_lead',
+    // Валидация
+    'validator',
+    'validator_lead',
+    // Бизнес-заказчик
+    'business_customer',
+    // Аудит / безопасность
+    'auditor',
+    'auditor_lead',
+    'audit_admin',
+    // Системные
+    'admin',
+    'staff',
+    'trust',
+]);
+
 class AuditInitiatorHelper {
 
     /**
@@ -62,7 +95,22 @@ class AuditInitiatorHelper {
     }
 
     /**
-     * Роль: приоритет — *_lead, иначе — последний сегмент последней группы.
+     * Разрешает staff_roleId из списка групп JWT.
+     *
+     * Приоритеты:
+     *   1. Группа с суффиксом '_lead' (например, 'ds_lead', 'validator_lead').
+     *   2. Группа из KNOWN_ROLES (например, 'validator', 'ds_editor').
+     *   3. Первая группа, соответствующая шаблону кода роли (латиница,
+     *      цифры, '_', без пробелов).
+     *   4. Fallback: последний сегмент последней группы.
+     *
+     * Это позволяет корректно обрабатывать продакшен-роли без '_lead'
+     * ('validator', 'ds_editor', 'auditor', 'modelops' и т.д.), а также
+     * отфильтровывать департаментские пути вида
+     * '/departament/Управление моделирования'.
+     *
+     * @param {Object} tokenPayload - payload JWT-токена
+     * @returns {string|null} - код роли или null
      */
     static extractRole(tokenPayload = {}) {
         const groups = Array.isArray(tokenPayload.groups) ? tokenPayload.groups : [];
@@ -70,13 +118,42 @@ class AuditInitiatorHelper {
             return null;
         }
 
-        const leadGroup = groups.find((group) =>
-            typeof group === 'string' && group.includes('_lead')
-        );
-        const targetGroup = leadGroup || groups[groups.length - 1];
+        // Нормализуем группы: берём последний сегмент пути, отбрасываем пустые.
+        const normalized = groups
+            .map((group) => {
+                if (typeof group !== 'string') {
+                    return null;
+                }
+                const segments = group.split('/').filter(Boolean);
+                return segments.length ? segments[segments.length - 1] : null;
+            })
+            .filter(Boolean);
 
-        const segments = String(targetGroup).split('/').filter(Boolean);
-        return segments.length ? segments[segments.length - 1] : null;
+        if (!normalized.length) {
+            return null;
+        }
+
+        // Приоритет 1: роль с суффиксом '_lead'.
+        const leadRole = normalized.find((role) => role.endsWith('_lead'));
+        if (leadRole) {
+            return leadRole;
+        }
+
+        // Приоритет 2: известная роль из KNOWN_ROLES.
+        const knownRole = normalized.find((role) => KNOWN_ROLES.has(role));
+        if (knownRole) {
+            return knownRole;
+        }
+
+        // Приоритет 3: первая группа, соответствующая шаблону кода роли.
+        // Отсеивает кириллические департаменты и прочие свободные значения.
+        const roleLike = normalized.find((role) => /^[a-z][a-z0-9_]{1,50}$/i.test(role));
+        if (roleLike) {
+            return roleLike;
+        }
+
+        // Приоритет 4: последний сегмент последней группы.
+        return normalized[normalized.length - 1];
     }
 
     /**
