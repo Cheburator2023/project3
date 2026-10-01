@@ -1,4 +1,4 @@
-const fetch = require('isomorphic-fetch')
+const {tracedFetch} = require("../../../utils/httpClient")
 const tslgLogger = require('../../../utils/logger')
 
 const jiraHost = process.env.JIRA_API
@@ -19,7 +19,8 @@ module.exports = ({
     if (!file)
         headers['Content-Type'] = 'application/json'
 
-    return fetch(
+    // Используем tracedFetch вместо fetch
+    return tracedFetch(
         `${jiraHost}${path}`,
         {
             method: body ? 'POST' : method,

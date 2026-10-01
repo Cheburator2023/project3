@@ -62,15 +62,6 @@ function createModelStateResolverWorker (database, opts = {}) {
       order by id
     `, { model_id: modelId })
 
-    await closeNonFinalStatusOverrides({
-      database,
-      connection,
-      modelId,
-      sourceRows: statusSources,
-      overrideRows: statusOverridesBeforeClose,
-      triggerEvent: jobLastEvent
-    })
-
     const statusOverrides = await selectRows(database, connection, `
       select id, model_id, source_record_id, status, effective_from, effective_to, correction_reason, is_final_override, author
       from model_status_override
@@ -320,71 +311,6 @@ function attachMetadata ({ rows, entityName, previousRows, calculatedAt, jobLast
       lastEvent: reusedLastEvent ?? jobLastEvent
     }
   })
-}
-
-/**
- * Реализует правило для status override:
- * активные незаблокированные (`is_final_override = false`) корректировки
- * закрываются при появлении более поздней source-записи статуса.
- *
- * Закрытие происходит обновлением самой override-записи:
- * - `effective_to = effective_from` новой source-записи;
- * - `updated_at = current_timestamp(0)`.
- */
-async function closeNonFinalStatusOverrides ({ database, connection, modelId, sourceRows, overrideRows, triggerEvent }) {
-  if (!sourceRows.length || !overrideRows.length) return
-
-  if (triggerEvent.table !== 'model_status_source' || triggerEvent.op !== 'INSERT') {
-    return
-  }
-
-  const insertedSourceId = normalizeNullableInteger(triggerEvent.row_id)
-  if (!insertedSourceId) return
-
-  const insertedSourceRow = sourceRows.find((row) => row.ID === insertedSourceId)
-  if (!insertedSourceRow) return
-
-  const replacementBySourceId = new Map(
-    overrideRows
-      .filter((row) => normalizeNullableInteger(row.SOURCE_RECORD_ID))
-      .map((row) => [normalizeNullableInteger(row.SOURCE_RECORD_ID), row])
-  )
-
-  // Source-статус, уже вытесненный override с source_record_id,
-  // не должен закрывать standalone override.
-  if (replacementBySourceId.has(insertedSourceId)) {
-    return
-  }
-
-  const insertedSourceFrom = toDate(insertedSourceRow.EFFECTIVE_FROM)
-  if (!insertedSourceFrom) return
-
-  const standaloneOpenOverrides = overrideRows.filter((row) => (
-    !normalizeNullableInteger(row.SOURCE_RECORD_ID) &&
-    row.IS_FINAL_OVERRIDE === false &&
-    normalizeTimestamp(row.EFFECTIVE_TO) === OPEN_INTERVAL
-  ))
-
-  for (const overrideRow of standaloneOpenOverrides) {
-    const overrideFrom = toDate(overrideRow.EFFECTIVE_FROM)
-    if (!overrideFrom) continue
-    if (insertedSourceFrom <= overrideFrom) continue
-
-    await database.executeWithConnection({
-      connection,
-      sql: `
-        update model_status_override
-        set
-          effective_to = :effective_to,
-          updated_at = current_timestamp(0)
-        where id = :id
-      `,
-      args: {
-        id: overrideRow.ID,
-        effective_to: normalizeTimestamp(insertedSourceRow.EFFECTIVE_FROM)
-      }
-    })
-  }
 }
 
 /**

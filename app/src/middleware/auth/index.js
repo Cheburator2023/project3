@@ -12,11 +12,6 @@ const config = {
     'bearer-only': true,
 };
 
-function consoleDebug(...args) {
-    const consoleToUse = console.original?.log || console.log;
-    consoleToUse('[DEBUG}', ...args);
-}
-
 const memoryStore = new session.MemoryStore();
 const keycloak = new Keycloak({ store: memoryStore }, config);
 const session_params = {
@@ -107,7 +102,7 @@ module.exports = {
             } catch (error) {
                 // Ошибка аудита не должна блокировать основной запрос
                 if (process.env.NODE_ENV !== 'production') {
-                    consoleDebug(`Ошибка отправки сообщения в Аудит: ${error.msg}`, {
+                    tslgLogger.debug(`Ошибка отправки сообщения в Аудит: ${error.msg}`, {
                         system: 'AUDIT',
                         error: error.message
                     });

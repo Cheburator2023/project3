@@ -28,5 +28,6 @@ module.exports = {
   currentModelStatus: require("./currentModelStatus"),
   closeStageOverrides: require("./closeStageOverrides"),
   closeSourceStagesByOverrides: require("./closeSourceStagesByOverrides"),
-
+  closeStatusOverrides: require("./closeStatusOverrides"),
+  closeSourceStatusesByOverrides: require("./closeSourceStatusesByOverrides"),
 };

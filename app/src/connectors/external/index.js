@@ -1,5 +1,5 @@
 const client = require("./connector");
-const {camundaExternalTaskStatusDecorator} = require("../../common/status-helpers");
+const { camundaExternalTaskStatusDecorator, withTracing } = require("../../common/status-helpers");
 
 const Jira = require("./jira");
 const Teamcity = require("./teamcity");
@@ -14,18 +14,18 @@ const AutoMl = require("./automl");
 module.exports = (db, integration, bpmn, common) => {
   // Jira Handler
   const jira = new Jira(db, integration);
-  client.subscribe("jiraIssue", jira.issue);
-  client.subscribe("jiraStatus", jira.status);
+  client.subscribe("jiraIssue", withTracing(jira.issue, "jiraIssue"));
+  client.subscribe("jiraStatus", withTracing(jira.status, "jiraStatus"));
 
   // Teamcity Handler
   const teamcity = new Teamcity(db, integration);
-  client.subscribe("teamcity", teamcity.main);
+  client.subscribe("teamcity", withTracing(teamcity.main, "teamcity"));
   client.subscribe("publish", camundaExternalTaskStatusDecorator(teamcity.publish, bpmn, db, true));
 
   // Kafka Handler
   const kafka = new Kafka(db, integration);
-  client.subscribe("kafka_createNewModel", kafka.createNewModel);
-  client.subscribe("kafka_archiveModel", kafka.archiveModel);
+  client.subscribe("kafka_createNewModel", withTracing(kafka.createNewModel, "kafka_createNewModel"));
+  client.subscribe("kafka_archiveModel", withTracing(kafka.archiveModel, "kafka_archiveModel"));
   client.subscribe("kafka_createNewStrategy", camundaExternalTaskStatusDecorator(kafka.kafka_createNewStrategy, bpmn, db));
 
   // Mail Handler
@@ -46,18 +46,18 @@ module.exports = (db, integration, bpmn, common) => {
 
   // System Handler
   const system = new System(db, bpmn);
-  client.subscribe("suspend", system.suspend);
-  client.subscribe("healthCheck", system.healthCheck);
-  client.subscribe("updateModelInfo", system.updateModelInfo);
-  client.subscribe("endEvent", system.endEvent);
-  client.subscribe("bpmnStart", system.bpmnStart);
-  client.subscribe("bpmnFinish", system.bpmnFinish);
-  client.subscribe("bpmnStatus", system.bpmnStatus);
+  client.subscribe("suspend", withTracing(system.suspend, "suspend"));
+  client.subscribe("healthCheck", withTracing(system.healthCheck, "healthCheck"));
+  client.subscribe("updateModelInfo", withTracing(system.updateModelInfo, "updateModelInfo"));
+  client.subscribe("endEvent", withTracing(system.endEvent, "endEvent"));
+  client.subscribe("bpmnStart", withTracing(system.bpmnStart, "bpmnStart"));
+  client.subscribe("bpmnFinish", withTracing(system.bpmnFinish, "bpmnFinish"));
+  client.subscribe("bpmnStatus", withTracing(system.bpmnStatus, "bpmnStatus"));
   client.subscribe("putJobDue", camundaExternalTaskStatusDecorator(system.putJobDue, bpmn, db));
-  client.subscribe("needModelOps", system.needModelOps);
+  client.subscribe("needModelOps", withTracing(system.needModelOps, "needModelOps"));
 
   // AutoML Handler
   const automl = new AutoMl(db, integration, bpmn);
-  client.subscribe("automl.import", automl.createModel);
-  client.subscribe("automl.artefact", automl.addArtefact);
+  client.subscribe("automl.import", withTracing(automl.createModel, "automl.import"));
+  client.subscribe("automl.artefact", withTracing(automl.addArtefact, "automl.artefact"));
 };

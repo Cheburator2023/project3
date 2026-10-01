@@ -63,10 +63,21 @@ class ConsoleLogger extends LoggerInterface {
             case 'warn':
                 this.originalConsole.warn(formattedMessage);
                 break;
+            case 'debug':
+                if (this.originalConsole.debug) {
+                    this.originalConsole.debug(formattedMessage);
+                } else {
+                    this.originalConsole.log(formattedMessage);
+                }
+                break;
             case 'info':
             default:
                 this.originalConsole.log(formattedMessage);
         }
+    }
+
+    debug(message, event = 'Отладка', additionalData = {}) {
+        this.log('debug', message, event, null, additionalData);
     }
 
     info(message, event = 'Информация', additionalData = {}) {

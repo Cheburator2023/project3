@@ -1,4 +1,4 @@
-const fetch = require('isomorphic-fetch')
+const {tracedFetch} = require("../../../utils/httpClient");
 const tslgLogger = require('../../../utils/logger');
 
 const repoHost = process.env.REPO_API
@@ -33,7 +33,8 @@ module.exports = ({
         requestOptions['body'] = JSON.stringify(data);
     }
 
-    return fetch(`${repoHost}${path}?${queryString}`, requestOptions)
+    // Используем tracedFetch вместо fetch
+    return tracedFetch(`${repoHost}${path}?${queryString}`, requestOptions)
         .then(data => {
             tslgLogger.log(`Repo response: ${data.status}`, 'Ответ', 'info', null, {
                 system: 'Repo',

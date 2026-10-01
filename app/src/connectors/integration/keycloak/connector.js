@@ -1,4 +1,4 @@
-const fetch = require('isomorphic-fetch')
+const {tracedFetch} = require("../../../utils/httpClient");
 const tslgLogger = require('../../../utils/logger');
 
 const keycloakHost = process.env.KEYCLOAK_URL
@@ -12,7 +12,8 @@ module.exports = ({
         path
     });
 
-    return fetch(
+    // Используем tracedFetch вместо fetch
+    return tracedFetch(
         `${keycloakHost}${path}`,
         {
             headers:  {

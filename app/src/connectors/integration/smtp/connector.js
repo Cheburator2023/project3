@@ -1,4 +1,4 @@
-const fetch = require('isomorphic-fetch')
+const {tracedFetch} = require("../../../utils/httpClient");
 const tslgLogger = require('../../../utils/logger');
 
 const smtpHost = process.env.SMTP_HOST || 'http://nodered.apps.pim.angara.cloud/'
@@ -14,7 +14,8 @@ module.exports = ({
         method
     });
 
-    return fetch(
+    // Используем tracedFetch вместо fetch
+    return tracedFetch(
         `${smtpHost}${path}`,
         {
             method: body ? 'POST' : method,

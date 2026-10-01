@@ -489,7 +489,8 @@ class Card {
 
   changeStatus = ({ modelId, modelStatus }) =>
     this.changeStaticModelStatus({ modelId, modelStatus })
-      .then(() => this.changeHistoricalModelStatus({ modelId, modelStatus }))
+      .then(() => this.closeStatusOverrides(modelId)) // вызываем закрытие корректировок при движении модели по БП (закрытии userTask)
+      .then(() => this.changeHistoricalModelStatus({ modelId, modelStatus }));
 
   changeStaticModelStatus = ({ modelId, modelStatus }) =>
     this.db.execute({
@@ -983,6 +984,31 @@ class Card {
       return resultOverrides.rowCount;
     } catch (err) {
       throw new Error(`Failed to close stage overrides for model ${modelId}: ${err.message}`);
+    }
+  };
+
+  closeStatusOverrides = async (modelId) => {
+    if (!modelId) {
+      throw new Error('modelId is required to close status overrides');
+    }
+
+    try {
+      const resultOverrides = await this.db.execute({
+        sql: sql.closeStatusOverrides,
+        args: { model_id: modelId },
+      });
+
+      const resultSource = await this.db.execute({
+        sql: sql.closeSourceStatusesByOverrides,
+        args: { model_id: modelId },
+      });
+
+      console.log(`[closeStatusOverrides] Closed ${resultOverrides.rowCount} status override(s) for model ${modelId}. 
+        ${resultSource.rowCount} source rows closed`);
+
+      return resultOverrides.rowCount;
+    } catch (err) {
+      throw new Error(`Failed to close status overrides for model ${modelId}: ${err.message}`);
     }
   };
 }

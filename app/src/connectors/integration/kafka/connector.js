@@ -1,12 +1,7 @@
-const fetch = require('isomorphic-fetch')
+const {tracedFetch} = require("../../../utils/httpClient");
 const tslgLogger = require('../../../utils/logger');
 
 const kafkaHost = process.env.KAFKA_API
-
-function consoleDebug(...args) {
-    const consoleToUse = console.original?.log || console.log;
-    consoleToUse('[DEBUG}', ...args);
-}
 
 module.exports = ({
                       path,
@@ -22,7 +17,8 @@ module.exports = ({
     const headers = {}
     headers['Content-Type'] = 'application/json'
 
-    return fetch(
+    // Используем tracedFetch вместо fetch
+    return tracedFetch(
         `${kafkaHost}${path}`,
         {
             method: body ? 'POST' : method,
@@ -45,7 +41,8 @@ module.exports = ({
             error.system = 'Kafka'
 
             if (process.env.NODE_ENV !== 'production') {
-                consoleDebug(`Kafka error: ${data.statusText} - ${error.message}`, {
+                tslgLogger.debug(`Kafka error: ${data.statusText} - ${error.message}`,
+                    'Отладка',{
                     system: 'Kafka',
                     path,
                     method,
@@ -58,7 +55,8 @@ module.exports = ({
         })
         .catch(error => {
             if (process.env.NODE_ENV !== 'production') {
-                consoleDebug(`Kafka unexpected error: ${error.message}`, {
+                tslgLogger.debug(`Kafka unexpected error: ${error.message}`,
+                    'Отладка', {
                     system: 'Kafka',
                     path,
                     method,

@@ -1,4 +1,4 @@
-const fetch = require('isomorphic-fetch')
+const {tracedFetch} = require("../../../utils/httpClient");
 const tslgLogger = require('../../../utils/logger');
 
 const sumrmHost = process.env.SUMRM_API
@@ -31,7 +31,8 @@ module.exports = ({
         body
     }
 
-    return fetch
+    // Используем tracedFetch вместо fetch
+    return tracedFetch
     (
         fullUrl,
         requestConfig
