@@ -1,5 +1,13 @@
 # Semantic Versioning Changelog
 
+# [1.43.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.42.0...v1.43.0) (2026-10-02)
+
+
+### Features
+
+* Реализовал подключения к бд через TLS и mTLS, с обратной совместимостью ([939206d](https://git.sfera.inno.local:7999/SUMD/backend/commit/939206d832935b0c13fa43b49a3b54b9b06fb78b))
+* Скорректировал env ([3d1867a](https://git.sfera.inno.local:7999/SUMD/backend/commit/3d1867ab506c6bdcee52a3cede0287467e6135de))
+
 # [1.42.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.41.1...v1.42.0) (2026-09-18)
 
 
