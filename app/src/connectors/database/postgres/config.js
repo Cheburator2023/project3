@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const enableTls = process.env.TLS_ENABLED === "true";
+const enableTls = process.env.DB_TLS_ENABLED === "true";
 
 /**
  * Читает файл сертификата или приватного ключа по указанному пути.
@@ -36,29 +36,29 @@ const readTlsFile = (filePath, label) => {
  * клиентский сертификат и приватный ключ.
  *
  * Поддерживаемые переменные окружения:
- *   - TLS_ENABLED: "true" для включения TLS (по умолчанию TLS выключен)
- *   - TLS_CA_CERT_PATH: путь к корневому CA-сертификату для проверки
+ *   - DB_TLS_ENABLED: "true" для включения TLS (по умолчанию TLS выключен)
+ *   - DB_TLS_CA_CERT_PATH: путь к корневому CA-сертификату для проверки
  *     подлинности сертификата сервера
- *   - TLS_CLIENT_CERT_PATH: путь к клиентскому сертификату (для mTLS)
- *   - TLS_CLIENT_KEY_PATH: путь к приватному ключу клиента (для mTLS)
- *   - TLS_SERVERNAME: имя сервера для SNI и проверки hostname в сертификате
+ *   - DB_TLS_CLIENT_CERT_PATH: путь к клиентскому сертификату (для mTLS)
+ *   - DB_TLS_CLIENT_KEY_PATH: путь к приватному ключу клиента (для mTLS)
+ *   - DB_TLS_SERVERNAME: имя сервера для SNI и проверки hostname в сертификате
  *
  * @returns {false|Object} - конфигурация TLS для pg.Pool или false, если TLS выключен
  * @throws {Error} - при некорректной конфигурации (например, указан только
- *   один из пары TLS_CLIENT_CERT_PATH/TLS_CLIENT_KEY_PATH)
+ *   один из пары DB_TLS_CLIENT_CERT_PATH/DB_TLS_CLIENT_KEY_PATH)
  */
 const buildTlsConfig = () => {
   if (!enableTls) {
     return false;
   }
 
-  const ca = readTlsFile(process.env.TLS_CA_CERT_PATH, "CA certificate");
+  const ca = readTlsFile(process.env.DB_TLS_CA_CERT_PATH, "CA certificate");
   const cert = readTlsFile(
-      process.env.TLS_CLIENT_CERT_PATH,
+      process.env.DB_TLS_CLIENT_CERT_PATH,
       "client certificate"
   );
   const key = readTlsFile(
-      process.env.TLS_CLIENT_KEY_PATH,
+      process.env.DB_TLS_CLIENT_KEY_PATH,
       "client private key"
   );
 
@@ -66,7 +66,7 @@ const buildTlsConfig = () => {
   // Это исключает запуск приложения в неконсистентной конфигурации.
   if ((cert && !key) || (!cert && key)) {
     throw new Error(
-        "Both TLS_CLIENT_CERT_PATH and TLS_CLIENT_KEY_PATH must be provided together for mTLS"
+        "Both DB_TLS_CLIENT_CERT_PATH and DB_TLS_CLIENT_KEY_PATH must be provided together for mTLS"
     );
   }
 
@@ -92,8 +92,8 @@ const buildTlsConfig = () => {
   // SNI: имя сервера, которое передаётся в TLS-хендшейке.
   // Также используется Node.js для проверки hostname в сертификате сервера.
   // Требуется, когда подключение идёт по IP, а сертификат выпущен на FQDN.
-  if (process.env.TLS_SERVERNAME) {
-    sslConfig.servername = process.env.TLS_SERVERNAME;
+  if (process.env.DB_TLS_SERVERNAME) {
+    sslConfig.servername = process.env.DB_TLS_SERVERNAME;
   }
 
   return sslConfig;
