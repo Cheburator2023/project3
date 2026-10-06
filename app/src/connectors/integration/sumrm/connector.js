@@ -11,7 +11,7 @@ module.exports = ({
                   }) => {
     const fullUrl = `${sumrmHost}${path}`
 
-    tslgLogger.log(`SUMRM request: ${method} ${fullUrl}`, 'Запрос', 'info', null, {
+    tslgLogger.log('info', `SUMRM request: ${method} ${fullUrl}`, 'Запрос', null, {
         system: 'SUMRM',
         path,
         method
@@ -50,7 +50,7 @@ module.exports = ({
             // Ignore body parsing errors
         }
 
-            tslgLogger.log(`SUMRM response: ${data.status} ${data.statusText}`, 'Ответ', 'info', null, {
+            tslgLogger.log('info', `SUMRM response: ${data.status} ${data.statusText}`, 'Ответ', null, {
                 system: 'SUMRM',
                 path,
                 method,
@@ -69,7 +69,7 @@ module.exports = ({
             error.system = 'SUMRM'
             error.responseBody = responseBody
 
-            tslgLogger.log(`SUMRM error: ${data.statusText}`, 'Ошибка', 'error', error, {
+            tslgLogger.log('error', `SUMRM error: ${data.statusText}`, 'Ошибка', error, {
                 system: 'SUMRM',
                 path,
                 method,
@@ -79,7 +79,7 @@ module.exports = ({
             throw error
         })
         .catch(error => {
-            tslgLogger.log(`SUMRM unexpected error: ${error.message}`, 'Ошибка', 'error', error, {
+            tslgLogger.log('error', `SUMRM unexpected error: ${error.message}`, 'Ошибка', error, {
                 system: 'SUMRM',
                 path,
                 method

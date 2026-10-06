@@ -119,7 +119,8 @@ class TSLGLogger extends LoggerInterface {
             reconnections: 0,
             bufferFlushes: 0,
             connectionErrors: 0,
-            filteredLogs: 0
+            filteredLogs: 0,
+            rejectedInvalidLevels: 0
         };
     }
 
@@ -148,16 +149,30 @@ class TSLGLogger extends LoggerInterface {
 
     /**
      * Проверяет, должен ли лог с указанным уровнем быть отправлен в TSLG-агент.
-     * Если уровень неизвестен — лог не фильтруется (разрешается).
+     *
+     * Логика фильтрации:
+     * 1. Если `level` — не распознанный уровень (не входит в enumerated
+     *    TRACE/DEBUG/INFO/WARN/WARNING/ERROR/FATAL/PANIC/CRITICAL),
+     *    лог ОТКЛОНЯЕТСЯ. Это защищает TSLG-агент от сообщений с невалидным
+     *    полем `level` (согласно документации 1404 такие сообщения попадают
+     *    в `tslg-dead-letter-queue`), а также защищает от ошибок вида
+     *    `log('Run POST /path', 'Запрос', 'info', ...)`, где аргументы
+     *    перепутаны местами.
+     * 2. Если `level` распознан, пропускаются только уровни с приоритетом
+     *    >= настроенного `TSLG_LOG_LEVEL`.
      *
      * @param {string} level
      * @returns {boolean}
      */
     shouldLog(level) {
         const normalizedLevel = normalizeLogLevel(level);
+
+        // Неизвестный/пустой/невалидный уровень → отклоняем.
+        // Согласно документации 1404 (раздел 4.5.1.1, «Базовые атрибуты»)
+        // поле `level` — enumerated, значения вне списка не допускаются.
         if (!normalizedLevel) {
-            // Неизвестный/пустой уровень — не блокируем, чтобы не терять логи
-            return true;
+            this.metrics.rejectedInvalidLevels++;
+            return false;
         }
 
         const configuredLevel = normalizeLogLevel(this.config.logLevel) || 'TRACE';
@@ -375,9 +390,9 @@ class TSLGLogger extends LoggerInterface {
     }
 
     log(level, message, event = 'Информация', error = null, additionalData = {}) {
-        // Фильтрация по TSLG_LOG_LEVEL:
-        // - если уровень ниже настроенного — лог не отправляется в TSLG-агент;
-        // - консольный вывод ниже также подавляется, чтобы соответствовать настроенному уровню.
+        // Фильтрация по уровню (включая отказ невалидных уровней).
+        // Если уровень не распознан — лог отклоняется и в TSLG-агент не уходит.
+        // Если уровень ниже настроенного TSLG_LOG_LEVEL — тоже отклоняется.
         if (!this.shouldLog(level)) {
             this.metrics.filteredLogs++;
             return;
