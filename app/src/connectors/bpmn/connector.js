@@ -18,7 +18,7 @@ const connector = ({ path, method = 'GET', body }, context = {}) => {
 
     const requestId = context?.requestId || 'unknown';
 
-    tslgLogger.log(`Run ${method} ${path}`, 'Запрос', 'info', null, {
+    tslgLogger.log('info', `Run ${method} ${path}`, 'Запрос', null, {
         requestId,
         system: 'BPMN'
     });
@@ -36,7 +36,7 @@ const connector = ({ path, method = 'GET', body }, context = {}) => {
             const { status, statusText } = data
 
             if (status === 200 || status === 204) {
-                tslgLogger.log(`BPMN ${method} ${path} completed successfully`, 'Успешно', 'info', null, {
+                tslgLogger.log('info', `BPMN ${method} ${path} completed successfully`, 'Успешно', null, {
                     requestId,
                     system: 'BPMN',
                     status
@@ -65,7 +65,7 @@ const connector = ({ path, method = 'GET', body }, context = {}) => {
             throw error
         })
         .then(data => {
-            tslgLogger.log(`Method ${path} completed successfully`, 'Успешно', 'info', null, {
+            tslgLogger.log('info', `Method ${path} completed successfully`, 'Успешно', null, {
                 requestId,
                 system: 'BPMN'
             });
