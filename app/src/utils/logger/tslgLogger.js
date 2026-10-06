@@ -5,6 +5,50 @@ const LoggerInterface = require('./LoggerInterface');
 const { getTracingLogFields } = require('../tracingContext');
 
 /**
+ * Карта числовых приоритетов уровней логирования.
+ * Чем выше число — тем выше критичность.
+ * Используется для фильтрации по TSLG_LOG_LEVEL.
+ *
+ * Соответствует документации 1404 (Таблица 4.5.1.1, «Базовые атрибуты»):
+ * TRACE, DEBUG, INFO, WARN, WARNING, ERROR, FATAL, PANIC, CRITICAL.
+ */
+const LOG_LEVEL_PRIORITY = {
+    TRACE: 0,
+    DEBUG: 1,
+    INFO: 2,
+    WARN: 3,
+    WARNING: 3,
+    ERROR: 4,
+    FATAL: 5,
+    PANIC: 6,
+    CRITICAL: 7
+};
+
+/**
+ * Нормализует строку уровня логирования:
+ * - приводит к верхнему регистру;
+ * - обрезает пробелы;
+ * - возвращает null, если значение невалидно.
+ *
+ * @param {string} value
+ * @returns {string|null}
+ */
+function normalizeLogLevel(value) {
+    if (typeof value !== 'string') {
+        return null;
+    }
+
+    const normalized = value.trim().toUpperCase();
+    if (!normalized) {
+        return null;
+    }
+
+    return Object.prototype.hasOwnProperty.call(LOG_LEVEL_PRIORITY, normalized)
+        ? normalized
+        : null;
+}
+
+/**
  * TSLG логгер для production
  */
 class TSLGLogger extends LoggerInterface {
@@ -58,7 +102,11 @@ class TSLGLogger extends LoggerInterface {
             namespace: process.env.KUBERNETES_NAMESPACE || 'default',
             podName: process.env.POD_NAME || os.hostname(),
             podIp: process.env.POD_IP || this.getLocalIP() || '127.0.0.1',
-            nodeName: process.env.NODE_NAME || os.hostname()
+            nodeName: process.env.NODE_NAME || os.hostname(),
+            // Минимальный уровень логирования, отправляемый в TSLG-агент.
+            // Значение читается из TSLG_LOG_LEVEL, нормализуется (info/INFO/Info => INFO).
+            // Если переменная не задана или невалидна — фильтрация отключена (TRACE).
+            logLevel: normalizeLogLevel(process.env.TSLG_LOG_LEVEL) || 'TRACE'
         };
 
         return { ...defaults, ...config };
@@ -70,7 +118,8 @@ class TSLGLogger extends LoggerInterface {
             failedLogs: 0,
             reconnections: 0,
             bufferFlushes: 0,
-            connectionErrors: 0
+            connectionErrors: 0,
+            filteredLogs: 0
         };
     }
 
@@ -95,6 +144,27 @@ class TSLGLogger extends LoggerInterface {
 
     isConnected() {
         return !!(this.socket && !this.socket.destroyed && this.socket.writable);
+    }
+
+    /**
+     * Проверяет, должен ли лог с указанным уровнем быть отправлен в TSLG-агент.
+     * Если уровень неизвестен — лог не фильтруется (разрешается).
+     *
+     * @param {string} level
+     * @returns {boolean}
+     */
+    shouldLog(level) {
+        const normalizedLevel = normalizeLogLevel(level);
+        if (!normalizedLevel) {
+            // Неизвестный/пустой уровень — не блокируем, чтобы не терять логи
+            return true;
+        }
+
+        const configuredLevel = normalizeLogLevel(this.config.logLevel) || 'TRACE';
+        const configuredPriority = LOG_LEVEL_PRIORITY[configuredLevel];
+        const currentPriority = LOG_LEVEL_PRIORITY[normalizedLevel];
+
+        return currentPriority >= configuredPriority;
     }
 
     connect() {
@@ -305,6 +375,14 @@ class TSLGLogger extends LoggerInterface {
     }
 
     log(level, message, event = 'Информация', error = null, additionalData = {}) {
+        // Фильтрация по TSLG_LOG_LEVEL:
+        // - если уровень ниже настроенного — лог не отправляется в TSLG-агент;
+        // - консольный вывод ниже также подавляется, чтобы соответствовать настроенному уровню.
+        if (!this.shouldLog(level)) {
+            this.metrics.filteredLogs++;
+            return;
+        }
+
         const logEntry = this.createLogEntry(level, message, event, error, additionalData);
         const logData = JSON.stringify(logEntry) + '\n';
 
@@ -344,6 +422,10 @@ class TSLGLogger extends LoggerInterface {
         }
     }
 
+    trace(message, event = 'Трассировка', additionalData = {}) {
+        this.log('trace', message, event, null, additionalData);
+    }
+
     debug(message, event = 'Отладка', additionalData = {}) {
         this.log('debug', message, event, null, additionalData);
     }
@@ -358,6 +440,18 @@ class TSLGLogger extends LoggerInterface {
 
     error(message, event = 'Ошибка', error = null, additionalData = {}) {
         this.log('error', message, event, error, additionalData);
+    }
+
+    fatal(message, event = 'Фатальная ошибка', error = null, additionalData = {}) {
+        this.log('fatal', message, event, error, additionalData);
+    }
+
+    panic(message, event = 'Паника', error = null, additionalData = {}) {
+        this.log('panic', message, event, error, additionalData);
+    }
+
+    critical(message, event = 'Критическая ошибка', error = null, additionalData = {}) {
+        this.log('critical', message, event, error, additionalData);
     }
 
     sys(message, additionalData = {}) {
@@ -411,7 +505,8 @@ class TSLGLogger extends LoggerInterface {
             config: {
                 host: this.config.host,
                 port: this.config.port,
-                appName: this.config.appName
+                appName: this.config.appName,
+                logLevel: this.config.logLevel
             },
             metrics: { ...this.metrics },
             bufferSize: this.logBuffer.length,
