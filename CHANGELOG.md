@@ -1,5 +1,13 @@
 # Semantic Versioning Changelog
 
+# [1.44.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.43.0...v1.44.0) (2026-10-07)
+
+
+### Features
+
+* Настроил логирование для управления DEBUG ([0485834](https://git.sfera.inno.local:7999/SUMD/backend/commit/0485834e6ff66840c0f7b454121c88bfa25f411b))
+* Скорректировал логи ([89c1729](https://git.sfera.inno.local:7999/SUMD/backend/commit/89c17292898b84228c3c68d67307b1fd5bbe2090))
+
 # [1.43.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.42.0...v1.43.0) (2026-10-02)
 
 
