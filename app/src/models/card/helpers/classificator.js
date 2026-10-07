@@ -18,13 +18,25 @@ const getArguments = (models) => models.reduce((acc, { MODEL_ID, TYPE }) => {
 
 // Group resopsen by MODEL_ID in specified models order
 const groupResponse = (response = [], models = []) => {
-  return models.map((model) => {
-    const group = response.filter((item) => item.MODEL_ID === model.MODEL_ID);
+  const groupsByModelId = new Map();
+
+  response.forEach((item) => {
+    const group = groupsByModelId.get(item.MODEL_ID);
+
+    if (group) {
+      group.push(item);
+    } else {
+      groupsByModelId.set(item.MODEL_ID, [item]);
+    }
+  });
+
+  return models.map(({ MODEL_ID }) => {
+    const group = groupsByModelId.get(MODEL_ID);
 
     // if has artefacts then transofrm fields, otherwise return empty array
-    return group.length
+    return group?.length
       ? cardArtefacts(group)
-      : group;
+      : [];
   });
 };
 
