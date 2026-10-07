@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.44.1](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.44.0...v1.44.1) (2026-10-07)
+
+
+### Bug Fixes
+
+* оптимизировал запрос по сложности алгоритма ([7ea9d04](https://git.sfera.inno.local:7999/SUMD/backend/commit/7ea9d047c24a2a872ea70d2716963e5ca99829ce))
+
 # [1.44.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.43.0...v1.44.0) (2026-10-07)
 
 
