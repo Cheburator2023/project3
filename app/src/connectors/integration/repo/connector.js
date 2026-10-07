@@ -8,7 +8,7 @@ module.exports = ({
                       method,
                       data
                   }) => {
-    tslgLogger.log(`Repo request: ${method} ${repoHost}${path}`, 'Запрос', 'info', null, {
+    tslgLogger.log('info', `Repo request: ${method} ${repoHost}${path}`, 'Запрос', null, {
         system: 'Repo',
         path,
         method
@@ -36,7 +36,7 @@ module.exports = ({
     // Используем tracedFetch вместо fetch
     return tracedFetch(`${repoHost}${path}?${queryString}`, requestOptions)
         .then(data => {
-            tslgLogger.log(`Repo response: ${data.status}`, 'Ответ', 'info', null, {
+            tslgLogger.log('info', `Repo response: ${data.status}`, 'Ответ', null, {
                 system: 'Repo',
                 path,
                 method,
@@ -49,7 +49,7 @@ module.exports = ({
             error.status = data.status;
             error.system = 'Repo';
 
-            tslgLogger.log(`Repo error: ${data.statusText}`, 'Ошибка', 'error', error, {
+            tslgLogger.log('error', `Repo error: ${data.statusText}`, 'Ошибка', error, {
                 system: 'Repo',
                 path,
                 method,
@@ -59,7 +59,7 @@ module.exports = ({
             throw error;
         })
         .catch(error => {
-            tslgLogger.log(`Repo unexpected error: ${error.message}`, 'Ошибка', 'error', error, {
+            tslgLogger.log('error', `Repo unexpected error: ${error.message}`, 'Ошибка', error, {
                 system: 'Repo',
                 path,
                 method
