@@ -1,3 +1,4 @@
+const { AuthenticationError } = require('apollo-server-express');
 const getUserName = require("./helpers");
 const {
   isBusinessPartner,
@@ -32,9 +33,9 @@ module.exports = async (root, args, context) => {
     let correlationId;
 
     try {
-        // PRJ-COMMON-26: Бизнес-партнеру (mipm/mipm_lead) недоступно создание модели
+        // PRJ-COMMON-26: Бизнес-партнеру (mipm/mipm_lead/mipm_stream) недоступно создание модели
         if (isBusinessPartner(context.user)) {
-            return null;
+            throw new AuthenticationError('Недостаточно прав для создания модели');
         }
 
         // Старт аудита – начало операции создания модели

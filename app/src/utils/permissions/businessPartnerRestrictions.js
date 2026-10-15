@@ -13,6 +13,7 @@ const RESTRICTED_MIPM_ARTEFACT_LABELS = [
   'product_name', // Продукт и область применения модели
   'developing_model_reason', // Основание для разработки модели
   'model_type', // Тип/классификация Модели
+  'model_type_lev1', // Тип / классификация Модели (ТК4, ARTEFACT_ID 173)
   'model_is_used', // Действующая модель/модуль
   'implementation_decision', // Реквизиты решения о внедрении
   'model_epic_12', // Этап 12
@@ -24,6 +25,22 @@ const RESTRICTED_MIPM_ARTEFACT_LABELS = [
   'group_company', // Компания группы
   'responsible_for_significance_validity', // Кем определен уровень значимости Модели/РС
   'dev_model_status_flg', // Модель давно разработана / работает в промышленном контуре
+  'assignment_contractor', // Исполнитель
+  'dev_team', // Название команды
+  'psi_protocol', // Протокол ПСИ
+  'project_ref', // Ссылка на репозиторий разработки модели (sumd-контур)
+  'code_repository_uri', // Ссылка на репозиторий разработки модели (альтернативный tech_label в СУМ)
+  'plan_validation_type', // Тип валидации
+  'developing_report', // Отчет по разработке модели / Аналитическая записка
+  'model_image_nexus_link', // Адрес образа модели в Nexus
+  'container_cfg_file', // Адрес конфигурационного файла контейнера
+  'source_code_link', // Ссылка на исходный код проекта
+  'build_link', // Ссылка на сборку
+  'docker_artifact_link', // Ссылка на артефакт сборки docker
+  'remove_decision', // Реквизиты решения о выведении из эксплуатации
+  'model_service_dev_link', // Ссылка на сервис для прода/КЗ
+  'importance_changes', // Краткая информация о решениях по изменению Модели (sumd tech_label)
+  'validation_tests', // Скрипты тестов/сценарии валидации (ARTEFACT_ID 153)
 ];
 
 /**
