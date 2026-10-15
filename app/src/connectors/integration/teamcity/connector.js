@@ -1,4 +1,4 @@
-const fetch = require('isomorphic-fetch')
+const {tracedFetch} = require("../../../utils/httpClient");
 const tslgLogger = require('../../../utils/logger');
 
 const teamcityHost = process.env.TEAMCITY_API
@@ -8,7 +8,7 @@ module.exports = ({
                       method = 'GET',
                       body
                   }) => {
-    tslgLogger.log(`Teamcity request: ${method} ${teamcityHost}${path}`, 'Запрос', 'info', null, {
+    tslgLogger.log('info', `Teamcity request: ${method} ${teamcityHost}${path}`, 'Запрос', null, {
         system: 'Teamcity',
         path,
         method
@@ -17,7 +17,8 @@ module.exports = ({
     const headers = {}
     headers['Content-Type'] = 'application/json'
 
-    return fetch(
+    // Используем tracedFetch вместо fetch
+    return tracedFetch(
         `${teamcityHost}${path}`,
         {
             method: body ? 'POST' : method,
@@ -26,7 +27,7 @@ module.exports = ({
         }
     )
         .then(data => {
-            tslgLogger.log(`Teamcity response: ${data.status}`, 'Ответ', 'info', null, {
+            tslgLogger.log('info', `Teamcity response: ${data.status}`, 'Ответ', null, {
                 system: 'Teamcity',
                 path,
                 method,
@@ -39,7 +40,7 @@ module.exports = ({
             error.status = data.status
             error.system = 'Teamcity'
 
-            tslgLogger.log(`Teamcity error: ${data.statusText}`, 'Ошибка', 'error', error, {
+            tslgLogger.log('error', `Teamcity error: ${data.statusText}`, 'Ошибка', error, {
                 system: 'Teamcity',
                 path,
                 method,
@@ -49,7 +50,7 @@ module.exports = ({
             throw error
         })
         .catch(error => {
-            tslgLogger.log(`Teamcity unexpected error: ${error.message}`, 'Ошибка', 'error', error, {
+            tslgLogger.log('error', `Teamcity unexpected error: ${error.message}`, 'Ошибка', error, {
                 system: 'Teamcity',
                 path,
                 method

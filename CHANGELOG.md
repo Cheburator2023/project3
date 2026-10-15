@@ -1,5 +1,47 @@
 # Semantic Versioning Changelog
 
+## [1.44.1](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.44.0...v1.44.1) (2026-10-07)
+
+
+### Bug Fixes
+
+* оптимизировал запрос по сложности алгоритма ([7ea9d04](https://git.sfera.inno.local:7999/SUMD/backend/commit/7ea9d047c24a2a872ea70d2716963e5ca99829ce))
+
+# [1.44.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.43.0...v1.44.0) (2026-10-07)
+
+
+### Features
+
+* Настроил логирование для управления DEBUG ([0485834](https://git.sfera.inno.local:7999/SUMD/backend/commit/0485834e6ff66840c0f7b454121c88bfa25f411b))
+* Скорректировал логи ([89c1729](https://git.sfera.inno.local:7999/SUMD/backend/commit/89c17292898b84228c3c68d67307b1fd5bbe2090))
+
+# [1.43.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.42.0...v1.43.0) (2026-10-02)
+
+
+### Features
+
+* Реализовал подключения к бд через TLS и mTLS, с обратной совместимостью ([939206d](https://git.sfera.inno.local:7999/SUMD/backend/commit/939206d832935b0c13fa43b49a3b54b9b06fb78b))
+* Скорректировал env ([3d1867a](https://git.sfera.inno.local:7999/SUMD/backend/commit/3d1867ab506c6bdcee52a3cede0287467e6135de))
+
+# [1.42.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.41.1...v1.42.0) (2026-09-18)
+
+
+### Features
+
+* Добавил debug ([d2a40f1](https://git.sfera.inno.local:7999/SUMD/backend/commit/d2a40f184e41c1fa9961c2df3983e5305fbfb86e))
+* Добавил OpenTelemetry ([72bc180](https://git.sfera.inno.local:7999/SUMD/backend/commit/72bc180536a3e44ad65d0bc0abd7fddb7d9d086a))
+* Добавил обёртку для external tasks ([1cb06b7](https://git.sfera.inno.local:7999/SUMD/backend/commit/1cb06b7472d8920b01f84919d9c386e557705345))
+* Исправил вызов auditClient в BpmnFinish ([bbc2ea2](https://git.sfera.inno.local:7999/SUMD/backend/commit/bbc2ea2a992c3fe96a94bf363a959290caeb6179))
+* Исправил вызов tracingContext() ([18fb772](https://git.sfera.inno.local:7999/SUMD/backend/commit/18fb772c97d75331be6daa8a0313221a06d367e0))
+* Поправил аудит ([8138bee](https://git.sfera.inno.local:7999/SUMD/backend/commit/8138bee85d68a6b57b4d79eabaa0221e0ff0d342))
+
+## [1.41.1](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.41.0...v1.41.1) (2026-09-11)
+
+
+### Bug Fixes
+
+* typo fix ([3a6cd2a](https://git.sfera.inno.local:7999/SUMD/backend/commit/3a6cd2ae85198a13c9fce8e7a47a2c36f364d4cd))
+
 # [1.41.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.40.0...v1.41.0) (2026-08-18)
 
 

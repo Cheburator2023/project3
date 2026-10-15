@@ -1,4 +1,4 @@
-const fetch = require('isomorphic-fetch')
+const {tracedFetch} = require("../../../utils/httpClient");
 const tslgLogger = require('../../../utils/logger');
 
 const smtpHost = process.env.SMTP_HOST || 'http://nodered.apps.pim.angara.cloud/'
@@ -8,13 +8,14 @@ module.exports = ({
                       method = 'GET',
                       body
                   }) => {
-    tslgLogger.log(`Email request: ${method} ${smtpHost}${path}`, 'Запрос', 'info', null, {
+    tslgLogger.log('info', `Email request: ${method} ${smtpHost}${path}`, 'Запрос', null, {
         system: 'SMTP',
         path,
         method
     });
 
-    return fetch(
+    // Используем tracedFetch вместо fetch
+    return tracedFetch(
         `${smtpHost}${path}`,
         {
             method: body ? 'POST' : method,
@@ -25,7 +26,7 @@ module.exports = ({
         }
     )
         .then(data => {
-            tslgLogger.log(`SMTP response: ${data.status} ${data.statusText}`, 'Ответ', 'info', null, {
+            tslgLogger.log('info', `SMTP response: ${data.status} ${data.statusText}`, 'Ответ', null, {
                 system: 'SMTP',
                 path,
                 method,
@@ -38,7 +39,7 @@ module.exports = ({
             error.status = data.status
             error.system = 'SMTP'
 
-            tslgLogger.log(`SMTP error: ${data.statusText}`, 'Ошибка', 'error', error, {
+            tslgLogger.log('error', `SMTP error: ${data.statusText}`, 'Ошибка', error, {
                 system: 'SMTP',
                 path,
                 method,
@@ -48,7 +49,7 @@ module.exports = ({
             throw error
         })
         .catch(error => {
-            tslgLogger.log(`SMTP unexpected error: ${error.message}`, 'Ошибка', 'error', error, {
+            tslgLogger.log('error', `SMTP unexpected error: ${error.message}`, 'Ошибка', error, {
                 system: 'SMTP',
                 path,
                 method

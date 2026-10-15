@@ -1,4 +1,4 @@
-const fetch = require('isomorphic-fetch')
+const { tracedFetch } = require('../../utils/httpClient')
 const tslgLogger = require('../../utils/logger')
 
 const host = process.env.BPMN_API || 'http://104.208.164.58:8888/engine-rest'
@@ -14,16 +14,11 @@ const headers = {
     Authorization
 }
 
-function consoleDebug(...args) {
-    const consoleToUse = console.original?.log || console.log;
-    consoleToUse('[DEBUG}', ...args);
-}
-
 const connector = ({ path, method = 'GET', body }, context = {}) => {
 
     const requestId = context?.requestId || 'unknown';
 
-    tslgLogger.log(`Run ${method} ${path}`, 'Запрос', 'info', null, {
+    tslgLogger.log('info', `Run ${method} ${path}`, 'Запрос', null, {
         requestId,
         system: 'BPMN'
     });
@@ -35,12 +30,13 @@ const connector = ({ path, method = 'GET', body }, context = {}) => {
     }
     const url = `${host}${path}`
 
-    return fetch(url, params)
+    // Используем tracedFetch вместо fetch
+    return tracedFetch(url, params)
         .then(data => {
             const { status, statusText } = data
 
             if (status === 200 || status === 204) {
-                tslgLogger.log(`BPMN ${method} ${path} completed successfully`, 'Успешно', 'info', null, {
+                tslgLogger.log('info', `BPMN ${method} ${path} completed successfully`, 'Успешно', null, {
                     requestId,
                     system: 'BPMN',
                     status
@@ -58,18 +54,18 @@ const connector = ({ path, method = 'GET', body }, context = {}) => {
             error.system = 'BPMN'
 
             if (process.env.NODE_ENV !== 'production') {
-                consoleDebug(`BPMN error: ${msg}`, {
-                requestId,
-                system: error.system,
-                status,
-                error: error.message
+                tslgLogger.debug(`BPMN error: ${msg}`, 'Отладка', {
+                    requestId,
+                    system: error.system,
+                    status,
+                    error: error.message
                 });
             }
 
             throw error
         })
         .then(data => {
-            tslgLogger.log(`Method ${path} completed successfully`, 'Успешно', 'info', null, {
+            tslgLogger.log('info', `Method ${path} completed successfully`, 'Успешно', null, {
                 requestId,
                 system: 'BPMN'
             });
@@ -77,7 +73,7 @@ const connector = ({ path, method = 'GET', body }, context = {}) => {
         })
         .catch(e => {
             if (process.env.NODE_ENV !== 'production') {
-                consoleDebug(`Unexpected BPMN error: ${e.msg}`, {
+                tslgLogger.debug(`Unexpected BPMN error: ${e.msg}`, 'ОтладкаBPMN', {
                     requestId,
                     system: 'BPMN',
                     error: e.message

@@ -87,6 +87,14 @@ class ProductionLogger extends LoggerInterface {
         }
     }
 
+    trace(message, event = 'Трассировка', additionalData = {}) {
+        this.log('trace', message, event, null, additionalData);
+    }
+
+    debug(message, event = 'Отладка', additionalData = {}) {
+        this.log('debug', message, event, null, additionalData);
+    }
+
     info(message, event = 'Информация', additionalData = {}) {
         this.log('info', message, event, null, additionalData);
     }
@@ -97,6 +105,18 @@ class ProductionLogger extends LoggerInterface {
 
     error(message, event = 'Ошибка', error = null, additionalData = {}) {
         this.log('error', message, event, error, additionalData);
+    }
+
+    fatal(message, event = 'Фатальная ошибка', error = null, additionalData = {}) {
+        this.log('fatal', message, event, error, additionalData);
+    }
+
+    panic(message, event = 'Паника', error = null, additionalData = {}) {
+        this.log('panic', message, event, error, additionalData);
+    }
+
+    critical(message, event = 'Критическая ошибка', error = null, additionalData = {}) {
+        this.log('critical', message, event, error, additionalData);
     }
 
     sys(message, additionalData = {}) {

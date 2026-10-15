@@ -133,11 +133,6 @@ class PostgresDatabase {
     }
   }
 
-  static consoleDebug(...args) {
-      const consoleToUse = console.original?.log || console.log;
-      consoleToUse('[DEBUG}', ...args);
-  }
-
   /**
    * Execute query.
    *
@@ -166,7 +161,7 @@ class PostgresDatabase {
               sql: sql.substring(0, 200) + '...',
               args: JSON.stringify(args).substring(0, 200) + '...'
           };
-          PostgresDatabase.consoleDebug(debugMessage, debugData);
+          tslgLogger.debug(debugMessage, 'Отладка', debugData);
       }
       throw err;
     } finally {
@@ -227,7 +222,7 @@ class PostgresDatabase {
                 sql: sql.substring(0, 200) + '...',
                 args: JSON.stringify(args).substring(0, 200) + '...'
             };
-            PostgresDatabase.consoleDebug(debugMessage, debugData);
+            tslgLogger.debug(debugMessage, 'Отладка', debugData);
       }
       throw err;
     }

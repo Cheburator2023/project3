@@ -55,6 +55,9 @@ class ConsoleLogger extends LoggerInterface {
 
         switch (level) {
             case 'error':
+            case 'fatal':
+            case 'panic':
+            case 'critical':
                 this.originalConsole.error(formattedMessage);
                 if (error && error.stack) {
                     this.originalConsole.error(error.stack);
@@ -63,10 +66,26 @@ class ConsoleLogger extends LoggerInterface {
             case 'warn':
                 this.originalConsole.warn(formattedMessage);
                 break;
+            case 'trace':
+            case 'debug':
+                if (this.originalConsole.debug) {
+                    this.originalConsole.debug(formattedMessage);
+                } else {
+                    this.originalConsole.log(formattedMessage);
+                }
+                break;
             case 'info':
             default:
                 this.originalConsole.log(formattedMessage);
         }
+    }
+
+    trace(message, event = 'Трассировка', additionalData = {}) {
+        this.log('trace', message, event, null, additionalData);
+    }
+
+    debug(message, event = 'Отладка', additionalData = {}) {
+        this.log('debug', message, event, null, additionalData);
     }
 
     info(message, event = 'Информация', additionalData = {}) {
@@ -79,6 +98,18 @@ class ConsoleLogger extends LoggerInterface {
 
     error(message, event = 'Ошибка', error = null, additionalData = {}) {
         this.log('error', message, event, error, additionalData);
+    }
+
+    fatal(message, event = 'Фатальная ошибка', error = null, additionalData = {}) {
+        this.log('fatal', message, event, error, additionalData);
+    }
+
+    panic(message, event = 'Паника', error = null, additionalData = {}) {
+        this.log('panic', message, event, error, additionalData);
+    }
+
+    critical(message, event = 'Критическая ошибка', error = null, additionalData = {}) {
+        this.log('critical', message, event, error, additionalData);
     }
 
     sys(message, additionalData = {}) {

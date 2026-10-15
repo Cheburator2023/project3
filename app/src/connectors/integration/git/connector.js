@@ -1,4 +1,4 @@
-const fetch = require('isomorphic-fetch')
+const {tracedFetch} = require("../../../utils/httpClient");
 const tslgLogger = require('../../../utils/logger');
 
 const gitHost = process.env.GIT_API
@@ -10,7 +10,7 @@ module.exports = ({
                       file
                   }, context = {}) => {
 
-    tslgLogger.log(`GIT request: ${method} ${gitHost}${path}`, 'Запрос', 'info', null, {
+    tslgLogger.log('info', `GIT request: ${method} ${gitHost}${path}`, 'Запрос', null, {
         system: 'GIT',
         path,
         method
@@ -20,7 +20,8 @@ module.exports = ({
     if (!file)
         headers['Content-Type'] = 'application/json'
 
-    return fetch(
+    // Используем tracedFetch вместо fetch
+    return tracedFetch(
         `${gitHost}${path}`,
         {
             method: body ? 'POST' : method,
@@ -30,7 +31,7 @@ module.exports = ({
     )
         .then(data => {
             if (data.status === 200) {
-                tslgLogger.log(`GIT response: ${data.status} ${data.statusText}`, 'Ответ', 'info', null, {
+                tslgLogger.log('info', `GIT response: ${data.status} ${data.statusText}`, 'Ответ', null, {
                     system: 'GIT',
                     path,
                     method,
@@ -43,7 +44,7 @@ module.exports = ({
             error.status = data.status
             error.system = 'GIT'
 
-            tslgLogger.log(`GIT error: ${data.statusText}`, 'Ошибка', 'error', error, {
+            tslgLogger.log('error', `GIT error: ${data.statusText}`, 'Ошибка', error, {
                 system: 'GIT',
                 path,
                 method,
@@ -53,7 +54,7 @@ module.exports = ({
             throw error
         })
         .catch(error => {
-            tslgLogger.log(`GIT unexpected error: ${error.message}`, 'Ошибка', 'error', error, {
+            tslgLogger.log('error', `GIT unexpected error: ${error.message}`, 'Ошибка', error, {
                 system: 'GIT',
                 path,
                 method
