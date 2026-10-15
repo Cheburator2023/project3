@@ -7,7 +7,7 @@ module.exports = ({
                       path,
                       token
                   }) => {
-    tslgLogger.log(`Keycloak request: GET ${keycloakHost}${path}`, 'Запрос', 'info', null, {
+    tslgLogger.log('info', `Keycloak request: GET ${keycloakHost}${path}`, 'Запрос', null, {
         system: 'Keycloak',
         path
     });
@@ -23,7 +23,7 @@ module.exports = ({
         }
     )
         .then(data => {
-            tslgLogger.log(`Keycloak response: ${data.status} ${data.statusText}`, 'Ответ', 'info', null, {
+            tslgLogger.log('info', `Keycloak response: ${data.status} ${data.statusText}`, 'Ответ', null, {
                 system: 'Keycloak',
                 path,
                 status: data.status
@@ -35,7 +35,7 @@ module.exports = ({
             error.status = data.status
             error.system = 'Keycloak'
 
-            tslgLogger.log(`Keycloak error: ${data.statusText}`, 'Ошибка', 'error', error, {
+            tslgLogger.log('error', `Keycloak error: ${data.statusText}`, 'Ошибка', error, {
                 system: 'Keycloak',
                 path,
                 status: data.status
@@ -44,7 +44,7 @@ module.exports = ({
             throw error
         })
         .catch(error => {
-            tslgLogger.log(`Keycloak unexpected error: ${error.message}`, 'Ошибка', 'error', error, {
+            tslgLogger.log('error', `Keycloak unexpected error: ${error.message}`, 'Ошибка', error, {
                 system: 'Keycloak',
                 path
             });

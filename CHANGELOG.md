@@ -1,5 +1,28 @@
 # Semantic Versioning Changelog
 
+## [1.44.1](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.44.0...v1.44.1) (2026-10-07)
+
+
+### Bug Fixes
+
+* оптимизировал запрос по сложности алгоритма ([7ea9d04](https://git.sfera.inno.local:7999/SUMD/backend/commit/7ea9d047c24a2a872ea70d2716963e5ca99829ce))
+
+# [1.44.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.43.0...v1.44.0) (2026-10-07)
+
+
+### Features
+
+* Настроил логирование для управления DEBUG ([0485834](https://git.sfera.inno.local:7999/SUMD/backend/commit/0485834e6ff66840c0f7b454121c88bfa25f411b))
+* Скорректировал логи ([89c1729](https://git.sfera.inno.local:7999/SUMD/backend/commit/89c17292898b84228c3c68d67307b1fd5bbe2090))
+
+# [1.43.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.42.0...v1.43.0) (2026-10-02)
+
+
+### Features
+
+* Реализовал подключения к бд через TLS и mTLS, с обратной совместимостью ([939206d](https://git.sfera.inno.local:7999/SUMD/backend/commit/939206d832935b0c13fa43b49a3b54b9b06fb78b))
+* Скорректировал env ([3d1867a](https://git.sfera.inno.local:7999/SUMD/backend/commit/3d1867ab506c6bdcee52a3cede0287467e6135de))
+
 # [1.42.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.41.1...v1.42.0) (2026-09-18)
 
 
