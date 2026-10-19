@@ -39,8 +39,17 @@ const RESTRICTED_MIPM_ARTEFACT_LABELS = [
   'docker_artifact_link', // Ссылка на артефакт сборки docker
   'remove_decision', // Реквизиты решения о выведении из эксплуатации
   'model_service_dev_link', // Ссылка на сервис для прода/КЗ
-  'importance_changes', // Краткая информация о решениях по изменению Модели (sumd tech_label)
+  'importance_changes', // Существенность внесенных изменений в РС (ARTEFACT_ID 794)
   'validation_tests', // Скрипты тестов/сценарии валидации (ARTEFACT_ID 153)
+  'implementation_doc_set_file', // Комплект документов для внедрения и применения модели (829)
+  'model_changes_info', // Краткая информация о решениях по изменению Модели (798)
+  'data_lineage_ml_link', // Ссылка на Data Lineage ML (909)
+  'devsecops_project_area', // Проектная область в Сфера DevSecOps (910)
+  'release_branch', // Релизная ветка (912)
+  'deployment_channel', // Канал(ы) внедрения (913)
+  'output_table', // Выходная таблица (914)
+  'allocation_assessment_class', // Класс оценки аллокаций (915)
+  'allocation_assessment_parameters', // Параметры оценки аллокации (916)
 ];
 
 /**
