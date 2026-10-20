@@ -81,7 +81,7 @@ module.exports = {
             const initiatorInfo = AuditInitiatorHelper.build(
                 { user: req.context.user, req },
                 {
-                    channel: 'http',
+                    channel: 'internal',
                     url: req.url,
                     method: req.method,
                 }

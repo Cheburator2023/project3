@@ -15,7 +15,7 @@ class System {
     endEvent = async ({task, taskService}) => {
         let correlationId;
         const initiator = AuditInitiatorHelper.build({}, {
-            channel: 'system',
+            channel: 'service',
             sub: 'system',
             method: 'endEvent',
         });
@@ -44,7 +44,7 @@ class System {
     updateModelInfo = async ({ task, taskService }) => {
         let correlationId;
         const initiator = AuditInitiatorHelper.build({}, {
-            channel: 'system',
+            channel: 'service',
             sub: 'system',
             method: 'updateModelInfo',
         });
@@ -171,7 +171,7 @@ class System {
         console.sys("Завершение Бизнес процесса");
         let correlationId;
         const initiator = AuditInitiatorHelper.build({}, {
-            channel: 'system',
+            channel: 'service',
             sub: 'system',
             method: 'bpmnFinish',
         });

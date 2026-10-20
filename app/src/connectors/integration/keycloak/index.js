@@ -20,7 +20,7 @@ class Keycloak {
         const username = keycloakUser;
         const password = keycloakPwd;
         const initiator = AuditInitiatorHelper.build({}, {
-            channel: 'keycloak',
+            channel: 'service',
             sub: username,
             realm: realms,
             method: 'authenticate',
@@ -83,7 +83,7 @@ class Keycloak {
 
     getTokenByUsername = async (username, password) => {
         const initiator = AuditInitiatorHelper.build({}, {
-            channel: 'keycloak',
+            channel: 'service',
             sub: username,
             realm: realms,
             method: 'authenticate',

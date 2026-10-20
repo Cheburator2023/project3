@@ -15,7 +15,7 @@ class Validation {
     validation = async ({ task, taskService }) => {
         const variables = task.variables.getAll();
         const initiator = AuditInitiatorHelper.build({}, {
-            channel: 'validation',
+            channel: 'service',
             sub: 'validation',
             method: 'validation',
         });

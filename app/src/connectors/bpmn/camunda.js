@@ -190,7 +190,7 @@ class Bpmn {
     modify = async (data, index = 0) => {
         let correlationId;
         const initiatorInfo = AuditInitiatorHelper.build({}, {
-            channel: 'bpmn',
+            channel: 'service',
             sub: 'system',
             method: 'modify',
             url: '/bpmn/modify',

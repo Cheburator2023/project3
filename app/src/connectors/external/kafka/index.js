@@ -11,7 +11,7 @@ class Kafka {
     const variables = task.variables.getAll();
 
     const initiator = AuditInitiatorHelper.build({}, {
-      channel: 'kafka',
+      channel: 'service',
       sub: 'kafka',
       method: 'kafka_createNewStrategy',
     });
@@ -77,7 +77,7 @@ class Kafka {
   createNewModel = async ({ task, taskService }) => {
     const variables = task.variables.getAll();
     const initiator = AuditInitiatorHelper.build({}, {
-      channel: 'kafka',
+      channel: 'service',
       sub: 'kafka',
       method: 'createNewModel',
     });
@@ -144,7 +144,7 @@ class Kafka {
   archiveModel = async ({ task, taskService }) => {
     const variables = task.variables.getAll();
     const initiator = AuditInitiatorHelper.build({}, {
-      channel: 'kafka',
+      channel: 'service',
       sub: 'kafka',
       method: 'archiveModel',
     });

@@ -6,7 +6,7 @@ const AuditInitiatorHelper = require('../../../../../utils/audit/auditInitiatorH
 module.exports = async (root, args, context) => {
     // Формирование информации об инициаторе для аудита
     const initiatorInfo = AuditInitiatorHelper.build(context, {
-        channel: 'graphql',
+        channel: 'service',
         url: '/graphql/mutation/cancelModel',
         method: 'cancelModel',
     });

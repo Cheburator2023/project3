@@ -62,7 +62,7 @@ module.exports = async (req, res, next) => {
     const initiatorInfo = AuditInitiatorHelper.build(
         req.context,
         {
-            channel: 'rest',
+            channel: 'service',
             url: req.url,
             method: req.method,
         }

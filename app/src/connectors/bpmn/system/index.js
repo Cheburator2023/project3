@@ -13,7 +13,7 @@ class System {
 
     endEvent = async ({ task, taskService }) => {
         let correlationId;
-        const initiator = { sub: 'system', channel: 'bpmn', method: 'endEvent' };
+        const initiator = { sub: 'system', channel: 'service', method: 'endEvent' };
         try {
             correlationId = await auditClient.start('SUMD_TASKCOMPLETE', initiator, { taskId: task.id });
             try {
@@ -38,7 +38,7 @@ class System {
 
     cancel = async ({ task, taskService }) => {
         let correlationId;
-        const initiator = { sub: 'system', channel: 'bpmn', method: 'cancel' };
+        const initiator = { sub: 'system', channel: 'service', method: 'cancel' };
         try {
             console.info('Отмена разработки модели');
             const model = task.variables.get("model");
@@ -73,7 +73,7 @@ class System {
         const variables = task.variables.getAll();
         console.sys('Завершение Бизнес процесса');
         let correlationId;
-        const initiator = { sub: 'system', channel: 'bpmn', method: 'bpmnFinish' };
+        const initiator = { sub: 'system', channel: 'service', method: 'bpmnFinish' };
         try {
             correlationId = await auditClient.start('SUMD_TASKCOMPLETE', initiator, { modelId: variables.model });
             await this.db.instance.finish({ model: variables.model, instance: task.processInstanceId, key: variables.key });
@@ -107,7 +107,7 @@ class System {
 
     updateModelInfo = async ({ task, taskService }) => {
         let correlationId;
-        const initiator = { sub: 'system', channel: 'bpmn', method: 'updateModelInfo' };
+        const initiator = { sub: 'system', channel: 'service', method: 'updateModelInfo' };
         try {
             const { model, model_stage } = task.variables.getAll();
             correlationId = await auditClient.start('SUMD_CANCELMODEL', initiator, { modelId: model });
