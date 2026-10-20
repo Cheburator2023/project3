@@ -108,6 +108,14 @@ module.exports = {
     database: process.env.PGSCHEMA,
     idleTimeoutMillis: parseInt(process.env.POOL_QUEUE_TIMEOUT) || 10000,
     max: parseInt(process.env.POOL_MAX) || 50,
+    // Таймаут получения соединения из пула.
+    // Защищает от бесконечного ожидания в pool.connect() при исчерпании пула.
+    connectionTimeoutMillis:
+        parseInt(process.env.POOL_CONNECT_TIMEOUT) || 10000,
+    // Серверный таймаут одного SQL-запроса.
+    // Защищает от бесконечного выполнения долгих/заблокированных запросов
+    // (FOR UPDATE / lock wait).
+    statement_timeout: parseInt(process.env.PG_STATEMENT_TIMEOUT) || 60000,
     allowExitOnIdle: false,
     ssl: buildTlsConfig(),
   },
