@@ -101,26 +101,29 @@ class AuditClient {
 
     /**
      * Внутренний метод отправки HTTP-запроса в сайдкар.
+     *
+     * Использует AbortController для прерывания fetch по истечении таймаута.
+     * Это предотвращает удержание сокета после того, как промис уже "завершился
+     * по таймауту" (что было при использовании Promise.race без отмены).
      */
     async _send(payload) {
-        let timeoutHandle;
-        const timeoutPromise = new Promise((_, reject) => {
-            timeoutHandle = setTimeout(
-                () => reject(new Error(`Audit sidecar timeout after ${this.timeout} ms`)),
-                this.timeout
-            );
-        });
-        const fetchPromise = fetch(this.sidecarUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-        });
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+
+        let response;
         try {
-            const response = await Promise.race([fetchPromise, timeoutPromise]);
+            response = await fetch(this.sidecarUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+                signal: controller.signal,
+            });
+
             if (!response.ok) {
                 const errorText = await response.text();
                 throw new Error(`Audit sidecar responded with ${response.status}: ${errorText}`);
             }
+
             tslgLogger.debug(
                 `[Audit] ${payload.eventClass}/${payload.eventCode} sent, correlationId=${payload.correlationId}`,
                 'AuditClient',
@@ -131,19 +134,32 @@ class AuditClient {
                 }
             );
         } catch (error) {
-            tslgLogger.debug(
-                `[Audit] Failed to send ${payload.eventClass}/${payload.eventCode}`,
-                'AuditClient',
-                {
-                    eventCode: payload.eventCode,
-                    eventClass: payload.eventClass,
-                    correlationId: payload.correlationId,
-                }
-            );
-        } finally {
-            if (timeoutHandle) {
-                clearTimeout(timeoutHandle);
+            // Различаем таймаут (AbortError) и остальные ошибки для удобства диагностики.
+            if (error && error.name === 'AbortError') {
+                tslgLogger.warn(
+                    `[Audit] Failed to send ${payload.eventClass}/${payload.eventCode} (timeout after ${this.timeout} ms)`,
+                    'AuditClient',
+                    {
+                        eventCode: payload.eventCode,
+                        eventClass: payload.eventClass,
+                        correlationId: payload.correlationId,
+                        timeoutMs: this.timeout,
+                    }
+                );
+            } else {
+                tslgLogger.debug(
+                    `[Audit] Failed to send ${payload.eventClass}/${payload.eventCode}`,
+                    'AuditClient',
+                    {
+                        eventCode: payload.eventCode,
+                        eventClass: payload.eventClass,
+                        correlationId: payload.correlationId,
+                        error: error?.message,
+                    }
+                );
             }
+        } finally {
+            clearTimeout(timeoutId);
         }
     }
 }

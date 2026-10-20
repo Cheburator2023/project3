@@ -1,3 +1,4 @@
+const pg = require('pg')
 const ModelStateResolverWorker = require('./model_state_resolver_worker')
 
 const OPEN_INTERVAL = '9999-12-31 23:59:59'
@@ -14,17 +15,39 @@ const OPEN_INTERVAL = '9999-12-31 23:59:59'
  * - сохраняет построчный `last_event`;
  * - полностью заменяет итоговые строки модели в `model_stage` и `model_status`.
  *
+ * LISTEN-соединение для канала пересчёта вынесено в отдельный пул (max=1),
+ * чтобы не занимать соединение из общего `pg.Pool` на всё время жизни воркера.
+ *
  * @param {object} database Инстанс PostgresDatabase.
  * @param {object} [opts]
  * @param {Function} [opts.stageValidator] Опциональная функция валидации stage override.
  * @param {Function} [opts.statusValidator] Опциональная функция валидации status override.
  * @param {string[]} [opts.validStages] Альтернативный способ задать whitelist для stage.
  * @param {string[]} [opts.validStatuses] Альтернативный способ задать whitelist для status.
+ * @param {pg.Pool} [opts.listenPool] Внешний пул для LISTEN-соединения (не будет закрыт воркером).
+ * @param {boolean} [opts.createDedicatedListenPool=true] Создать ли собственный пул для LISTEN.
  * @returns {ModelStateResolverWorker}
  */
 function createModelStateResolverWorker (database, opts = {}) {
   if (!database) {
     throw new Error('createModelStateResolverWorker: database is required')
+  }
+
+  // Отдельный пул для LISTEN-соединения.
+  // Нужен, чтобы долгоживущее соединение не занимало слот в общем пуле,
+  // который используется HTTP-обработчиками (иначе при пиковой нагрузке
+  // воркер уменьшает доступную ёмкость пула.
+  let listenPool = opts.listenPool || null
+  let listenPoolOwnedByWorker = false
+  if (!listenPool && opts.createDedicatedListenPool !== false) {
+    listenPool = new pg.Pool({
+      ...database.options.poolConfig,
+      max: 1,
+      // LISTEN-соединение держим всегда, idle-reaper не нужен.
+      idleTimeoutMillis: 0,
+      application_name: 'sumd-model-state-resolver-listen',
+    })
+    listenPoolOwnedByWorker = true
   }
 
   async function recomputeResolved (job, { connection }) {
@@ -202,18 +225,15 @@ function createModelStateResolverWorker (database, opts = {}) {
     }
   }
 
-  return new ModelStateResolverWorker(database, recomputeResolved, { ...opts })
-}
-
-/**
- * Упрощённый helper чтения строк через уже открытое транзакционное соединение.
- *
- * @returns {Promise<object[]>}
- */
-async function selectRows (database, connection, sql, args) {
-  const res = await database.executeWithConnection({ connection, sql, args })
-  return res.rows ?? []
-}
+  /**
+   * Упрощённый helper чтения строк через уже открытое транзакционное соединение.
+   *
+   * @returns {Promise<object[]>}
+   */
+  async function selectRows (database, connection, sql, args) {
+    const res = await database.executeWithConnection({ connection, sql, args })
+    return res.rows ?? []
+  }
 
 /**
  * Возвращает текущее время Postgres в строковом SQL-формате `YYYY-MM-DD HH:mm:ss`.
@@ -552,6 +572,13 @@ function toStatusInsertArgs (row) {
     source_table: row.sourceTable,
     last_event: JSON.stringify(row.lastEvent)
   }
+}
+
+  return new ModelStateResolverWorker(database, recomputeResolved, {
+    ...opts,
+    listenPool,
+    listenPoolOwnedByWorker,
+  })
 }
 
 module.exports = createModelStateResolverWorker

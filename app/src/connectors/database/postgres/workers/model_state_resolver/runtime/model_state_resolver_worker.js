@@ -11,6 +11,11 @@
  * Воркер поддерживает два механизма пробуждения:
  * - `LISTEN/NOTIFY` по каналу Postgres;
  * - периодический polling очереди как fallback.
+ *
+ * LISTEN-соединение может использовать выделенный `listenPool`
+ * (передаётся из фабрики), чтобы не занимать слот в общем `pg.Pool`,
+ * который используется HTTP-обработчиками. Если `listenPool` не задан —
+ * используется `db.getConnection()` (старое поведение).
  */
 class ModelStateResolverWorker {
   /**
@@ -22,6 +27,9 @@ class ModelStateResolverWorker {
    * @param {string} [opts.channel='model_recalc'] Канал Postgres для LISTEN/NOTIFY.
    * @param {boolean} [opts.useListen=true] Включать ли LISTEN/NOTIFY.
    * @param {object} [opts.logger=console] Логгер с методами info/warn/error.
+   * @param {object} [opts.listenPool] Выделенный пул для LISTEN-соединения.
+   * @param {boolean} [opts.listenPoolOwnedByWorker=false] Признак, что воркер
+   *   владеет `listenPool` и должен закрыть его при остановке.
    */
   constructor (db, recomputeResolved, opts = {}) {
     this.db = db
@@ -32,6 +40,9 @@ class ModelStateResolverWorker {
     this.channel = opts.channel ?? 'model_recalc'
     this.useListen = opts.useListen ?? true
     this.logger = opts.logger ?? console
+
+    this.listenPool = opts.listenPool ?? null
+    this.listenPoolOwnedByWorker = opts.listenPoolOwnedByWorker ?? false
 
     this.running = false
     this.wake = false
@@ -62,6 +73,7 @@ class ModelStateResolverWorker {
       })
     } catch (error) {
       this.running = false
+      await this.closeOwnedListenPool()
       throw error
     }
   }
@@ -72,10 +84,14 @@ class ModelStateResolverWorker {
    * Порядок остановки:
    * - ставит флаг завершения цикла;
    * - закрывает LISTEN-соединение;
-   * - дожидается завершения основного loop.
+   * - дожидается завершения основного loop;
+   * - закрывает собственный listenPool (если воркер им владеет).
    */
   async stop () {
-    if (!this.running && !this.listenConn && !this.loopPromise) return
+    if (!this.running && !this.listenConn && !this.loopPromise) {
+      await this.closeOwnedListenPool()
+      return
+    }
 
     this.running = false
     this.wake = true
@@ -89,14 +105,19 @@ class ModelStateResolverWorker {
         this.loopPromise = null
       }
     }
+
+    await this.closeOwnedListenPool()
   }
 
   /**
-   * Открывает отдельное соединение к БД и подписывается на канал `LISTEN`.
+   * Открывает соединение для подписки на канал `LISTEN`.
+   * Если задан `listenPool` — берёт соединение из него; иначе из общего `db`.
    * При получении notification воркер просыпается и сразу перечитывает очередь.
    */
   async startListener () {
-    this.listenConn = await this.db.getConnection()
+    this.listenConn = this.listenPool
+        ? await this.listenPool.connect()
+        : await this.db.getConnection()
 
     await this.listenConn.query(`LISTEN ${ this.channel }`)
 
@@ -143,7 +164,7 @@ class ModelStateResolverWorker {
   }
 
   /**
-   * Снимает подписку LISTEN и освобождает выделенное соединение.
+   * Снимает подписку LISTEN и освобождает соединение.
    */
   async stopListener () {
     if (!this.listenConn) return
@@ -162,6 +183,24 @@ class ModelStateResolverWorker {
     try {
       await connection.release()
     } catch {
+    }
+  }
+
+  /**
+   * Закрывает собственный `listenPool`, если воркер им владеет.
+   * Если `listenPool` передан извне — не закрываем его (это ответственность владельца).
+   */
+  async closeOwnedListenPool () {
+    if (!this.listenPool || !this.listenPoolOwnedByWorker) return
+
+    const pool = this.listenPool
+    this.listenPool = null
+    this.listenPoolOwnedByWorker = false
+
+    try {
+      await pool.end()
+    } catch (error) {
+      this.logger.warn('[ModelStateResolverWorker] failed to close listenPool', error)
     }
   }
 

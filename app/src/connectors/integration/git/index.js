@@ -1,5 +1,5 @@
 const connector = require('./connector')
-const fetch = require('isomorphic-fetch')
+const { tracedFetch } = require('../../../utils/httpClient')
 const storage = process.env.GIT_STORAGE;
 
 class Git {
@@ -13,7 +13,7 @@ class Git {
             file: true
         })
     // Get link for upload
-    download = ({ model, name }) => fetch(`${process.env.GIT_API}${storage}/${model}/${model}/${name}`)
+    download = ({ model, name }) => tracedFetch(`${process.env.GIT_API}${storage}/${model}/${model}/${name}`)
         .then(res => res.body)
 
     //Get filelink for download

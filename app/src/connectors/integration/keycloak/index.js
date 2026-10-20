@@ -3,6 +3,7 @@ const qs = require('qs');
 const querystring =  require('querystring')
 const auditClient = require('../../../utils/audit/auditClient');
 const tslgLogger = require('../../../utils/logger')
+const { tracedFetch } = require('../../../utils/httpClient');
 
 const connector = require('./connector')
 
@@ -34,7 +35,7 @@ class Keycloak {
 
         let data;
         try {
-            const response = await fetch(
+            const response = await tracedFetch(
                 `${keycloakHost}auth/realms/${realms}/protocol/openid-connect/token`,
                 {
                     method: 'POST',
@@ -96,7 +97,7 @@ class Keycloak {
 
         let data;
         try {
-            const response = await fetch(
+            const response = await tracedFetch(
                 `${keycloakHost}auth/realms/${realms}/protocol/openid-connect/token`,
                 {
                     method: 'POST',
