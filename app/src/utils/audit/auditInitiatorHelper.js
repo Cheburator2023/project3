@@ -83,10 +83,11 @@ class AuditInitiatorHelper {
                 || null,
 
             // staff_id / staff_roleId: приоритет — ролевая модель (РМ),
-            // fallback — JWT (TechDebt, если РМ недоступна).
+            // fallback — JWT (TechDebt, если РМ недоступна),
+            // затем — initiator_sub (для гарантии непустого значения).
             staffId: roleModel.staffId
                 || jwtData.staffId
-                || null,
+                || sub,
             staffRoleId: roleModel.staffRoleId
                 || jwtData.staffRoleId
                 || null,
