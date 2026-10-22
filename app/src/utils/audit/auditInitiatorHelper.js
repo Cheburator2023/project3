@@ -13,16 +13,13 @@ const ChannelNormalizer = require('./channelNormalizer');
  *   - initiator_realm            — realm (JWT realm или из iss)
  *   - initiator_clientAppId      — client_id/azp из JWT
  *   - initiator_channel          — internal/external/apic/service/smmb/SMBGuest/trust
- *                                  (JWT channel → x-channel → ENV → 'unknown')
+ *                                  (options.channel -> JWT channel -> x-channel -> ENV -> 'unknown')
  *   - initiator_sourceIp         — IP инициатора (XFF / req.ip)
  *   - context_url                — URL аудируемой операции
  *   - context_method             — HTTP-метод
  *   - context_nearbyNodeIp       — IP ближайшего узла (RemoteAddr)
  *   - staff_id                   — subjectCode РМ (через RoleModelClient) или fallback
  *   - staff_roleId               — roleCode РМ (через RoleModelClient) или fallback
- *
- * Параметр options.channel сохраняется для обратной совместимости, но
- * НЕ используется для записи в initiator_channel — только для логирования.
  */
 class AuditInitiatorHelper {
 
@@ -31,13 +28,16 @@ class AuditInitiatorHelper {
      *
      * @param {Object} context - контекст запроса (user, req)
      * @param {Object} [options]
-     * @param {string} [options.channel]   - техническая метка (graphql/rest/...)
-     *                                       для логирования, в initiator_channel не пишется
+     * @param {string} [options.channel]   - приоритетный источник для initiator_channel
      * @param {string} [options.url]       - URL операции (переопределяет req)
      * @param {string} [options.method]    - HTTP-метод (переопределяет req)
      * @param {string} [options.sourceIp]  - IP инициатора
      * @param {string} [options.nearbyNodeIp] - IP ближайшего узла
      * @param {Object} [options.roleModel] - { staffId, staffRoleId } из РМ (приоритет выше JWT)
+     * @param {string} [options.sub]       - идентификатор инициатора (переопределяет JWT)
+     * @param {string} [options.realm]     - realm (переопределяет JWT)
+     * @param {string} [options.clientAppId] - clientAppId (переопределяет JWT)
+     * @param {string} [options.userSessionId] - userSessionId (переопределяет JWT)
      */
     static build(context = {}, options = {}) {
         const safeContext = context || {};
@@ -73,7 +73,7 @@ class AuditInitiatorHelper {
                 || user.realm
                 || jwtData.realm
                 || 'staff',
-            channel: ChannelNormalizer.resolveChannel(jwtData, req, sub),
+            channel: ChannelNormalizer.resolveChannel(jwtData, req, sub, options.channel),
             clientAppId: options.clientAppId
                 || jwtData.clientAppId
                 || null,

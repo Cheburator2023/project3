@@ -39,18 +39,25 @@ class ChannelNormalizer {
 
     /**
      * Определяет initiator_channel по иерархии:
+     *  - optionsChannel (если передан явно)
      *  - JWT channel
      *  - заголовок x-channel
      *  - process.env.DEFAULT_INITIATOR_CHANNEL
      *  - 'unknown'
      * с последующей нормализацией.
+     *
+     * @param {Object} jwtData - данные из JWT
+     * @param {Object} req - HTTP-запрос
+     * @param {string} sub - идентификатор инициатора
+     * @param {string} [optionsChannel] - явно переданный канал (приоритет)
+     * @returns {string} - нормализованное значение канала
      */
-    static resolveChannel(jwtData, req, sub) {
-        let channel = null;
+    static resolveChannel(jwtData, req, sub, optionsChannel = null) {
+        let channel = optionsChannel || null;
 
-        if (jwtData && jwtData.channel) {
+        if (!channel && jwtData && jwtData.channel) {
             channel = jwtData.channel;
-        } else if (req && req.headers) {
+        } else if (!channel && req && req.headers) {
             const headerChannel = req.headers['x-channel'];
             if (headerChannel && String(headerChannel).trim()) {
                 channel = String(headerChannel).trim();
