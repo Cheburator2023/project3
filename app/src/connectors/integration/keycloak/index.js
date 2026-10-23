@@ -2,6 +2,7 @@ const fetch = require('isomorphic-fetch')
 const qs = require('qs');
 const querystring =  require('querystring')
 const auditClient = require('../../../utils/audit/auditClient');
+const AuditInitiatorHelper = require('../../../utils/audit/auditInitiatorHelper');
 const tslgLogger = require('../../../utils/logger')
 
 const connector = require('./connector')
@@ -18,12 +19,12 @@ class Keycloak {
     getToken = async () => {
         const username = keycloakUser;
         const password = keycloakPwd;
-        const initiator = {
+        const initiator = AuditInitiatorHelper.build({}, {
+            channel: 'service',
             sub: username,
-            channel: 'keycloak',
             realm: realms,
-            method: 'authenticate'
-        };
+            method: 'authenticate',
+        });
         let correlationId = null;
         // Старт аудита
         try {
@@ -81,12 +82,12 @@ class Keycloak {
     }
 
     getTokenByUsername = async (username, password) => {
-        const initiator = {
+        const initiator = AuditInitiatorHelper.build({}, {
+            channel: 'service',
             sub: username,
-            channel: 'keycloak',
             realm: realms,
-            method: 'authenticate'
-        };
+            method: 'authenticate',
+        });
         let correlationId = null;
         try {
             correlationId = await auditClient.start('SUMD_AUTH', initiator, { username, realm: realms });

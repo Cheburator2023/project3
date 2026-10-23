@@ -1,6 +1,7 @@
 const connector = require("./connector");
 const querystring = require("querystring");
 const auditClient = require('../../utils/audit/auditClient');
+const AuditInitiatorHelper = require('../../utils/audit/auditInitiatorHelper');
 
 class Bpmn {
     constructor(db, context) {
@@ -188,12 +189,12 @@ class Bpmn {
     // Tree modification
     modify = async (data, index = 0) => {
         let correlationId;
-        const initiatorInfo = {
+        const initiatorInfo = AuditInitiatorHelper.build({}, {
+            channel: 'service',
             sub: 'system',
-            channel: 'bpmn',
             method: 'modify',
-            url: '/bpmn/modify'
-        };
+            url: '/bpmn/modify',
+        });
         try {
             // tree deep
             if (index > data.length - 1) return true;
