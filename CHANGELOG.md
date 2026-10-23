@@ -1,5 +1,18 @@
 # Semantic Versioning Changelog
 
+# [1.45.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.44.1...v1.45.0) (2026-10-23)
+
+
+### Features
+
+* Добавил новые поля для аудита ([3258aed](https://git.sfera.inno.local:7999/SUMD/backend/commit/3258aed2894b32d63acebe859b5dd48e3a130ba1))
+* Корректировка staff_roleId и operation_description ([e07fb3b](https://git.sfera.inno.local:7999/SUMD/backend/commit/e07fb3b26800c75122ae7890e203423bd74bdd98))
+* Рефакторинг auditInitiatorHelper ([76d090a](https://git.sfera.inno.local:7999/SUMD/backend/commit/76d090a290bec62e8ccbe94d3146cffd430579fc))
+* Скорректировал channel ([72a4ffc](https://git.sfera.inno.local:7999/SUMD/backend/commit/72a4ffca081101df5ffce3bf3b1e7f389947a6c0))
+* Скорректировал initiator_channel ([513d344](https://git.sfera.inno.local:7999/SUMD/backend/commit/513d3443ad66def60c6db157d525d93e42599967))
+* Скорректировал staffId ([fc6fb06](https://git.sfera.inno.local:7999/SUMD/backend/commit/fc6fb06408027a7b40954d26d2b869ed06c8def0))
+* Скорректировал tracedFetch ([a9d43a5](https://git.sfera.inno.local:7999/SUMD/backend/commit/a9d43a5e3b804d4fc307a339a9bbbfeb1242ecdf))
+
 ## [1.44.1](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.44.0...v1.44.1) (2026-10-07)
 
 
