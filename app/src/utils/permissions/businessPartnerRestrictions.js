@@ -50,6 +50,14 @@ const RESTRICTED_MIPM_ARTEFACT_LABELS = [
   'output_table', // Выходная таблица (914)
   'allocation_assessment_class', // Класс оценки аллокаций (915)
   'allocation_assessment_parameters', // Параметры оценки аллокации (916)
+  'deploy_team', // Команда, которая внедряла модель (919)
+  'runtime_subsystem', // Подсистема реализации модели (920)
+  'validation_report_approve_date', // Дата утверждения отчета валидации (792)
+  'deploy_system', // Система внедрения (921)
+  'order_for_developing_or_buiseness_case', // Заявка на разработку модели или описание гипотезы бизнес-кейса (70)
+  'buiseness_process_name', // Бизнес-процесс (59)
+  'decision_of_model_completion_doc', // Решение заказчика по модели (700)
+  'snapshot_long_datamart', // Snapshot широкой витрины (49)
 ];
 
 /**
