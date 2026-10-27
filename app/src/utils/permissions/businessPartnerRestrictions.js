@@ -58,6 +58,12 @@ const RESTRICTED_MIPM_ARTEFACT_LABELS = [
   'buiseness_process_name', // Бизнес-процесс (59)
   'decision_of_model_completion_doc', // Решение заказчика по модели (700)
   'snapshot_long_datamart', // Snapshot широкой витрины (49)
+  'model_integration_dag_link', // Путь к DAG-файлу (prod,test,dev) (856)
+  'validation_result_approve_date', // Информация о дате утверждения на УО МР (793)
+  'validation_department', // Подразделение, проводившее валидацию (790)
+  'full_validation_result_approve_date', // Информация о дате утверждения на УО МР (879)
+  'full_validation_department', // Подразделение, проводившее валидацию (874)
+  'model_result_purpose_comment', // Комментарий к цели использования результатов модели (66)
 ];
 
 /**
