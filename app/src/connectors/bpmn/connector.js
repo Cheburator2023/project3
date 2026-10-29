@@ -8,17 +8,15 @@ const pwd = process.env.BPMN_PWD || 'demo'
 const Authorization =
     `Basic ${Buffer.from(`${user}:${pwd}`).toString('base64')}`
 
-
 const headers = {
     'Content-Type': 'application/json',
     Authorization
 }
 
 const connector = ({ path, method = 'GET', body }, context = {}) => {
-
     const requestId = context?.requestId || 'unknown';
 
-    tslgLogger.log('info', `Run ${method} ${path}`, 'Запрос', null, {
+    tslgLogger.info(`Run ${method} ${path}`, 'Запрос', {
         requestId,
         system: 'BPMN'
     });
@@ -32,51 +30,88 @@ const connector = ({ path, method = 'GET', body }, context = {}) => {
 
     // Используем tracedFetch вместо fetch
     return tracedFetch(url, params)
-        .then(data => {
-            const { status, statusText } = data
+        .then(response => {
+            const { status, statusText } = response;
 
             if (status === 200 || status === 204) {
-                tslgLogger.log('info', `BPMN ${method} ${path} completed successfully`, 'Успешно', null, {
+                tslgLogger.info(`BPMN ${method} ${path} completed successfully`, 'Успешно', {
                     requestId,
                     system: 'BPMN',
                     status
                 });
             }
 
-            // Success
-            if (status === 204) return true
-            if (status === 200) return data.json()
+            // Успешные ответы
+            if (status === 204) return true;
+            if (status === 200) return response.json();
 
-            // Error handler
-            const msg = `Method ${path}. Failed: ${statusText}`
-            const error = new Error (msg)
-            error.status = status
-            error.system = 'BPMN'
+            // Обработка ошибок: читаем тело ответа
+            return response.json()
+                .catch(jsonParseError => {
+                    // Если не удалось распарсить JSON — используем statusText
+                    const msg = `Method ${path}. Failed: ${statusText} (JSON parse error: ${jsonParseError.message})`
+                    const error = new Error(msg)
+                    error.status = status
+                    error.system = 'BPMN'
 
-            if (process.env.NODE_ENV !== 'production') {
-                tslgLogger.debug(`BPMN error: ${msg}`, 'Отладка', {
-                    requestId,
-                    system: error.system,
-                    status,
-                    error: error.message
-                });
-            }
+                    tslgLogger.error(
+                        `BPMN ${method} ${path} failed: ${msg}`,
+                        'Ошибка',
+                        error,
+                        {
+                            requestId,
+                            system: 'BPMN',
+                            status,
+                        }
+                    );
 
-            throw error
+                    throw error
+                })
+                .then(errorBody => {
+                    const errorMessage = errorBody?.message || statusText;
+                    const errorType = errorBody?.type || 'UnknownException';
+                    const error = new Error(errorMessage)
+                    error.status = status
+                    error.system = 'BPMN'
+                    error.type = errorType
+
+                    tslgLogger.error(
+                        `BPMN ${method} ${path} failed with error: ${errorMessage}`,
+                        'Ошибка',
+                        error,
+                        {
+                            requestId,
+                            system: 'BPMN',
+                            status,
+                            errorType
+                        }
+                    );
+
+                    throw error
+                })
         })
         .then(data => {
-            tslgLogger.log('info', `Method ${path} completed successfully`, 'Успешно', null, {
+            tslgLogger.info(`Method ${path} completed successfully`, 'Успешно', {
                 requestId,
                 system: 'BPMN'
             });
             return data
         })
         .catch(e => {
-            if (process.env.NODE_ENV !== 'production') {
-                tslgLogger.debug(`Unexpected BPMN error: ${e.msg}`, 'ОтладкаBPMN', {
+            if (e.system !== 'BPMN') {
+                tslgLogger.error(`BPMN ${method} ${path} request failed: ${e.message}`, 'Ошибка', e, {
                     requestId,
                     system: 'BPMN',
-                    error: e.message
+                    status: e.status
+                });
+            }
+            if (process.env.NODE_ENV !== 'production') {
+                tslgLogger.debug(`Unexpected BPMN error: ${e.message}`, 'ОтладкаBPMN', {
+                    requestId,
+                    system: 'BPMN',
+                    error: e.message,
+                    status: e.status,
+                    errorType: e.type
                 });
             }
             throw e

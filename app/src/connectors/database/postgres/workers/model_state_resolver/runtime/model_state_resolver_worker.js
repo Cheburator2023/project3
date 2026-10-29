@@ -206,7 +206,7 @@ class ModelStateResolverWorker {
    * - `0`, если доступных записей нет.
    */
   async processOneModelTx () {
-    const connection = await this.db.beginTransation()
+    const connection = await this.db.beginTransaction()
 
     try {
       const job = await this.takeOne(connection)

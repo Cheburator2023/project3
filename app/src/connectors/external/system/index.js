@@ -36,7 +36,7 @@ class System {
             await auditClient.success('SUMD_TASKCOMPLETE', correlationId, initiator, {taskId: task.id});
         } catch (error) {
             await auditClient.failure('SUMD_TASKCOMPLETE', correlationId, error, initiator, {taskId: task.id});
-            tslgLogger.sys(error);
+            tslgLogger.error(error.message, 'Ошибка', error);
         }
     };
 
@@ -65,7 +65,7 @@ class System {
             await auditClient.success('SUMD_CANCELMODEL', correlationId, initiator, { modelId: model });
         } catch (error) {
             await auditClient.failure('SUMD_CANCELMODEL', correlationId, error, initiator, { modelId: task.variables.get("model") });
-            tslgLogger.sys(error);
+            tslgLogger.error(error.message, 'Ошибка', error);
         }
     };
 
@@ -158,7 +158,7 @@ class System {
         });
       }
     } catch (e) {
-      console.sys(e);
+      tslgLogger.error(e.message, 'Ошибка', e);
     }
   };
 
@@ -244,7 +244,7 @@ class System {
                 modelId,
                 error: error.message,
             });
-            tslgLogger.error('Error in bpmnFinish', 'SystemError', error);
+            tslgLogger.error(error.message, 'SystemError', error);
             // Ошибка НЕ пробрасывается дальше, чтобы external task не зависал
         }
     };
@@ -261,7 +261,7 @@ class System {
       }
       await taskService.complete(task);
     } catch (e) {
-      console.sys(e);
+      tslgLogger.error(e.message, 'Ошибка', e);
     }
   };
 
@@ -278,7 +278,7 @@ class System {
         );
       await taskService.complete(task);
     } catch (e) {
-      console.sys(e);
+      tslgLogger.error(e.message, 'Ошибка', e);
     }
   };
 
@@ -309,7 +309,7 @@ class System {
       });
       await taskService.complete(task, processVariables);
     } catch (e) {
-      console.sys(e);
+      tslgLogger.error(e.message, 'Ошибка', e);
     }
   };
 }
