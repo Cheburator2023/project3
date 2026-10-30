@@ -21,7 +21,7 @@ class System {
         });
         try {
             correlationId = await auditClient.start('SUMD_TASKCOMPLETE', initiator, {taskId: task.id});
-            console.log("Remove parallel call activity");
+            tslgLogger.log('info',"Remove parallel call activity","Информация");
             const instance = task.variables.get("instance");
             const processInstances = await this.bpmn.processInstances();
             const process = processInstances.find(
@@ -36,7 +36,11 @@ class System {
             await auditClient.success('SUMD_TASKCOMPLETE', correlationId, initiator, {taskId: task.id});
         } catch (error) {
             await auditClient.failure('SUMD_TASKCOMPLETE', correlationId, error, initiator, {taskId: task.id});
-            tslgLogger.error(error.message, 'Ошибка', error);
+            tslgLogger.error(`endEvent error: ${error.message}`, 'Ошибка', error, {
+                system: 'System',
+                task: task,
+                status: model_status
+            });
         }
     };
 
@@ -65,13 +69,17 @@ class System {
             await auditClient.success('SUMD_CANCELMODEL', correlationId, initiator, { modelId: model });
         } catch (error) {
             await auditClient.failure('SUMD_CANCELMODEL', correlationId, error, initiator, { modelId: task.variables.get("model") });
-            tslgLogger.error(error.message, 'Ошибка', error);
+            tslgLogger.error(`updateModelInfo error: ${error.message}`, 'Ошибка', error, {
+                system: 'System',
+                task: task,
+                status: model_status
+            });
         }
     };
 
   // Validates the consistency of a model's state between the database and Camunda. Add result to process variables
   healthCheck = async ({ task, taskService }) => {
-    console.log("Starting health check model...");
+    tslgLogger.log('info',"Starting health check model...","Информация");
 
     const { model } = task.variables.getAll();
 
@@ -98,7 +106,7 @@ class System {
   // Suspend all active process instances
   suspend = async ({ task, taskService }) => {
     try {
-      console.log("Starting suspending model...");
+      tslgLogger.log('info',"Starting suspending model...","Информация");
 
       const { model } = task.variables.getAll();
 
@@ -108,14 +116,18 @@ class System {
       });
 
       await taskService.complete(task);
-    } catch (e) {
-      console.error(e);
+    } catch (error) {
+        tslgLogger.error(`Suspend error: ${error.message}`, 'Ошибка', error, {
+            system: 'System',
+            task: task,
+            status: model_status
+        });
     }
   };
 
   bpmnStart = async ({ task, taskService }) => {
     const variables = task.variables.getAll();
-    console.sys("Инициализация Бизнес процесса");
+    tslgLogger.log('info',"Инициализация Бизнес процесса","Информация");
 
     try {
       const checkInstance = await this.db.instance.id(task.processInstanceId);
@@ -157,8 +169,12 @@ class System {
           modelStatus: modelStatus ? modelStatus : null,
         });
       }
-    } catch (e) {
-      tslgLogger.error(e.message, 'Ошибка', e);
+    } catch (error) {
+      tslgLogger.error(`bpmnStart error: ${error.message}`, 'Ошибка', error, {
+          system: 'System',
+          task: task,
+          status: model_status
+      });
     }
   };
 
@@ -168,7 +184,7 @@ class System {
      */
     bpmnFinish = async ({ task, taskService }) => {
         const variables = task.variables.getAll();
-        console.sys("Завершение Бизнес процесса");
+        tslgLogger.log('info',"Завершение Бизнес процесса","Информация");
         let correlationId;
         const initiator = AuditInitiatorHelper.build({}, {
             channel: 'service',
@@ -183,8 +199,11 @@ class System {
                 throw new Error('Model ID is missing in task variables');
             }
 
-            // Старт аудита с передачей modelId
-            correlationId = await auditClient.start('SUMD_TASKCOMPLETE', initiator, { modelId });
+            // Старт аудита с передачей modelId и taskId
+            correlationId = await auditClient.start('SUMD_TASKCOMPLETE', initiator, {
+                modelId: modelId,
+                taskId: task.id
+            });
 
             // Завершаем инстанс в БД
             await this.db.instance.finish({
@@ -235,23 +254,31 @@ class System {
             }
 
             // Успешное завершение – аудит SUCCESS
-            await auditClient.success('SUMD_TASKCOMPLETE', correlationId, initiator, { modelId });
+            await auditClient.success('SUMD_TASKCOMPLETE', correlationId, initiator, {
+                modelId: modelId,
+                taskId: task.id
+            });
 
         } catch (error) {
             // Обработка ошибки: отправка FAILURE с fallback-значением modelId
             const modelId = variables?.model || 'unknown';
             await auditClient.failure('SUMD_TASKCOMPLETE', correlationId, error, initiator, {
-                modelId,
+                modelId: modelId,
+                taskId: task.id,
                 error: error.message,
             });
-            tslgLogger.error(error.message, 'SystemError', error);
+            tslgLogger.error(`bpmnFinish error: ${error.message}`, 'Ошибка', error,{
+                system: 'System',
+                task: task,
+                status: model_status
+                });
             // Ошибка НЕ пробрасывается дальше, чтобы external task не зависал
         }
     };
 
   bpmnStatus = async ({ task, taskService }) => {
     const variables = task.variables.getAll();
-    console.sys("Смена статуса модели");
+    tslgLogger.log('info',"Смена статуса модели","Информация");
     try {
       if ("model_status" in variables) {
         await this.db.card.changeStatus({
@@ -260,8 +287,12 @@ class System {
         });
       }
       await taskService.complete(task);
-    } catch (e) {
-      tslgLogger.error(e.message, 'Ошибка', e);
+    } catch (error) {
+      tslgLogger.error(`bpmnFinish error: ${error.message}`, 'Ошибка', error,{
+          system: 'System',
+          task: task,
+          status: model_status
+      });
     }
   };
 
@@ -277,8 +308,12 @@ class System {
           )
         );
       await taskService.complete(task);
-    } catch (e) {
-      tslgLogger.error(e.message, 'Ошибка', e);
+    } catch (error) {
+        tslgLogger.error(`putJobDue error: ${error.message}`, 'Ошибка', error,{
+            system: 'System',
+            task: task,
+            status: model_status
+        });
     }
   };
 
@@ -308,8 +343,12 @@ class System {
         need_model_ops: !filteredValues.includes(status)
       });
       await taskService.complete(task, processVariables);
-    } catch (e) {
-      tslgLogger.error(e.message, 'Ошибка', e);
+    } catch (error) {
+        tslgLogger.error(`needModelOps error: ${error.message}`, 'Ошибка', error,{
+            system: 'System',
+            task: task,
+            status: model_status
+        });
     }
   };
 }
