@@ -1,5 +1,19 @@
 # Semantic Versioning Changelog
 
+# [1.46.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.45.0...v1.46.0) (2026-10-30)
+
+
+### Bug Fixes
+
+* preserve Camunda error details and logging context ([18e1bfb](https://git.sfera.inno.local:7999/SUMD/backend/commit/18e1bfb6f87c2bd30e1460ebb27b75ce04291033))
+* Исправил события Аудита и Журналирования ([c63de92](https://git.sfera.inno.local:7999/SUMD/backend/commit/c63de9210ec8aa37491b6c471305fd3c14f5d122))
+
+
+### Features
+
+* improve model rollback and preserve tracing and diagnostic logging ([2716099](https://git.sfera.inno.local:7999/SUMD/backend/commit/27160999ea33d3fef6e115cb12d33a04afbb6fdf))
+* рефакторинг откатов ([a39921b](https://git.sfera.inno.local:7999/SUMD/backend/commit/a39921b536990376081b7d2eba5b64c315021fd4))
+
 # [1.45.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.44.1...v1.45.0) (2026-10-23)
 
 
