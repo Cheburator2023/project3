@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.48.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.47.0...v1.48.0) (2026-11-05)
+
+
+### Features
+
+* restore model rollback and logging changes for r3 ([91ed261](https://git.sfera.inno.local:7999/SUMD/backend/commit/91ed261a98de2b074f7b3d1e4b2ceb8bb0d0cf97))
+
 # [1.47.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.46.0...v1.47.0) (2026-11-05)
 
 
