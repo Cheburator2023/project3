@@ -1,4 +1,5 @@
-const availableGroups = ["ds", "ds_lead", "mipm"];
+// PRJ-COMMON-26: mipm/mipm_lead (Бизнес-партнер) лишены возможности остановки модели
+const availableGroups = ["ds", "ds_lead"];
 const cancelInstanceKey = "model_state_transition";
 const auditClient = require('../../../../../utils/audit/auditClient');
 const AuditInitiatorHelper = require('../../../../../utils/audit/auditInitiatorHelper');

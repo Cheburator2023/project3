@@ -1,4 +1,7 @@
 const getUserName = require("./helpers");
+const {
+  isBusinessPartner,
+} = require('../../../../../utils/permissions/businessPartnerRestrictions');
 
 // This array contains bpmn key ids that are linked to the model state transition schemas.
 // These processes should not be removed after rollback
@@ -294,6 +297,11 @@ const checkModelFinalStatus = async (modelId, context) => {
 
 module.exports = async (root, { activity }, context) => {
   try {
+    // PRJ-COMMON-26: Бизнес-партнеру (mipm/mipm_lead) недоступен откат по бизнес-процессу
+    if (isBusinessPartner(context.user)) {
+      return null;
+    }
+
     const { MODEL_ID, MODELS_IS_ACTIVE_FLG, DEPLOYMENT_ID } = await getModelInfo(
       activity,
       context
