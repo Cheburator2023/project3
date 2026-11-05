@@ -1,5 +1,9 @@
 const { AuthenticationError } = require('apollo-server-express');
 const userCanWrite = require('../../../../../utils/permissions/userCanWrite');
+const {
+  isBusinessPartner,
+  RESTRICTED_MIPM_ARTEFACT_LABELS,
+} = require('../../../../../utils/permissions/businessPartnerRestrictions');
 
 module.exports = async (root, args, context) => {
   const {
@@ -15,6 +19,18 @@ module.exports = async (root, args, context) => {
   // Проверяем уровень доступа текущего пользователя
   if (!userCanWrite(context.user)) {
     throw new AuthenticationError(`Недостаточно прав для редактирования артефакта: "${ARTEFACT_ID}"`);
+  }
+
+  // PRJ-COMMON-26: Бизнес-партнеру (mipm/mipm_lead) запрещено редактирование
+  // ограниченных атрибутов карточки модели (вкладки «Основная информация», «Артефакты»)
+  if (isBusinessPartner(context.user)) {
+    const artefact = await context.db.artefact.artefactById({ artefactId: ARTEFACT_ID });
+    const techLabel =
+      (artefact && (artefact.ARTEFACT_TECH_LABEL || artefact.artefact_tech_label)) || null;
+
+    if (RESTRICTED_MIPM_ARTEFACT_LABELS.includes(techLabel)) {
+      throw new AuthenticationError(`Недостаточно прав для редактирования артефакта: "${ARTEFACT_ID}"`);
+    }
   }
 
   // Архивируем существующий артефакт
