@@ -516,6 +516,24 @@ class Bpmn {
         variables: "model_eq_" + modelId,
       })}`,
     });
+
+  historyProcessInstanceById = (processInstanceId, sortBy = 'endTime', sortOrder = 'desc') =>
+    this.connector({
+      path: `/history/process-instance?${querystring.stringify({
+        sortBy: sortBy,
+        sortOrder: sortOrder,
+        processInstanceId: processInstanceId,
+      })}`,
+    });
+
+  historyVariableInstancesByActivity = (activityIds, sortBy = 'variableName', sortOrder = 'asc') =>
+    this.connector({
+      path: `/history/variable-instance?${querystring.stringify({
+        sortBy: sortBy,
+        sortOrder: sortOrder,
+        activityInstanceIdIn: activityIds.join(','),
+      })}`,
+    });
 }
 
 module.exports = Bpmn;
