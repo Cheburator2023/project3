@@ -1,5 +1,32 @@
 # Semantic Versioning Changelog
 
+# [1.47.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.46.0...v1.47.0) (2026-11-05)
+
+
+### Bug Fixes
+
+* поправил синтаксис values в скрипте миграции стрима ([d3a71c4](https://git.sfera.inno.local:7999/SUMD/backend/commit/d3a71c4786f6bca89b61106b36c4e9c66e5e8cd0))
+
+
+### Features
+
+* include PRJ-COMMON-26 changes in the first release ([2192310](https://git.sfera.inno.local:7999/SUMD/backend/commit/21923102d0fc716c71e08dc9595800deeafc9e59))
+* блокировка редактирования артефактов для бизнес партнера ([a775a5f](https://git.sfera.inno.local:7999/SUMD/backend/commit/a775a5f22cf4d596edb30da96f2ecd21c7fa6ab5))
+* блокировка редактирования артефактов для бизнес партнера ([71d30bd](https://git.sfera.inno.local:7999/SUMD/backend/commit/71d30bdcef839b117438142ee5fcf451b091a379))
+* блокировка редактирования артефактов для бизнес партнера ([19e9200](https://git.sfera.inno.local:7999/SUMD/backend/commit/19e92005faae0907968d0f011dc995e57e4fea91))
+* добавил ai-модели партнерств в справочник стрим-исполнитель (7) ([142bbc1](https://git.sfera.inno.local:7999/SUMD/backend/commit/142bbc15100817ecd07165ff3afbe0dc89dda8d1))
+* добавил скрипт миграции стрима партнерств в ai и rnd ([36304b8](https://git.sfera.inno.local:7999/SUMD/backend/commit/36304b81a49aa25812911a5770fccdcb53229e09))
+* добавил стрим ai-модели партнерств в mapping для ds ([e072004](https://git.sfera.inno.local:7999/SUMD/backend/commit/e0720040d737a160d7ac3c34fefb1592e3b1dc94))
+* добавление роли Бизнес партнер и Бизнес партнер стримовой ([54b031d](https://git.sfera.inno.local:7999/SUMD/backend/commit/54b031d2ad283597405eab54ee1f3a66d547e869))
+* фильтрация Бизнес партнер стримовой ([a0e0b1b](https://git.sfera.inno.local:7999/SUMD/backend/commit/a0e0b1b0e0a64f614277c310c3a7a2a3ecdc65ad))
+* фильтрация Бизнес партнер стримовой ([dcbf82d](https://git.sfera.inno.local:7999/SUMD/backend/commit/dcbf82d2d5c32ac3873a219456244b7dee120d9d))
+* фильтрация Бизнес партнер стримовой ([9c3f6bc](https://git.sfera.inno.local:7999/SUMD/backend/commit/9c3f6bc974550dbbb318ca63622828c3c3ccde07))
+
+
+### Reverts
+
+* defer model rollback and logging changes to R3 ([79a437e](https://git.sfera.inno.local:7999/SUMD/backend/commit/79a437ef2b653d5c2f342e0a6340ce32f39385d8))
+
 # [1.46.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.45.0...v1.46.0) (2026-10-30)
 
 
