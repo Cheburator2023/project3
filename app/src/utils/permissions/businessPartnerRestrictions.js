@@ -64,6 +64,9 @@ const RESTRICTED_MIPM_ARTEFACT_LABELS = [
   'full_validation_result_approve_date', // Информация о дате утверждения на УО МР (879)
   'full_validation_department', // Подразделение, проводившее валидацию (874)
   'model_result_purpose_comment', // Комментарий к цели использования результатов модели (66)
+  'model_risk_type', // Вид / подвид риска (797)
+  'model_indicator', // Индикатор модели (784)
+  'validity_approve', // Решение об утверждении Модели / РС (787)
 ];
 
 /**
