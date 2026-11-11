@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.49.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.48.0...v1.49.0) (2026-11-11)
+
+
+### Features
+
+* блокировка полей в карточке артефакта для бизнес партнера ([54dba1c](https://git.sfera.inno.local:7999/SUMD/backend/commit/54dba1cff0917719d2ff9ec2da8458c90a183096))
+
 # [1.48.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.47.0...v1.48.0) (2026-11-05)
 
 
