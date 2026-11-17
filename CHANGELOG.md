@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.50.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.49.0...v1.50.0) (2026-11-17)
+
+
+### Features
+
+* typo feat ([f873c7f](https://git.sfera.inno.local:7999/SUMD/backend/commit/f873c7f2cac5f5a002886ea22c48ca61a68713cc))
+
 # [1.49.0](https://git.sfera.inno.local:7999/SUMD/backend/compare/v1.48.0...v1.49.0) (2026-11-11)
 
 
