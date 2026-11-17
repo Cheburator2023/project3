@@ -9,6 +9,7 @@ const server = require('./server');
 const {initTracing} = require("./utils/opentelemetry/opentelemetry");
 initTracing();
 
+
 class Application {
   constructor() {
     this.httpServer = null;
