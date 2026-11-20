@@ -14,13 +14,17 @@ class System {
 
     endEvent = async ({task, taskService}) => {
         let correlationId;
-        const initiator = AuditInitiatorHelper.build({}, {
+        const initiator = AuditInitiatorHelper.buildFromTaskVariables(task.variables.getAll(), {
             channel: 'service',
-            sub: 'system',
+            url: '/external/system/endEvent',
             method: 'endEvent',
         });
         try {
-            correlationId = await auditClient.start('SUMD_TASKCOMPLETE', initiator, {taskId: task.id});
+            correlationId = await auditClient.start('SUMD_TASKCOMPLETE', initiator, {
+                modelId: task.variables.get("model"),
+                modelName: task.variables.get("modelName"),
+                taskId: task.id,
+            });
             tslgLogger.log('info',"Remove parallel call activity","Информация");
             const instance = task.variables.get("instance");
             const processInstances = await this.bpmn.processInstances();
@@ -33,9 +37,20 @@ class System {
             console.log(JSON.stringify(process));
             await this.bpmn.deleteProcess(process.id);
             await taskService.complete(task);
-            await auditClient.success('SUMD_TASKCOMPLETE', correlationId, initiator, {taskId: task.id});
+            await auditClient.success('SUMD_TASKCOMPLETE', correlationId, initiator, {
+                modelId: task.variables.get("model"),
+                modelName: task.variables.get("modelName"),
+                taskId: task.id,
+                status: model_status
+            });
         } catch (error) {
-            await auditClient.failure('SUMD_TASKCOMPLETE', correlationId, error, initiator, {taskId: task.id});
+            await auditClient.failure('SUMD_TASKCOMPLETE', correlationId, error, initiator, {
+                modelId: task.variables.get("model"),
+                modelName: task.variables.get("modelName"),
+                taskId: task.id,
+                status: model_status,
+                error: error.message
+            });
             tslgLogger.error(`endEvent error: ${error.message}`, 'Ошибка', error, {
                 system: 'System',
                 task: task,
@@ -47,14 +62,19 @@ class System {
     // Update model data in DB
     updateModelInfo = async ({ task, taskService }) => {
         let correlationId;
-        const initiator = AuditInitiatorHelper.build({}, {
+        const initiator = AuditInitiatorHelper.buildFromTaskVariables(task.variables.getAll(), {
             channel: 'service',
-            sub: 'system',
+            url: '/external/system/updateModelInfo',
             method: 'updateModelInfo',
         });
         try {
             const { model, model_stage } = task.variables.getAll();
-            correlationId = await auditClient.start('SUMD_CANCELMODEL', initiator, { modelId: model });
+            correlationId = await auditClient.start('SUMD_CANCELMODEL', initiator, {
+                modelId: task.variables.get("model"),
+                modelName: task.variables.get("modelName"),
+                taskId: task.id,
+                status: model_status
+            });
 
             // Set model_is_active_flg to 0 in models table
             await this.db.card.cancel({ model });
@@ -66,9 +86,20 @@ class System {
             });
 
             await taskService.complete(task);
-            await auditClient.success('SUMD_CANCELMODEL', correlationId, initiator, { modelId: model });
+            await auditClient.success('SUMD_CANCELMODEL', correlationId, initiator, {
+                modelId: task.variables.get("model"),
+                modelName: task.variables.get("modelName"),
+                taskId: task.id,
+                status: model_status
+            });
         } catch (error) {
-            await auditClient.failure('SUMD_CANCELMODEL', correlationId, error, initiator, { modelId: task.variables.get("model") });
+            await auditClient.failure('SUMD_CANCELMODEL', correlationId, error, initiator, {
+                modelId: task.variables.get("model"),
+                modelName: task.variables.get("modelName"),
+                taskId: task.id,
+                status: model_status,
+                error: error.message
+            });
             tslgLogger.error(`updateModelInfo error: ${error.message}`, 'Ошибка', error, {
                 system: 'System',
                 task: task,
@@ -186,9 +217,9 @@ class System {
         const variables = task.variables.getAll();
         tslgLogger.log('info',"Завершение Бизнес процесса","Информация");
         let correlationId;
-        const initiator = AuditInitiatorHelper.build({}, {
+        const initiator = AuditInitiatorHelper.buildFromTaskVariables(variables, {
             channel: 'service',
-            sub: 'system',
+            url: '/external/system/bpmnFinish',
             method: 'bpmnFinish',
         });
 
@@ -201,7 +232,8 @@ class System {
 
             // Старт аудита с передачей modelId и taskId
             correlationId = await auditClient.start('SUMD_TASKCOMPLETE', initiator, {
-                modelId: modelId,
+                modelId: task.variables.get("model"),
+                modelName: task.variables.get("modelName"),
                 taskId: task.id
             });
 
@@ -255,7 +287,8 @@ class System {
 
             // Успешное завершение – аудит SUCCESS
             await auditClient.success('SUMD_TASKCOMPLETE', correlationId, initiator, {
-                modelId: modelId,
+                modelId: task.variables.get("model"),
+                modelName: task.variables.get("modelName"),
                 taskId: task.id
             });
 
@@ -263,7 +296,8 @@ class System {
             // Обработка ошибки: отправка FAILURE с fallback-значением modelId
             const modelId = variables?.model || 'unknown';
             await auditClient.failure('SUMD_TASKCOMPLETE', correlationId, error, initiator, {
-                modelId: modelId,
+                modelId: task.variables.get("model"),
+                modelName: task.variables.get("modelName"),
                 taskId: task.id,
                 error: error.message,
             });

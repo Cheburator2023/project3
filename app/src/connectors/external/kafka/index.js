@@ -10,9 +10,8 @@ class Kafka {
   kafka_createNewStrategy = async ({ task, taskService }) => {
     const variables = task.variables.getAll();
 
-    const initiator = AuditInitiatorHelper.build({}, {
+    const initiator = AuditInitiatorHelper.buildFromTaskVariables(variables, {
       channel: 'service',
-      sub: 'kafka',
       method: 'kafka_createNewStrategy',
     });
     let correlationId;
@@ -23,7 +22,11 @@ class Kafka {
     });
 
     try {
-      correlationId = await auditClient.start('SUMD_CREATEMODEL', initiator, { modelId: variables.model });
+      correlationId = await auditClient.start('SUMD_CREATEMODEL', initiator, {
+        modelId: task.variables.get("model"),
+        modelName: task.variables.get("modelName"),
+        taskId: task.id,
+      });
       const model_entity = await this.db.integration
           .modelGet(variables.model)
           .then((d) => d.rows[0]);
@@ -57,7 +60,11 @@ class Kafka {
         taskId: task.id
       });
 
-      await auditClient.success('SUMD_CREATEMODEL', correlationId, initiator, { modelId: variables.model, alias });
+      await auditClient.success('SUMD_CREATEMODEL', correlationId, initiator, {
+        modelId: task.variables.get("model"),
+        modelName: task.variables.get("modelName"),
+        taskId: task.id,
+      });
 
     } catch (error) {
         if (process.env.NODE_ENV !== 'production') {
@@ -69,16 +76,20 @@ class Kafka {
             };
             tslgLogger.debug(debugMessage, 'Отладка', debugData);
         }
-        await auditClient.failure('SUMD_CREATEMODEL', correlationId, error, initiator, { modelId: variables.model });
+        await auditClient.failure('SUMD_CREATEMODEL', correlationId, error, initiator, {
+          modelId: task.variables.get("model"),
+          modelName: task.variables.get("modelName"),
+          taskId: task.id,
+          error: error.message
+        });
         throw error;
     }
   };
 
   createNewModel = async ({ task, taskService }) => {
     const variables = task.variables.getAll();
-    const initiator = AuditInitiatorHelper.build({}, {
+    const initiator = AuditInitiatorHelper.buildFromTaskVariables(variables, {
       channel: 'service',
-      sub: 'kafka',
       method: 'createNewModel',
     });
     let correlationId;
@@ -89,7 +100,11 @@ class Kafka {
     });
 
     try {
-      correlationId = await auditClient.start('SUMD_CREATEMODEL', initiator, { modelId: variables.model });
+      correlationId = await auditClient.start('SUMD_CREATEMODEL', initiator, {
+        modelId: task.variables.get("model"),
+        modelName: task.variables.get("modelName"),
+        taskId: task.id
+      });
       const model_entity = await this.db.integration
           .modelGet(variables.model)
           .then((d) => d.rows[0]);
@@ -124,7 +139,11 @@ class Kafka {
         alias,
         taskId: task.id
       });
-      await auditClient.success('SUMD_CREATEMODEL', correlationId, initiator, { modelId: variables.model, alias });
+      await auditClient.success('SUMD_CREATEMODEL', correlationId, initiator, {
+        modelId: task.variables.get("model"),
+        modelName: task.variables.get("modelName"),
+        taskId: task.id
+      });
 
     } catch (error) {
         if (process.env.NODE_ENV !== 'production') {
@@ -136,16 +155,20 @@ class Kafka {
             };
             tslgLogger.debug(debugMessage, 'Отладка', debugData);
         }
-      await auditClient.failure('SUMD_CREATEMODEL', correlationId, error, initiator, { modelId: variables.model });
+      await auditClient.failure('SUMD_CREATEMODEL', correlationId, error, initiator, {
+        modelId: task.variables.get("model"),
+        modelName: task.variables.get("modelName"),
+        taskId: task.id,
+        error: error.message
+      });
       throw error;
     }
   };
 
   archiveModel = async ({ task, taskService }) => {
     const variables = task.variables.getAll();
-    const initiator = AuditInitiatorHelper.build({}, {
+    const initiator = AuditInitiatorHelper.buildFromTaskVariables(variables, {
       channel: 'service',
-      sub: 'kafka',
       method: 'archiveModel',
     });
     let correlationId;
@@ -156,7 +179,11 @@ class Kafka {
     });
 
     try {
-      correlationId = await auditClient.start('SUMD_REMOVEMODEL', initiator, { modelId: variables.model });
+      correlationId = await auditClient.start('SUMD_REMOVEMODEL', initiator, {
+        modelId: task.variables.get("model"),
+        modelName: task.variables.get("modelName"),
+        taskId: task.id
+      });
       const model_entity = await this.db.integration
           .modelGet(variables.model)
           .then((d) => d.rows[0]);
@@ -181,7 +208,11 @@ class Kafka {
 
       await taskService.complete(task);
 
-      await auditClient.success('SUMD_REMOVEMODEL', correlationId, initiator, { modelId: variables.model, alias });
+      await auditClient.success('SUMD_REMOVEMODEL', correlationId, initiator, {
+        modelId: task.variables.get("model"),
+        modelName: task.variables.get("modelName"),
+        taskId: task.id
+      });
 
         tslgLogger.info(`Модель архивирована: ${alias}`, 'УспехАрхивацииМодели', {
         modelId: variables.model,
@@ -190,7 +221,12 @@ class Kafka {
       });
 
     } catch (error) {
-        await auditClient.failure('SUMD_REMOVEMODEL', correlationId, error, initiator, { modelId: variables.model });
+        await auditClient.failure('SUMD_REMOVEMODEL', correlationId, error, initiator, {
+          modelId: task.variables.get("model"),
+          modelName: task.variables.get("modelName"),
+          taskId: task.id,
+          error: error.message
+        });
 
         tslgLogger.error(`Ошибка архивации модели`, 'ОшибкаАрхивацииМодели', error, {
         modelId: variables.model,

@@ -14,14 +14,17 @@ class Validation {
 
     validation = async ({ task, taskService }) => {
         const variables = task.variables.getAll();
-        const initiator = AuditInitiatorHelper.build({}, {
+        const initiator = AuditInitiatorHelper.buildFromTaskVariables(variables, {
             channel: 'service',
-            sub: 'validation',
             method: 'validation',
         });
         let correlationId;
         try {
-            correlationId = await auditClient.start('SUMD_UPLOADREPORT', initiator, { modelId: variables.model });
+            correlationId = await auditClient.start('SUMD_UPLOADREPORT', initiator, {
+                modelId: task.variables.get("model"),
+                modelName: task.variables.get("modelName"),
+                taskId: task.id
+            });
             const processVariables = new Variables()
             const variables  = task.variables.getAll()
             const model_entity = await this.db
@@ -72,10 +75,19 @@ class Validation {
             await taskService.complete(task, processVariables)
 
             // Отправка аудита: выгрузка отчета (SUCCESS)
-            await auditClient.success('SUMD_UPLOADREPORT', correlationId, initiator, { modelId: variables.model, alias });
+            await auditClient.success('SUMD_UPLOADREPORT', correlationId, initiator, {
+                modelId: task.variables.get("model"),
+                modelName: task.variables.get("modelName"),
+                taskId: task.id
+            });
         } catch (error) {
             // Отправка аудита: выгрузка отчета (FAILURE)
-            await auditClient.failure('SUMD_UPLOADREPORT', correlationId, error, initiator, { modelId: variables.model });
+            await auditClient.failure('SUMD_UPLOADREPORT', correlationId, error, initiator, {
+                modelId: task.variables.get("model"),
+                modelName: task.variables.get("modelName"),
+                taskId: task.id,
+                error: error.message
+            });
             tslgLogger.error('Ошибка отправки аудита выгрузки отчета', 'AuditError', error);
         }
     }

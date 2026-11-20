@@ -100,6 +100,67 @@ class AuditInitiatorHelper {
     }
 
     /**
+     * Формирует информацию об инициаторе для обработчиков внешних задач Camunda.
+     *
+     * Обработчики внешних задач Camunda не имеют HTTP-контекста с JWT: они
+     * запускаются поллером Camunda, а не HTTP-запросом пользователя. Данные об
+     * инициаторе передаются через переменные процесса Camunda:
+     *   - userSub / userRealm / userChannel / clientIp — плоские переменные;
+     *   - либо user / token / tokenPayload — JWT-токен, из которого данные
+     *     извлекаются через JwtHelper.
+     *
+     * Приоритет: options (явные) → JWT из variables → плоские переменные → fallback.
+     *
+     * @param {Object} variables - переменные задачи Camunda (task.variables.getAll())
+     * @param {Object} [options]
+     * @param {string} [options.channel]   - приоритетный источник initiator_channel
+     * @param {string} [options.url]       - URL аудируемой операции
+     * @param {string} [options.method]    - HTTP-метод / имя операции
+     * @param {string} [options.sourceIp]  - IP инициатора
+     * @param {string} [options.sub]       - идентификатор инициатора
+     * @param {string} [options.realm]     - realm
+     * @returns {Object} initiatorInfo для auditClient
+     */
+    static buildFromTaskVariables(variables = {}, options = {}) {
+        const safeVariables = variables || {};
+        const user = safeVariables.user || {};
+
+        const tokenPayload = JwtHelper.extractTokenPayload(user)
+            || JwtHelper.extractTokenPayload(safeVariables);
+        const jwtData = JwtHelper.fromJwt(tokenPayload);
+
+        const sub = options.sub
+            || user.preferred_username
+            || user.username
+            || jwtData.sub
+            || safeVariables.userSub
+            || 'system';
+
+        const realm = options.realm
+            || user.realm
+            || jwtData.realm
+            || safeVariables.userRealm
+            || 'staff';
+
+
+        const context = {};
+        if (Object.keys(user).length) {
+            context.user = user;
+        } else if (Object.keys(tokenPayload).length) {
+            context.user = { token: { payload: tokenPayload } };
+        }
+
+        return AuditInitiatorHelper.build(context, {
+            channel: safeVariables.userChannel || options.channel || 'service',
+            url: options.url || null,
+            method: options.method || null,
+            sourceIp: options.sourceIp || safeVariables.clientIp || '127.0.0.1',
+            sub,
+            realm,
+        });
+    }
+
+    /**
      * Возвращает пустую структуру инициатора.
      */
     static empty() {

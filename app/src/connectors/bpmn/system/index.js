@@ -3,6 +3,7 @@ const { Variables } = require("camunda-external-task-client-js");
 const { model_status } = require("../../../common/status-map");
 const { getLastActiveStatus } = require("../../../common/status-helpers");
 const auditClient = require('../../../utils/audit/auditClient');
+const AuditInitiatorHelper = require('../../../utils/audit/auditInitiatorHelper');
 const tslgLogger = require('../../../utils/logger');
 
 class System {
@@ -13,9 +14,16 @@ class System {
 
     endEvent = async ({ task, taskService }) => {
         let correlationId;
-        const initiator = { sub: 'system', channel: 'service', method: 'endEvent' };
+        const initiator = AuditInitiatorHelper.buildFromTaskVariables(task.variables.getAll(), {
+            channel: 'service',
+            method: 'endEvent',
+        });
         try {
-            correlationId = await auditClient.start('SUMD_TASKCOMPLETE', initiator, { taskId: task.id });
+            correlationId = await auditClient.start('SUMD_TASKCOMPLETE', initiator, {
+                modelId: task.variables.get("model"),
+                modelName: task.variables.get("modelName"),
+                taskId: task.id,
+            });
             try {
                 console.log("Remove parallel call activity");
                 const instance = task.variables.get("instance");
@@ -29,28 +37,52 @@ class System {
                 await this.bpmn.deleteProcess(process.id);
             } catch (e) { console.log(e); }
             await taskService.complete(task);
-            await auditClient.success('SUMD_TASKCOMPLETE', correlationId, initiator, { taskId: task.id });
+            await auditClient.success('SUMD_TASKCOMPLETE', correlationId, initiator, {
+                modelId: task.variables.get("model"),
+                modelName: task.variables.get("modelName"),
+                taskId: task.id,
+            });
         } catch (error) {
-            await auditClient.failure('SUMD_TASKCOMPLETE', correlationId, error, initiator, { taskId: task.id });
+            await auditClient.failure('SUMD_TASKCOMPLETE', correlationId, error, initiator, {
+                modelId: task.variables.get("model"),
+                modelName: task.variables.get("modelName"),
+                taskId: task.id,
+            });
             throw error;
         }
     };
 
     cancel = async ({ task, taskService }) => {
         let correlationId;
-        const initiator = { sub: 'system', channel: 'service', method: 'cancel' };
+        const initiator = AuditInitiatorHelper.buildFromTaskVariables(task.variables.getAll(), {
+            channel: 'service',
+            url: '/bpmn/system/cancel',
+            method: 'cancel',
+        });
         try {
             console.info('Отмена разработки модели');
             const model = task.variables.get("model");
-            correlationId = await auditClient.start('SUMD_CANCELMODEL', initiator, { modelId: model });
+            correlationId = await auditClient.start('SUMD_CANCELMODEL', initiator, {
+                modelId: task.variables.get("model"),
+                modelName: task.variables.get("modelName"),
+                taskId: task.id,
+            });
             const instances = await this.db.instance.model({ model });
             console.info('Завершение всех инстансов модели', model);
             await Promise.all(instances.map(inst => this.bpmn.deleteProcess(inst.BPMN_INSTANCE_ID)));
             await this.db.card.cancel({ model });
             await taskService.complete(task);
-            await auditClient.success('SUMD_CANCELMODEL', correlationId, initiator, { modelId: model });
+            await auditClient.success('SUMD_CANCELMODEL', correlationId, initiator, {
+                modelId: task.variables.get("model"),
+                modelName: task.variables.get("modelName"),
+                taskId: task.id,
+            });
         } catch (error) {
-            await auditClient.failure('SUMD_CANCELMODEL', correlationId, error, initiator, { modelId: task.variables.get("model") });
+            await auditClient.failure('SUMD_CANCELMODEL', correlationId, error, initiator, {
+                modelId: task.variables.get("model"),
+                modelName: task.variables.get("modelName"),
+                taskId: task.id,
+            });
             if (process.env.NODE_ENV !== 'production') {
                 tslgLogger.debug(`Ошибка отправки сообщения в Аудит: ${error.msg}`, 'Отладка', {
                     system: 'BPMN',
@@ -73,9 +105,16 @@ class System {
         const variables = task.variables.getAll();
         console.sys('Завершение Бизнес процесса');
         let correlationId;
-        const initiator = { sub: 'system', channel: 'service', method: 'bpmnFinish' };
+        const initiator = AuditInitiatorHelper.buildFromTaskVariables(variables, {
+            channel: 'service',
+            method: 'bpmnFinish',
+        });
         try {
-            correlationId = await auditClient.start('SUMD_TASKCOMPLETE', initiator, { modelId: variables.model });
+            correlationId = await auditClient.start('SUMD_TASKCOMPLETE', initiator, {
+                modelId: task.variables.get("model"),
+                modelName: task.variables.get("modelName"),
+                taskId: task.id,
+            });
             await this.db.instance.finish({ model: variables.model, instance: task.processInstanceId, key: variables.key });
             await taskService.complete(task);
             await this.db.card.removeStage({ modelId: variables.model, modelStage: variables.model_stage });
@@ -90,10 +129,16 @@ class System {
                     await this.db.card.editActiveStatus({ MODEL_ID: variables.model, MODELS_IS_ACTIVE_FLG: 0 });
                 }
             }
-            await auditClient.success('SUMD_TASKCOMPLETE', correlationId, initiator, { modelId: variables.model });
+            await auditClient.success('SUMD_TASKCOMPLETE', correlationId, initiator, {
+                modelId: task.variables.get("model"),
+                modelName: task.variables.get("modelName"),
+                taskId: task.id,
+            });
         } catch (error) {
             await auditClient.failure('SUMD_TASKCOMPLETE', correlationId, error, initiator, {
-                modelId: variables.model,
+                modelId: task.variables.get("model"),
+                modelName: task.variables.get("modelName"),
+                taskId: task.id,
                 error: error.message
             });
             if (process.env.NODE_ENV !== 'production') {
@@ -107,16 +152,31 @@ class System {
 
     updateModelInfo = async ({ task, taskService }) => {
         let correlationId;
-        const initiator = { sub: 'system', channel: 'service', method: 'updateModelInfo' };
+        const initiator = AuditInitiatorHelper.buildFromTaskVariables(task.variables.getAll(), {
+            channel: 'service',
+            method: 'updateModelInfo',
+        });
         try {
             const { model, model_stage } = task.variables.getAll();
-            correlationId = await auditClient.start('SUMD_CANCELMODEL', initiator, { modelId: model });
+            correlationId = await auditClient.start('SUMD_CANCELMODEL', initiator, {
+                modelId: task.variables.get("model"),
+                modelName: task.variables.get("modelName"),
+                taskId: task.id,
+            });
             await this.db.card.cancel({ model });
             await this.db.card.changeStage({ modelId: model, modelStage: model_stage ? model_stage : null });
             await taskService.complete(task);
-            await auditClient.success('SUMD_CANCELMODEL', correlationId, initiator, { modelId: model });
+            await auditClient.success('SUMD_CANCELMODEL', correlationId, initiator, {
+                modelId: task.variables.get("model"),
+                modelName: task.variables.get("modelName"),
+                taskId: task.id,
+            });
         } catch (e) {
-            await auditClient.failure('SUMD_CANCELMODEL', correlationId, e, initiator, { modelId: task.variables.get("model") });
+            await auditClient.failure('SUMD_CANCELMODEL', correlationId, e, initiator, {
+                modelId: task.variables.get("model"),
+                modelName: task.variables.get("modelName"),
+                taskId: task.id,
+            });
             throw e;
         }
     };

@@ -189,9 +189,8 @@ class Bpmn {
     // Tree modification
     modify = async (data, index = 0) => {
         let correlationId;
-        const initiatorInfo = AuditInitiatorHelper.build({}, {
+        const initiatorInfo = AuditInitiatorHelper.build(this.context, {
             channel: 'service',
-            sub: 'system',
             method: 'modify',
             url: '/bpmn/modify',
         });
@@ -220,7 +219,11 @@ class Bpmn {
           }
 
             // Get new Instance
-            correlationId = await auditClient.start('SUMD_ROLLBACKMODEL', initiatorInfo, { processInstanceId, activityId });
+            correlationId = await auditClient.start('SUMD_ROLLBACKMODEL', initiatorInfo, {
+                processInstanceId: processInstanceId,
+                targetActivityId: activityId,
+                modelId: data[0]?.processInstanceId
+            });
             const prevTreeEl = data[index - 1];
             const newPrevActivity = await this.activity(prevTreeEl.processInstanceId);
             const newInstance = newPrevActivity.filter(

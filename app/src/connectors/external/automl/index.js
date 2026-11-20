@@ -17,13 +17,10 @@ class AutoMl {
     const MODEL_DESC = 'AutoML';
     const { modeldev_name } = vars;
 
-        const initiatorInfo = AuditInitiatorHelper.build({}, {
-            channel: vars.userChannel || 'internal',
+        const initiatorInfo = AuditInitiatorHelper.buildFromTaskVariables(vars, {
+            channel: 'service',
             url: 'AutoMl/createModel',
             method: 'CREATE_MODEL',
-            sourceIp: vars.clientIp || '127.0.0.1',
-            sub: vars.userSub || 'system',
-            realm: vars.userRealm || 'staff',
         });
         let correlationId;
 
@@ -33,7 +30,10 @@ class AutoMl {
       /* GET LIST OF ARTEFACTS */
       const artefacts = await this.db.artefact.list();
 
-      correlationId = await auditClient.start('SUMD_CREATEMODEL', initiatorInfo, { modeldev_name });
+      correlationId = await auditClient.start('SUMD_CREATEMODEL', initiatorInfo, {
+          modelId: task.variables.get("model"),
+          modelName: task.variables.get("modelName"),
+          taskId: task.id, });
 
       /* NEW CAMUNDA INSTANCE */
       const instance = await this.bpmn.start(
@@ -93,10 +93,19 @@ class AutoMl {
       await taskService.complete(task, processVariables);
 
         // Отправка аудита: успешное создание модели
-        await auditClient.success('SUMD_CREATEMODEL', correlationId, initiatorInfo, { modelId: model.MODEL_ID, modelAlias: alias });
+        await auditClient.success('SUMD_CREATEMODEL', correlationId, initiatorInfo, {
+            modelId: task.variables.get("model"),
+            modelName: task.variables.get("modelName"),
+            taskId: task.id,
+        });
         tslgLogger.info(`Модель AutoML создана успешно: ${alias}`, 'СозданиеAutoML', { modelId: model.MODEL_ID, alias });
     } catch (error) {
-        await auditClient.failure('SUMD_CREATEMODEL', correlationId, error, initiatorInfo, { modeldev_name, error: error.message });
+        await auditClient.failure('SUMD_CREATEMODEL', correlationId, error, initiatorInfo, {
+            modelId: task.variables.get("model"),
+            modelName: task.variables.get("modelName"),
+            taskId: task.id,
+            error: error.message
+        });
         tslgLogger.error(`Ошибка создания модели AutoML: ${modeldev_name}`, 'ОшибкаAutoML', error);
         throw error;
     }
